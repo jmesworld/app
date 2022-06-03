@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "ios": {
+      "bundleIdentifier": "com.jmesworld"
+    },
+    "android": {
+      "package": "com.jmesworld"
+    },
+    "scheme": "jmesworld",
+    "icon": "assets/image/app-icon.png",
+    "splash": {
+      "image": "assets/image/app-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "entryPoint": "./index.js"
+  }
+}
