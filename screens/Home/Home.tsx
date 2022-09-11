@@ -34,7 +34,6 @@ export default function HomeScreen() {
                     height: '90%',
                     width: '100%',
                     marginTop: '10%',
-                    // justifyContent: 'center',
                     backgroundColor: 'rgba(255,255,255,0)',
                     justifyContent: 'flex-start',
                     alignItems: 'center',

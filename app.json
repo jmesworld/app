@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "JMESWorld",
-    "slug": "JMESWorld",
-    "owner": "jmesworld",
+    "slug": "jmes-test",
+    "owner": "huntersides",
     "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -33,6 +33,11 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ddb15756-ad49-4845-8099-37806bd4a23a"
+      }
     }
   }
 }

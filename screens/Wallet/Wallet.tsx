@@ -1,71 +1,10 @@
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform, StyleSheet } from 'react-native';
-//
-// import { Text, View } from '../../components/Themed/Themed';
-// import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-// import {useEffect, useMemo, useState} from "react";
-// import {fetchAddressBalance} from "../../utils";
-// import Background4 from "../../components/Background4/Background4";
-//
-// export default function WalletScreen() {
-//     const mnemonic = useStoreState((state)=>state.wallet.mnemonic);
-//     const address = useStoreState((state)=>state.accounts[0].address)
-//     const balanceState = useStoreState((state)=>state.accounts[0].balance)
-//     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-//
-//     function updateStoreState(){
-//         updateAccount({index:0, balance: balance})
-//     }
-//     const [balance, setBalance] = useState(balanceState);
-//
-//     useEffect(() => {
-//         async function fetch() {
-//             const fetchedBalance = await fetchAddressBalance(address);
-//             console.log({fetchedBalance});
-//             setBalance(fetchedBalance);
-//         }
-//         fetch();
-//     }, [updateStoreState]);
-//     return (
-//         <View style={styles.container}>
-//             <Background4>
-//             <Text style={styles.title}>Balance</Text>
-//             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-//             <Text>Wallet</Text>
-//             <Text>Mnemonic: {mnemonic}</Text>
-//             <Text>Address: {address}</Text>
-//             <Text>Balance: {(parseFloat(balance)/1e18)}</Text>
-//
-//             {/* Use a light status bar on iOS to account for the black space above the modal */}
-//             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//             </Background4>
-//             </View>
-//     );
-// }
-//
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//     },
-//     separator: {
-//         marginVertical: 30,
-//         height: 1,
-//         width: '80%',
-//     },
-// });
 
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable, Image} from 'react-native';
+import {Platform, StyleSheet, Pressable, Image} from 'react-native';
 
 import {Text, View} from '../../components/Themed/Themed';
-import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import {useEffect, useMemo, useState} from "react";
+import {useStoreState, useStoreActions} from "../../hooks/storeHooks";
+import {useEffect, useState} from "react";
 import {fetchAddressBalance} from "../../utils";
 import Background4 from "../../components/Background4/Background4";
 import {
@@ -88,21 +27,12 @@ type Props = {
 };
 
 export default function WalletScreen({ navigation }: Props) {
-    const mnemonic = useStoreState((state) => state.wallet.mnemonic);
+    
     const address = useStoreState((state) => state.accounts[0].address)
-    // const username = useStoreState((state)=>state.accounts[0].username)
-    const username = useStoreState((state) => state.user.username)
     const balanceState = useStoreState((state) => state.accounts[0].balance)
     const account = useStoreState((state) => state.accounts[0])
     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-
     const [shouldFetch, setShouldFetch] = useState(true);
-
-    function updateStoreState() {
-        // console.log('UpdateStoreState');
-        // updateAccount({...account, balance: balance})
-    }
-
     const [balance, setBalance] = useState(balanceState);
     const [balanceEur, setBalanceEur] = useState(balanceState);
 
@@ -114,17 +44,57 @@ export default function WalletScreen({ navigation }: Props) {
         Comfortaa_700Bold,
         Roboto_900Black
     });
+    
+    function updateStoreState() {
+        console.log('UpdateStoreState');
+       updateAccount({...account, balance: balance})
+    }
+
+    async function fetchFromLocal() {
+
+        const path = `http://localhost:3000/users?address=${address}`;
+
+        const rawResponse = await fetch(path, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+
+        });
+        const parsedResponse = await rawResponse.json()
+        const balance = parsedResponse[0].balance.toString()
+        console.log("balance:", balance)
+        setBalance(balance);
+
+        const convertedBalance = (parseInt(balance) * 0.1412840103).toString();
+
+        console.log({convertedBalance});
+       
+        setBalanceEur(parseFloat(convertedBalance).toFixed(2))
+    }
 
     useEffect(() => {
+        fetchFromLocal()
+        setInterval(()=>{
+            if(shouldFetch){
+                fetchFromLocal();
+            }
+            console.log('interval');
+        }, 10*1000)
+    },[updateStoreState])
+
+   /* useEffect(() => {
         async function fetch() {
             const fetchedBalance = await fetchAddressBalance(address);
             console.log({fetchedBalance});
             setBalance(Web3.utils.fromWei(fetchedBalance, 'ether'));
+
             const convertedBalance = (parseInt(fetchedBalance) * 0.1412840103).toString();
-            // const convertedBalance = (parseInt(fetchedBalance) * 0.001412840103).toString();
+            
             console.log({convertedBalance});
             setBalanceEur(parseFloat(Web3.utils.fromWei(convertedBalance, 'ether')).toFixed(2))
-            // updateAccount({...account, balance: fetchedBalance})
+
         }
 
         fetch();
@@ -133,10 +103,9 @@ export default function WalletScreen({ navigation }: Props) {
                 fetch();
             }
             console.log('interval');
-            // updateStoreState()
-
         }, 10*1000)
     }, [updateStoreState]);
+*/
     return (
         <View style={styles.container}>
             <Background4>

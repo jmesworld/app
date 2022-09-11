@@ -1,6 +1,6 @@
 import {StatusBar} from 'expo-status-bar';
 import {Platform, StyleSheet, Button, Pressable} from 'react-native';
-
+import Scanner from './Scanner'
 import {Text, View} from '../../components/Themed/Themed';
 import Background4 from "../../components/Background4/Background4";
 import {
@@ -31,14 +31,18 @@ export default function ScanScreen() {
         <View style={styles.container}>
             <Background4>
                 <Text style={styles.title}>Scan</Text>
-                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)"/>
-                <Text style={styles.description}>
-                    Enables the user to scan QRCode for sending transaction.
-                </Text>
-                <Text style={styles.section}>Features</Text>
-                <Text style={styles.item}>
-                    - Enter in an events via NFC or by scanning a QR Code.
-                </Text>
+                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)">
+                    <Text style={styles.description}>
+                        Enables the user to scan QRCode for sending transaction.
+                    </Text>
+                    <Text style={styles.section}>Features</Text>
+                    <Text style={styles.item}>
+                        - Enter in an events via NFC or by scanning a QR Code.
+                    </Text>
+                </View>
+                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)">
+                    <Scanner />
+                </View>
                 {/* Use a light status bar on iOS to account for the black space above the modal */}
                 <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'}/>
             </Background4>
@@ -63,6 +67,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         lineHeight: 18,
         paddingTop: 15,
+        color: '#FFF',
         // alignSelf: "flex-start",
         fontFamily: 'Roboto_500Black',
         textTransform: "uppercase",
@@ -76,6 +81,7 @@ const styles = StyleSheet.create({
         lineHeight: 28,
         paddingTop: 15,
         paddingBottom: 25,
+        color: '#FFF',
         // alignSelf: "flex-start",
         textTransform: "uppercase",
         width: '70%',
@@ -87,7 +93,8 @@ const styles = StyleSheet.create({
     item: {
         fontWeight: 'bold',
         paddingTop: 5,
-        alignSelf: "center"
+        alignSelf: "center",
+        color: '#FFF',
     },
 
     separator: {

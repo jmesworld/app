@@ -8,6 +8,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest --watchAll",
+    "server": "node server.js",
     "postinstall": "node_modules/.bin/ts-node scripts/postinstall"
   },
   "jest": {
@@ -35,6 +36,7 @@
     "expo": "~45.0.5",
     "expo-app-loading": "^2.0.0",
     "expo-asset": "~8.4.4",
+    "expo-barcode-scanner": "~11.3.0",
     "expo-constants": "~13.0.0",
     "expo-crypto": "~10.1.1",
     "expo-file-system": "^14.0.0",
@@ -46,6 +48,7 @@
     "expo-updates": "^0.13.2",
     "expo-web-browser": "~10.1.0",
     "https-browserify": "^1.0.0",
+    "json-server": "^0.17.0",
     "moralis": "^1.6.0",
     "node-libs-browser": "^2.2.1",
     "os-browserify": "^0.3.0",

@@ -19,6 +19,7 @@ export const DERIVATION_PATH = {
 };
 
 const JSON_RPC_PATH = 'http://3.72.109.56:8545';
+const LOCAL_SERVER_PATH = 'http://localhost:3000'
 // const REST_PATH = '52.59.220.121'
 // "mountain toilet almost birth forest ghost hand drum success enhance garment slice pipe option eager palace adult bridge speak gasp leopard jealous insane drama"
 
@@ -44,21 +45,11 @@ const accountFromSeed = async (
     derivationPath: string,
     accountIndex: 0
 ) => {
-    // console.log(`Derive from seed`, seed);
-    // const derivedSeed = deriveSeed(
-    //     seed,
-        // walletIndex,
-        // 0,
-        // 0
-        // accountIndex
-        // 0
-        // derivationPath,
-    // );
+
     const web3 = new Web3(
         new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
     );
-    // console.log({derivedSeed});
-    // @ts-ignore
+
     const rootKey = await bip32.fromSeed(Buffer.from(seed, 'hex'));
     const derivedKey = rootKey.derivePath('m/0');
 
@@ -70,11 +61,7 @@ const accountFromSeed = async (
     // @ts-ignore
     return {accountIndex, walletIndex: 0, address, privateKey, account};
     // @ts-ignore
-    // web3.eth.getAccounts(console.log);
-
-    // const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
-
-    // const acc = new solanaWeb3.Keypair(keyPair);
+    
     const acc = {
         stuff: true
     }
@@ -87,7 +74,7 @@ const accountFromPrivateKey = (
     derivationPath: '',
     accountIndex: 0
 ) => {
-    console.log(`Derive from privateKey`, privateKey);
+    //console.log(`Derive from privateKey`, privateKey);
 
     const web3 = new Web3(
         new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
@@ -95,7 +82,7 @@ const accountFromPrivateKey = (
     // @ts-ignore
     const account = web3.eth.accounts.privateKeyToAccount(privateKey);
     // console.log({account});
-    console.log('Derived address:', {address: account.address})
+    //console.log('Derived address:', {address: account.address})
     const {address, encrypt, sign, signTransaction} = account;
     // @ts-ignore
     return {accountIndex, walletIndex: 0, address, privateKey, account};
@@ -110,6 +97,15 @@ const accountFromPrivateKey = (
     }
     return acc;
 };
+
+const accountFromAddress = async (address: string) => {
+    const response = await fetch(
+        `${LOCAL_SERVER_PATH}/users?address=${address}`)
+
+    const account = await response.json()
+    console.log(account)
+    return account
+}
 
 const maskedAddress = (address: string) => {
     if (!address) return;
@@ -162,7 +158,7 @@ const signMessage = (message: string, privateKey: string,)=>{
     console.log(web3.eth.accounts.recover(message, signatureData.signature));
     return signatureData
 }
-const sendTransaction = async (transactionParams ={}, account)=>{
+const sendTransaction = async (transactionParams = {}, account)=>{
     // @ts-ignore
     const {address, amount} = transactionParams
     const web3 = new Web3(
@@ -171,19 +167,19 @@ const sendTransaction = async (transactionParams ={}, account)=>{
     if(!address) throw new Error('Missing address');
     if(!amount) throw new Error('Missing amount');
 
-    const value = Web3.utils.toWei(amount.toString(), 'ether').toString()
+    //const value = Web3.utils.toWei(amount.toString(), 'ether').toString()
 
     // const balance = await fetchAddressBalance(this.account.address)
     // if(balance<amount){
     //     throw new Error(`Unsufficiant amount ${balance}<${amount}`)
     // }
-    console.log(`Sending ${value} to ${address} from ${account.address}`)
+    //console.log(`Sending ${value} to ${address} from ${account.address}`)
     // console.log(web3.eth.accounts.defaultAccount);
     // console.log({balance, value, address})
 
     try {
-        console.log(account);
-        const tx = await account.signTransaction({
+        console.log("Account", account);
+        /*const tx = await account.signTransaction({
             to: address,
             from: account.address,
             // nonce: datas.nonce,
@@ -194,7 +190,7 @@ const sendTransaction = async (transactionParams ={}, account)=>{
         console.log(tx);
         console.log(tx.rawTransaction);
         const res = await web3.eth.sendSignedTransaction(tx.rawTransaction);
-        return res;
+        return res;*/
     } catch (e){
         console.error(e);
         throw e;
@@ -212,6 +208,8 @@ const sign = (message: string, privateKey: string,)=>{
     return signatureData
 }
 export {
+
+    accountFromAddress,
     fetchAddressBalance,
     accountFromPrivateKey,
     generateMnemonic,
