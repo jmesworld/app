@@ -1,8 +1,10 @@
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet,  Pressable} from 'react-native';
+import {Platform, StyleSheet,  Pressable, TextInput, SafeAreaView} from 'react-native';
 import {Text, View} from '../../components/Themed/Themed';
-import {useStoreState} from "../../hooks/storeHooks";
+import {useStoreState, useStoreActions} from "../../hooks/storeHooks";
 import Background4 from "../../components/Background4/Background4";
+import GeneratedQRCode from '../../components/QRCode/QRCode';
+
 import {
     useFonts,
     Comfortaa_300Light,
@@ -16,14 +18,46 @@ import {
 } from '@expo-google-fonts/roboto';
 
 import {Navigation} from "../../types";
+import {IQRCodePayload } from "../../lib/IQRCodePayload"
+import { SCHEMA_PREFIX, notateWeiValue } from '../../utils';
+import { useEffect, useState } from 'react';
+import Web3 from 'web3';
 
 type Props = {
     navigation: Navigation;
 };
 
+    // QRCODE URI Syntax: schema_prefix target_address [ "@" chain_id ] [ "/" function_name ] [ "?" parameters ]
+    // example of transfer jmes:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359/transfer?address=0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359=1
+    // example of request jmes:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18 
 
+    
 export default function WalletReceiveScreen({ navigation }: Props) {
+ 
+    const address = useStoreState((state) => state.accounts[0].address)
     const username = useStoreState((state) => state.user.username)
+    //const [payload, setPayload] = useState<IQRCodePayload>()
+    const [payload, setPayload] = useState(null)
+    const [amount, setAmount] = useState(0);
+
+    const parsePayload = async () => { //currently resembles a request amount transaction
+        const notatedAmount = await notateWeiValue(amount)
+        const parsedPayload = `${SCHEMA_PREFIX}${address}?value=${notatedAmount}`
+        
+        setPayload(parsedPayload)
+        console.log("payload", parsedPayload)
+    }
+    
+    const handleGenerateQR = async () => {
+        if (amount) {
+        //implement case switch to determine type of transaction being made (request,transfer, etc)
+            await parsePayload()
+        }
+        else{
+            alert("Please enter a valid Amount");
+          }
+    }
+
     const handleRequestBalance = async () => {
         return await requestReceiveFromFaucet();
     }
@@ -35,6 +69,7 @@ export default function WalletReceiveScreen({ navigation }: Props) {
         console.log(await requestFaucet.json());
         return navigation.navigate("Balance");
     }
+
 
     let [fontsLoaded] = useFonts({
         Comfortaa_300Light,
@@ -50,11 +85,26 @@ export default function WalletReceiveScreen({ navigation }: Props) {
         <View style={styles.container}>
             <Background4>
                 <Text style={styles.title}>Receive JMES</Text>
-                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)"/>
                 <Pressable
                     onPress={() => handleRequestBalance() }
                     style={styles.button}>
                     <Text style={styles.buttonText}>Request from Faucet</Text>
+                </Pressable>
+                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)"/>
+               
+                <SafeAreaView>
+                    <TextInput style={styles.input} placeholder="Enter an amount" onChangeText={(val) => setAmount(val)}/>
+                    {payload ? 
+                        <GeneratedQRCode payload={payload}/> 
+                    : null
+                    }
+                </SafeAreaView>
+                <Pressable
+                    onPress={async() => { 
+                        await handleGenerateQR() 
+                    }}
+                    style={styles.button}>
+                    <Text style={styles.buttonText}>Generate QR Code</Text>
                 </Pressable>
                 {/* Use a light status bar on iOS to account for the black space above the modal */}
                 <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'}/>
@@ -98,6 +148,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 36,
         fontFamily: 'Comfortaa_300Light',
+    },
+    input: {
+        backgroundColor: "white",
+        height: 40,
+        margin: 12,
+        borderWidth: 1,
+        padding: 10,
     },
     secondTitle:{
         fontSize: 36,

@@ -19,6 +19,7 @@ import {
     Roboto_900Black
 } from '@expo-google-fonts/roboto';
 import Web3 from "web3";
+import { LOCAL_SERVER_PATH } from '../../utils';
 import {Navigation} from "../../types";
 import * as React from "react";
 
@@ -28,13 +29,13 @@ type Props = {
 
 export default function WalletScreen({ navigation }: Props) {
     
-    const address = useStoreState((state) => state.accounts[0].address)
-    const balanceState = useStoreState((state) => state.accounts[0].balance)
+   
     const account = useStoreState((state) => state.accounts[0])
     const updateAccount = useStoreActions((actions) => actions.updateAccount);
     const [shouldFetch, setShouldFetch] = useState(true);
-    const [balance, setBalance] = useState(balanceState);
-    const [balanceEur, setBalanceEur] = useState(balanceState);
+    const [balance, setBalance] = useState(account.balanceState);
+    console.log(account.balanceState, "Account.balanceState")
+    const [balanceEur, setBalanceEur] = useState(account.balanceState);
 
     let [fontsLoaded] = useFonts({
         Comfortaa_300Light,
@@ -52,9 +53,9 @@ export default function WalletScreen({ navigation }: Props) {
 
     async function fetchFromLocal() {
 
-        const path = `http://localhost:3000/users?address=${address}`;
+        const path = `${LOCAL_SERVER_PATH}/users?address=${account.address}`;
 
-        const rawResponse = await fetch(path, {
+        const rawResponse = await fetch(path , {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -64,12 +65,12 @@ export default function WalletScreen({ navigation }: Props) {
         });
         const parsedResponse = await rawResponse.json()
         const balance = parsedResponse[0].balance.toString()
-        console.log("balance:", balance)
+        //console.log("balance:", balance)
         setBalance(balance);
 
         const convertedBalance = (parseInt(balance) * 0.1412840103).toString();
 
-        console.log({convertedBalance});
+        //console.log({convertedBalance});
        
         setBalanceEur(parseFloat(convertedBalance).toFixed(2))
     }
@@ -80,32 +81,10 @@ export default function WalletScreen({ navigation }: Props) {
             if(shouldFetch){
                 fetchFromLocal();
             }
-            console.log('interval');
+            //console.log('interval');
         }, 10*1000)
     },[updateStoreState])
 
-   /* useEffect(() => {
-        async function fetch() {
-            const fetchedBalance = await fetchAddressBalance(address);
-            console.log({fetchedBalance});
-            setBalance(Web3.utils.fromWei(fetchedBalance, 'ether'));
-
-            const convertedBalance = (parseInt(fetchedBalance) * 0.1412840103).toString();
-            
-            console.log({convertedBalance});
-            setBalanceEur(parseFloat(Web3.utils.fromWei(convertedBalance, 'ether')).toFixed(2))
-
-        }
-
-        fetch();
-        setInterval(()=>{
-            if(shouldFetch){
-                fetch();
-            }
-            console.log('interval');
-        }, 10*1000)
-    }, [updateStoreState]);
-*/
     return (
         <View style={styles.container}>
             <Background4>

@@ -17,6 +17,7 @@ import {useStoreState} from "../../hooks/storeHooks";
 import React from "react";
 import {
     accountFromPrivateKey,
+    LOCAL_SERVER_PATH,
     sendTransaction,
 } from "../../utils";
 import Background4 from "../../components/Background4/Background4";
@@ -41,7 +42,7 @@ export default function WalletSendScreen({navigation}: Props) {
     });
 
     const handleSend = async function (_username) {
-        const path = `http://localhost:3000/users?username=${_username}`;
+        const path = `${LOCAL_SERVER_PATH}/users?username=${_username}`;
         const requestIdentity = await fetch(path);
         const parsedRequest = await requestIdentity.json();
 
@@ -88,7 +89,6 @@ export default function WalletSendScreen({navigation}: Props) {
                 </SafeAreaView>
                 <Text style={styles.title}>Amount</Text>
                 <SafeAreaView>
-                    
                     <TextInput
                         style={styles.input}
                         onChangeText={onChangeAmount}

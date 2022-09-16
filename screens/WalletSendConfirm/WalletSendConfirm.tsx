@@ -4,8 +4,7 @@ import {Platform, StyleSheet, Pressable} from 'react-native';
 import {Text, View} from '../../components/Themed/Themed';
 import {useEffect, useState} from "react";
 import {
-    accountFromAddress,
-
+    accountFromAddress, LOCAL_SERVER_PATH,
 } from "../../utils";
 import {useStoreState, useStoreActions} from "../../hooks/storeHooks";
 import Background4 from "../../components/Background4/Background4";
@@ -52,7 +51,7 @@ export default function WalletSendConfirmScreen({ navigation, route }: Props) {
             const account = await accountFromAddress(address)
             const updatedBalance = await parseInt(account[0].balance) + parseInt(recipientAmount)
 
-            await fetch(`http://localhost:3000/users/${account[0].id}`, {
+            await fetch(`${LOCAL_SERVER_PATH}/users/${account[0].id}`, {
                 method: 'PATCH',
                 headers: {
                     'Accept': 'application/json',
@@ -69,7 +68,7 @@ export default function WalletSendConfirmScreen({ navigation, route }: Props) {
             const account = await accountFromAddress(address)
             const updatedBalance = await parseInt(account[0].balance) - parseInt(recipientAmount)
 
-            await fetch(`http://localhost:3000/users/${account[0].id}`, {
+            await fetch(`${LOCAL_SERVER_PATH}/users/${account[0].id}`, {
                 method: 'PATCH',
                 headers: {
                     'Accept': 'application/json',

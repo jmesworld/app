@@ -18,8 +18,11 @@ export const DERIVATION_PATH = {
     bip44Change: "bip44Change",
 };
 
+export const SCHEMA_PREFIX = 'jmes:'
+
 const JSON_RPC_PATH = 'http://3.72.109.56:8545';
-const LOCAL_SERVER_PATH = 'http://localhost:3000'
+const LOCAL_SERVER_PATH = 'http://127.0.0.1:3000';
+const LAN_NETWORK_PATH = '192.168.1.0'
 // const REST_PATH = '52.59.220.121'
 // "mountain toilet almost birth forest ghost hand drum success enhance garment slice pipe option eager palace adult bridge speak gasp leopard jealous insane drama"
 
@@ -107,6 +110,19 @@ const accountFromAddress = async (address: string) => {
     return account
 }
 
+
+const notateWeiValue = async (amount:number) => {
+    const fmt /*: BigIntToLocaleStringOptions */ = {
+        notation: 'scientific',
+        maximumFractionDigits: 20 // The default is 3, but 20 is the maximum supported by JS according to MDN.
+      }; 
+    //const weiValue = Web3.utils.toBN(Web3.utils.toWei(amount.toString(), "ether")).toString(16) 
+    const wei = amount*10e17
+    const weiToBigInt = BigInt(wei).toLocaleString('en-us', fmt)
+
+    return weiToBigInt
+
+}
 const maskedAddress = (address: string) => {
     if (!address) return;
     return `${address.slice(0, 8)}...${address.slice(address.length - 8)}`;
@@ -158,6 +174,7 @@ const signMessage = (message: string, privateKey: string,)=>{
     console.log(web3.eth.accounts.recover(message, signatureData.signature));
     return signatureData
 }
+
 const sendTransaction = async (transactionParams = {}, account)=>{
     // @ts-ignore
     const {address, amount} = transactionParams
@@ -166,7 +183,7 @@ const sendTransaction = async (transactionParams = {}, account)=>{
     );
     if(!address) throw new Error('Missing address');
     if(!amount) throw new Error('Missing amount');
-
+    
     //const value = Web3.utils.toWei(amount.toString(), 'ether').toString()
 
     // const balance = await fetchAddressBalance(this.account.address)
@@ -208,7 +225,8 @@ const sign = (message: string, privateKey: string,)=>{
     return signatureData
 }
 export {
-
+    LOCAL_SERVER_PATH,
+    notateWeiValue,
     accountFromAddress,
     fetchAddressBalance,
     accountFromPrivateKey,
