@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "JMESWorld",
-    "slug": "jmes-test",
-    "owner": "huntersides",
+    "slug": "JMESWorld",
+    "owner": "jmesworld",
     "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
