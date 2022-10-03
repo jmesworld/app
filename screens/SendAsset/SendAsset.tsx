@@ -1,72 +1,8 @@
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform, StyleSheet } from 'react-native';
-//
-// import { Text, View } from '../../components/Themed/Themed';
-// import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-// import {useEffect, useMemo, useState} from "react";
-// import {fetchAddressBalance} from "../../utils";
-// import Background4 from "../../components/Background4/Background4";
-//
-// export default function WalletScreen() {
-//     const mnemonic = useStoreState((state)=>state.wallet.mnemonic);
-//     const address = useStoreState((state)=>state.accounts[0].address)
-//     const balanceState = useStoreState((state)=>state.accounts[0].balance)
-//     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-//
-//     function updateStoreState(){
-//         updateAccount({index:0, balance: balance})
-//     }
-//     const [balance, setBalance] = useState(balanceState);
-//
-//     useEffect(() => {
-//         async function fetch() {
-//             const fetchedBalance = await fetchAddressBalance(address);
-//             console.log({fetchedBalance});
-//             setBalance(fetchedBalance);
-//         }
-//         fetch();
-//     }, [updateStoreState]);
-//     return (
-//         <View style={styles.container}>
-//             <Background4>
-//             <Text style={styles.title}>Balance</Text>
-//             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-//             <Text>Wallet</Text>
-//             <Text>Mnemonic: {mnemonic}</Text>
-//             <Text>Address: {address}</Text>
-//             <Text>Balance: {(parseFloat(balance)/1e18)}</Text>
-//
-//             {/* Use a light status bar on iOS to account for the black space above the modal */}
-//             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//             </Background4>
-//             </View>
-//     );
-// }
-//
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//     },
-//     separator: {
-//         marginVertical: 30,
-//         height: 1,
-//         width: '80%',
-//     },
-// });
 
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable, Image, TextInput, SafeAreaView, Animated} from 'react-native';
-
+import {Platform, StyleSheet,Pressable, Image, TextInput, SafeAreaView} from 'react-native';
 import {Text, View} from '../../components/Themed/Themed';
-import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import React, {useEffect, useMemo, useState} from "react";
-import {fetchAddressBalance} from "../../utils";
+import React from "react";
 import Background4 from "../../components/Background4/Background4";
 import {
     useFonts,
@@ -103,8 +39,7 @@ export default function SendAssetScreen({navigation}: Props) {
     });
 
     const performNFTSend = async function () {
-        // const path = `http://localhost:3001/identity/${_username}`;
-
+       
         console.log(`Send NFT`, { nftTitle, recipientAddress });
         console.log('Send NFT request',nftTitle, recipientUsername, recipientAddress);
         return navigation.navigate( "CreateAssetConfirm");

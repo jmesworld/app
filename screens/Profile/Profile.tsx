@@ -1,9 +1,9 @@
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable} from 'react-native';
+import {Platform, StyleSheet, Pressable} from 'react-native';
 
 import {Text, View} from '../../components/Themed/Themed';
 import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {fetchAddressBalance} from "../../utils";
 import Background4 from "../../components/Background4/Background4";
 import {
@@ -17,7 +17,7 @@ import {
 import {
     Roboto_900Black
 } from '@expo-google-fonts/roboto';
-import {navigate} from "@react-navigation/routers/src/CommonActions";
+
 import {Navigation} from "../../types";
 
 
@@ -52,7 +52,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
     const handleLogout = ()=>{
         resetStore(true);
-        // navigation.navigate('Onboarding');
+
     };
 
     useEffect(() => {

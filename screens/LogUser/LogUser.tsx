@@ -1,163 +1,12 @@
-// import React, { memo, useEffect, useState } from "react";
-// import {
-//     Background2 as Background,
-//     BackButton,
-//     Header,
-//     NumberKeyboard, Button, Paragraph,
-// } from "../../components";
-// import { useStoreActions } from "../../hooks/storeHooks";
-// import { Navigation } from "../../types";
-//
-// import {generateMnemonic, mnemonicToSeed, accountFromSeed, deriveSeed, signMessage} from "../../utils";
-// import {TextInput, Text, StyleSheet} from "react-native";
-// import {SafeAreaView} from "react-native";
-// import {white} from "react-native-paper/lib/typescript/styles/colors";
-//
-// type Props = {
-//     navigation: Navigation;
-// };
-//
-// const LogUserScreen = ({ navigation }: Props) => {
-//     const [username, onChangeUsername] = React.useState('');
-//     const [mnemonic, onChangeMnemonic] = React.useState('');
-//
-//     const addWallet = useStoreActions((actions) => actions.addWallet);
-//     const addUser = useStoreActions((actions) => actions.addUser);
-//     const addAccount = useStoreActions((actions) => actions.addAccount);
-//
-//     async function login(){
-//         console.log('SEND TO BACKEND FOR VERIFICATION');
-//         console.log(mnemonic, username);
-//         const seed = await mnemonicToSeed(mnemonic);
-//         const derivation = await deriveSeed(seed, 0, 0)
-//         const {signature} = await signMessage('jmesworld', derivation.privateKey);
-//         console.log({derivation});
-//         console.log(signature)
-//
-//         addUser({
-//             username,
-//             signature: signature
-//         });
-//
-//         addWallet({
-//             mnemonic: mnemonic,
-//             seed: seed,
-//         });
-//
-//         addAccount({index:0, title: 'default', address: derivation.address, username});
-//         navigation.navigate("SetPin")
-//     }
-//     return (
-//         <Background noMenu skipHeader>
-//             <BackButton goBack={() => navigation.navigate("Onboarding")} />
-//             <Header>Log in account</Header>
-//             <SafeAreaView>
-//                 <TextInput
-//                     style={styles.input}
-//                     onChangeText={onChangeUsername}
-//                     value={username}
-//                     placeholder="Enter your username"
-//                 />
-//                 <TextInput
-//                     style={styles.input}
-//                     onChangeText={onChangeMnemonic}
-//                     value={mnemonic}
-//                     placeholder="Enter your mnemonic"
-//                 />
-//             </SafeAreaView>
-//             <Button mode="contained" onPress={() => login()}>
-//                 Login
-//             </Button>
-//         </Background>
-//     );
-// };
-//
-// const styles = StyleSheet.create({
-//     text:{
-//         color: "white"
-//     },
-//     input: {
-//         backgroundColor: "white",
-//         height: 40,
-//         margin: 12,
-//         borderWidth: 1,
-//         padding: 10,
-//     },
-// });
-// export default memo(LogUserScreen);
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform, StyleSheet } from 'react-native';
-//
-// import { Text, View } from '../../components/Themed/Themed';
-// import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-// import {useEffect, useMemo, useState} from "react";
-// import {fetchAddressBalance} from "../../utils";
-// import Background4 from "../../components/Background4/Background4";
-//
-// export default function WalletScreen() {
-//     const mnemonic = useStoreState((state)=>state.wallet.mnemonic);
-//     const address = useStoreState((state)=>state.accounts[0].address)
-//     const balanceState = useStoreState((state)=>state.accounts[0].balance)
-//     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-//
-//     function updateStoreState(){
-//         updateAccount({index:0, balance: balance})
-//     }
-//     const [balance, setBalance] = useState(balanceState);
-//
-//     useEffect(() => {
-//         async function fetch() {
-//             const fetchedBalance = await fetchAddressBalance(address);
-//             console.log({fetchedBalance});
-//             setBalance(fetchedBalance);
-//         }
-//         fetch();
-//     }, [updateStoreState]);
-//     return (
-//         <View style={styles.container}>
-//             <Background4>
-//             <Text style={styles.title}>Balance</Text>
-//             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-//             <Text>Wallet</Text>
-//             <Text>Mnemonic: {mnemonic}</Text>
-//             <Text>Address: {address}</Text>
-//             <Text>Balance: {(parseFloat(balance)/1e18)}</Text>
-//
-//             {/* Use a light status bar on iOS to account for the black space above the modal */}
-//             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//             </Background4>
-//             </View>
-//     );
-// }
-//
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//     },
-//     separator: {
-//         marginVertical: 30,
-//         height: 1,
-//         width: '80%',
-//     },
-// });
-
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable, Image, TextInput, SafeAreaView, Animated} from 'react-native';
+import {Platform, StyleSheet,Pressable,TextInput, SafeAreaView} from 'react-native';
 
 import {Text, View} from '../../components/Themed/Themed';
-import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import React, {useEffect, useMemo, useState} from "react";
+import {useStoreActions} from "../../hooks/storeHooks";
+import React from "react";
 import {
-    accountFromPrivateKey,
     accountFromSeed,
     deriveSeed,
-    fetchAddressBalance,
     mnemonicToSeed,
     signMessage
 } from "../../utils";
@@ -173,7 +22,6 @@ import {
 import {
     Roboto_900Black
 } from '@expo-google-fonts/roboto';
-import Web3 from "web3";
 import {Navigation} from "../../types";
 
 

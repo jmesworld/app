@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Background, Button, Paragraph } from "../../components";
+import { Background, Button } from "../../components";
 import { Navigation } from "../../types";
 import {View, Text} from "react-native";
 
@@ -14,12 +14,10 @@ const OnboardingScreen = ({ navigation }: Props) => (
             height: 76,
             width: '100%',
             backgroundColor: '#714FF8',
-            // justifyContent: 'center',
             justifyContent: 'flex-end',
             alignItems: 'center',
         }}>
             <Button
-                // mode="contained"
                 style={{backgroundColor:'#FFF',
                     borderColor:'#000',
                     borderWidth: 5,
@@ -31,7 +29,6 @@ const OnboardingScreen = ({ navigation }: Props) => (
                 <Text style={{color: '#000'}}>LOGIN</Text>
             </Button>
             <Button
-                // mode="contained"
                 style={{backgroundColor:'#000',
                     marginLeft:"5%",
                     marginRight: '10%',

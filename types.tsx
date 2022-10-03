@@ -37,3 +37,4 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
 export type Navigation = {
   navigate: (scene: string) => void;
 };
+

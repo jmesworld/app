@@ -1,98 +1,86 @@
-import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Text, StyleSheet, Button } from 'react-native';
+import { IQRCodePayload } from '../../lib/IQRCodePayload';
 
-import {Text, View} from '../../components/Themed/Themed';
-import Background4 from "../../components/Background4/Background4";
-import {
-    useFonts,
-    Comfortaa_300Light,
-    Comfortaa_400Regular,
-    Comfortaa_500Medium,
-    Comfortaa_600SemiBold,
-    Comfortaa_700Bold,
-} from '@expo-google-fonts/comfortaa';
-import {
-    Roboto_500Medium,
-    Roboto_900Black
-} from '@expo-google-fonts/roboto';
+export default function ScanScreen(){
+    const [loading, setLoading] = useState(true);
+    const [scanData, setScanData] = useState<IQRCodePayload>();
+    const [permission, setPermission] = useState(true);
 
-export default function ScanScreen() {
-    let [fontsLoaded] = useFonts({
-        Comfortaa_300Light,
-        Comfortaa_400Regular,
-        Comfortaa_500Medium,
-        Comfortaa_600SemiBold,
-        Comfortaa_700Bold,
-        Roboto_500Medium,
-        Roboto_900Black
-    });
+    useEffect(() => {
+        requestCameraPermission();
+    }, []);
 
-    return (
-        <View style={styles.container}>
-            <Background4>
-                <Text style={styles.title}>Scan</Text>
-                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)"/>
-                <Text style={styles.description}>
-                    Enables the user to scan QRCode for sending transaction.
-                </Text>
-                <Text style={styles.section}>Features</Text>
-                <Text style={styles.item}>
-                    - Enter in an events via NFC or by scanning a QR Code.
-                </Text>
-                {/* Use a light status bar on iOS to account for the black space above the modal */}
-                <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'}/>
-            </Background4>
-        </View>
-    );
-}
+    const requestCameraPermission = async () => {
+        try {
+            const { status, granted } = await BarCodeScanner.requestPermissionsAsync();
+            console.log(`Status: ${status}, Granted: ${granted}`);
+
+            if (status === 'granted') {
+                console.log('Access granted');
+                setPermission(true);
+            } else {
+                setPermission(false);
+            }
+        } catch (error) {
+            console.error(error);
+            setPermission(false);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) return <Text>Requesting permission ...</Text>;
+
+    if (scanData) {
+        return (
+            <>
+                <Text style={styles.text}>Name: {scanData.address}</Text>
+                <Text style={styles.text}>Number: {scanData.amount}</Text>
+                <Button title="Scan Again" onPress={() => setScanData(undefined)}>
+                    Scan Again
+                </Button>
+            </>
+        );
+    }
+
+    if (permission) {
+        return (
+            <BarCodeScanner
+                style={[styles.container]}
+                onBarCodeScanned={({ type, data }) => {
+                    try {
+                        console.log(type);
+                        console.log(data);
+                        let _data = JSON.parse(data);
+                        setScanData(_data);
+                    } catch (error) {
+                        console.error('Unable to parse string: ', error);
+                    }
+                }}
+            >
+                <Text style={styles.text}>Scan the QR code.</Text>
+            </BarCodeScanner>
+        );
+    } else {
+        return <Text style={styles.textError}>Permission rejected.</Text>;
+    }
+};
+
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        padding: 10,
         alignItems: 'center',
-        backgroundColor: "#fff",
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
-    title: {
-        fontSize: 36,
-        fontFamily: 'Comfortaa_300Light',
+    text: {
+        marginTop: 15,
+        backgroundColor: 'white'
     },
-    description: {
-        fontWeight: 'bold',
-        flex: 0,
-        fontSize: 16,
-        lineHeight: 18,
-        paddingTop: 15,
-        // alignSelf: "flex-start",
-        fontFamily: 'Roboto_500Black',
-        textTransform: "uppercase",
-        width: '70%',
-        alignSelf: 'center'
-    },
-    section: {
-        fontWeight: 'bold',
-        flex: 0,
-        fontSize: 24,
-        lineHeight: 28,
-        paddingTop: 15,
-        paddingBottom: 25,
-        // alignSelf: "flex-start",
-        textTransform: "uppercase",
-        width: '70%',
-        alignSelf: 'center',
-        textAlign: "center",
-        fontFamily: 'Roboto_500Black',
-        textTransform: "uppercase"
-    },
-    item: {
-        fontWeight: 'bold',
-        paddingTop: 5,
-        alignSelf: "center"
-    },
-
-    separator: {
-        marginVertical: 30,
-        height: 1,
-        width: '80%',
-    },
+    textError: {
+        color: 'red'
+    }
 });

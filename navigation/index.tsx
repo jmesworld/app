@@ -231,7 +231,8 @@ function BottomTabNavigator() {
                     title: 'Marketplace',
                     tabBarLabel: "",
                     tabBarActiveBackgroundColor: '#222',
-                    tabBarInactiveBackgroundColor: '#000',                    tabBarIcon: ({color}) => <TabBarIcon name="shop" color={color}/>,
+                    tabBarInactiveBackgroundColor: '#000',                    
+                    tabBarIcon: ({color}) => <TabBarIcon name="shop" color={color}/>,
                     header: () => (
                         <Header navigation={navigation} />
                     ),
@@ -245,7 +246,23 @@ function BottomTabNavigator() {
                     title: 'Events',
                     tabBarLabel: "",
                     tabBarActiveBackgroundColor: '#222',
-                    tabBarInactiveBackgroundColor: '#000',                    tabBarIcon: ({color}) => <TabBarIcon name="calendar" color={color}/>,
+                    tabBarInactiveBackgroundColor: '#000',                    
+                    tabBarIcon: ({color}) => <TabBarIcon name="calendar" color={color}/>,
+                    header: () => (
+                        <Header navigation={navigation} />
+                    ),
+                })}
+            />
+            <BottomTab.Screen
+                name="Scanner"
+                style={{backgroundColor:'#000'}}
+                component={ScanScreen}
+                options={({navigation}: RootTabScreenProps<'Scanner'>) => ({
+                    title: 'Scanner',
+                    tabBarLabel: "",
+                    tabBarActiveBackgroundColor: '#222',
+                    tabBarInactiveBackgroundColor: '#000',                    
+                    tabBarIcon: ({color}) => <TabBarIcon name="scanner" color={color}/>,
                     header: () => (
                         <Header navigation={navigation} />
                     ),
@@ -324,6 +341,12 @@ function TabBarIcon(props: {
         case 'calendar':
             return  <Image
                 source={require('../assets/icons/events_white.png')}
+                style={style}
+            />
+            break;
+        case 'scanner':
+            return  <Image
+                source={require('../assets/icons/scan_white.png')}
                 style={style}
             />
             break;
