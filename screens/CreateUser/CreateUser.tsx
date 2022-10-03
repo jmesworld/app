@@ -1,7 +1,7 @@
 
 import {StatusBar} from 'expo-status-bar';
 import {Platform, StyleSheet, Pressable, TextInput, SafeAreaView} from 'react-native';
-
+import { LOCAL_SERVER_PATH } from '../../utils';
 import {Text, View} from '../../components/Themed/Themed';
 import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
 import React, {useEffect} from "react";
@@ -55,7 +55,7 @@ export default function CreateUserScreen({navigation}: Props) {
         const account = await accountFromSeed(seed);
         const balance = 10000
         const {signature} = await signMessage('jmesworld', account.privateKey);
-
+        
         await addUser({
             username,
             signature: signature
@@ -67,7 +67,8 @@ export default function CreateUserScreen({navigation}: Props) {
         });
 
         const derivedAddress = account.address;
-        const path = `http://localhost:3000/users`;
+        //const path = `http://localhost:3000/users`;
+        const path = `${LOCAL_SERVER_PATH}/users`;
         const rawResponse = await fetch(path, {
             method: 'POST',
             headers: {

@@ -1,6 +1,6 @@
-
+import {useEffect, useState} from "react";
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Pressable,TextInput, SafeAreaView} from 'react-native';
+import {Platform, StyleSheet, Pressable,TextInput, SafeAreaView, ActionSheetIOS} from 'react-native';
 import {
     useFonts,
     Comfortaa_300Light,
@@ -13,8 +13,8 @@ import {
     Roboto_900Black
 } from '@expo-google-fonts/roboto';
 import {Text, View} from '../../components/Themed/Themed';
-import {useStoreState} from "../../hooks/storeHooks";
-import React from "react";
+import {useStoreState, useStoreActions} from "../../hooks/storeHooks";
+
 import {
     accountFromPrivateKey,
     LOCAL_SERVER_PATH,
@@ -22,24 +22,28 @@ import {
 } from "../../utils";
 import Background4 from "../../components/Background4/Background4";
 import {Navigation} from "../../types";
+import {Route} from "@react-navigation/native";
+import { IQRCodePayload } from "../../lib/IQRCodePayload";
 
 type Props = {
     navigation: Navigation;
+    route: Route<any>
 };
 
-export default function WalletSendScreen({navigation}: Props) {
+export default function WalletSendScreen({navigation, route}: Props) {
+    
     const privateKey = useStoreState((state) => state.wallet.privateKey)
-    const [username, onChangeUsername] = React.useState('');
-    const [amount, onChangeAmount] = React.useState(0);
-    const [address, onChangeAddress] = React.useState('');
-    let [fontsLoaded] = useFonts({
-        Comfortaa_300Light,
-        Comfortaa_400Regular,
-        Comfortaa_500Medium,
-        Comfortaa_600SemiBold,
-        Comfortaa_700Bold,
-        Roboto_900Black
-    });
+    //const [payload, setPayload] = useState<IQRCodePayload>(route.params);
+    const [username, setUsername] = useState('');
+    const [amount, setAmount] = useState(undefined);
+    const [address, setAddress] = useState('');
+
+    useEffect(() => {
+        if(route.params){
+            if(route.params.payload.amount)  setAmount(route.params.payload.amount);  
+            if(route.params.payload.username) setUsername(route.params.payload.username);  
+        } 
+    }, [route.params]);
 
     const handleSend = async function (_username) {
         const path = `${LOCAL_SERVER_PATH}/users?username=${_username}`;
@@ -49,16 +53,13 @@ export default function WalletSendScreen({navigation}: Props) {
         if (!parsedRequest.error) {
           
             const address =  parsedRequest[0].address
-
-            await onChangeAddress(address);
-
-            console.log(`Preparing tx of ${amount} $JMES to User: ${username}, Address: ${address}`)
-
-            // @ts-ignore
-            const account = await accountFromPrivateKey(privateKey);
+            await setAddress(address);
             
-            await sendTransaction({amount, address}, account);
-            // @ts-ignore
+            console.log(`Preparing tx of ${amount} $JMES to User: ${username}, Address: ${address}`)// @ts-ignore
+            
+            const account = await accountFromPrivateKey(privateKey);
+            await sendTransaction({amount, address}, account);// @ts-ignore
+            
             return navigation.navigate({
                 name: "WalletSendConfirm",
                 params: {
@@ -72,7 +73,7 @@ export default function WalletSendScreen({navigation}: Props) {
             return navigation.navigate( 'Balance');
         }
     }
-  
+    
     return (
         <View style={styles.container}>
             <Background4>
@@ -82,18 +83,18 @@ export default function WalletSendScreen({navigation}: Props) {
                 <SafeAreaView>
                     <TextInput
                         style={styles.input}
-                        onChangeText={onChangeUsername}
+                        onChangeText={setUsername}
                         value={username}
-                        placeholder="Enter a recipient username"
+                        placeholder={'Enter recipients username'}
                     />
                 </SafeAreaView>
                 <Text style={styles.title}>Amount</Text>
                 <SafeAreaView>
                     <TextInput
                         style={styles.input}
-                        onChangeText={onChangeAmount}
+                        onChangeText={setAmount}
                         value={amount}
-                        placeholder="Enter an amount"
+                        placeholder={'Amount to send'}
                     />
                 </SafeAreaView>
                 <Pressable

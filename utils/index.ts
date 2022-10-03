@@ -21,8 +21,8 @@ export const DERIVATION_PATH = {
 export const SCHEMA_PREFIX = 'jmes:'
 
 const JSON_RPC_PATH = 'http://3.72.109.56:8545';
-const LOCAL_SERVER_PATH = 'http://127.0.0.1:3000';
-const LAN_NETWORK_PATH = '192.168.1.0'
+//const LOCAL_SERVER_PATH = 'http://127.0.0.1:3000'; //localhost
+const LOCAL_SERVER_PATH = 'http://192.168.0.2:3000'; //lan
 // const REST_PATH = '52.59.220.121'
 // "mountain toilet almost birth forest ghost hand drum success enhance garment slice pipe option eager palace adult bridge speak gasp leopard jealous insane drama"
 
