@@ -1,72 +1,63 @@
 import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Text, StyleSheet, Button } from 'react-native';
+import {Navigation} from "../../types";
+import { useStoreActions, useStoreState } from '../../hooks/storeHooks';
 import { IQRCodePayload } from '../../lib/IQRCodePayload';
 
-export default function ScanScreen(){
-    const [loading, setLoading] = useState(true);
-    const [scanData, setScanData] = useState<IQRCodePayload>();
-    const [permission, setPermission] = useState(true);
-
-    useEffect(() => {
-        requestCameraPermission();
-    }, []);
-
-    const requestCameraPermission = async () => {
-        try {
-            const { status, granted } = await BarCodeScanner.requestPermissionsAsync();
-            console.log(`Status: ${status}, Granted: ${granted}`);
-
-            if (status === 'granted') {
-                console.log('Access granted');
-                setPermission(true);
-            } else {
-                setPermission(false);
-            }
-        } catch (error) {
-            console.error(error);
-            setPermission(false);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading) return <Text>Requesting permission ...</Text>;
-
-    if (scanData) {
-        return (
-            <>
-                <Text style={styles.text}>Name: {scanData.address}</Text>
-                <Text style={styles.text}>Number: {scanData.amount}</Text>
-                <Button title="Scan Again" onPress={() => setScanData(undefined)}>
-                    Scan Again
-                </Button>
-            </>
-        );
-    }
-
-    if (permission) {
-        return (
-            <BarCodeScanner
-                style={[styles.container]}
-                onBarCodeScanned={({ type, data }) => {
-                    try {
-                        console.log(type);
-                        console.log(data);
-                        let _data = JSON.parse(data);
-                        setScanData(_data);
-                    } catch (error) {
-                        console.error('Unable to parse string: ', error);
-                    }
-                }}
-            >
-                <Text style={styles.text}>Scan the QR code.</Text>
-            </BarCodeScanner>
-        );
-    } else {
-        return <Text style={styles.textError}>Permission rejected.</Text>;
-    }
+type Props = {
+    navigation: Navigation;
 };
+
+export default function ScanScreen({ navigation }: Props){
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    };
+    getBarCodeScannerPermissions();
+  }, []);
+
+const handleBarCodeScanned = async ({ data }) => {
+  const payload = JSON.parse(data)
+  setScanned(true);
+
+  if (data) {  
+    alert(`Scanned data ${payload.url}`) // @ts-ignore
+    return navigation.navigate({
+        name: "WalletSend",
+            params: {
+                payload
+            }
+        })
+  } else {
+    alert(`there was an error with your request`);
+    console.error("error");
+  } 
+
+};
+
+  
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  return (
+    <View style={styles.container}>
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+    </View>
+  );
+}
 
 
 const styles = StyleSheet.create({

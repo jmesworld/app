@@ -25,6 +25,7 @@ import Web3 from 'web3';
 
 type Props = {
     navigation: Navigation;
+
 };
 
     // QRCODE URI Syntax: schema_prefix target_address [ "@" chain_id ] [ "/" function_name ] [ "?" parameters ]
@@ -36,22 +37,28 @@ export default function WalletReceiveScreen({ navigation }: Props) {
  
     const address = useStoreState((state) => state.accounts[0].address)
     const username = useStoreState((state) => state.user.username)
-    //const [payload, setPayload] = useState<IQRCodePayload>()
-    const [payload, setPayload] = useState(null)
+    const [payload, setPayload] = useState<IQRCodePayload>()
     const [amount, setAmount] = useState(0);
 
     const parsePayload = async () => { //currently resembles a request amount transaction
         const notatedAmount = await notateWeiValue(amount)
-        const parsedPayload = `${SCHEMA_PREFIX}${address}?value=${notatedAmount}`
-        
-        setPayload(parsedPayload)
-        console.log("payload", parsedPayload)
+        const url = `${SCHEMA_PREFIX}${address}?value=${notatedAmount}`
+        const payloadData = ({
+            url: url,
+            address: address,
+            username: username,
+            amount: amount
+        })
+        setPayload(payloadData)
+      
     }
     
     const handleGenerateQR = async () => {
         if (amount) {
         //implement case switch to determine type of transaction being made (request,transfer, etc)
+            
             await parsePayload()
+            
         }
         else{
             alert("Please enter a valid Amount");
