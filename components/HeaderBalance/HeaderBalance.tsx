@@ -91,3 +91,4 @@ export default function HeaderBalance({ navigation }: Props) {
     </View>
   );
 }
+

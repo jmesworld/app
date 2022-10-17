@@ -352,3 +352,4 @@ function TabBarIcon(props: { name: string; color: string }) {
   // @ts-ignore
   return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }
+
