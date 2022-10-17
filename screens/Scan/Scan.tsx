@@ -1,98 +1,77 @@
-import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Button } from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import {Navigation} from "../../types";
+import { useStoreActions, useStoreState } from '../../hooks/storeHooks';
+import { IQRCodePayload } from '../../lib/IQRCodePayload';
 
-import {Text, View} from '../../components/Themed/Themed';
-import Background4 from "../../components/Background4/Background4";
-import {
-    useFonts,
-    Comfortaa_300Light,
-    Comfortaa_400Regular,
-    Comfortaa_500Medium,
-    Comfortaa_600SemiBold,
-    Comfortaa_700Bold,
-} from '@expo-google-fonts/comfortaa';
-import {
-    Roboto_500Medium,
-    Roboto_900Black
-} from '@expo-google-fonts/roboto';
+type Props = {
+    navigation: Navigation;
+};
 
-export default function ScanScreen() {
-    let [fontsLoaded] = useFonts({
-        Comfortaa_300Light,
-        Comfortaa_400Regular,
-        Comfortaa_500Medium,
-        Comfortaa_600SemiBold,
-        Comfortaa_700Bold,
-        Roboto_500Medium,
-        Roboto_900Black
-    });
+export default function ScanScreen({ navigation }: Props){
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
 
-    return (
-        <View style={styles.container}>
-            <Background4>
-                <Text style={styles.title}>Scan</Text>
-                <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)"/>
-                <Text style={styles.description}>
-                    Enables the user to scan QRCode for sending transaction.
-                </Text>
-                <Text style={styles.section}>Features</Text>
-                <Text style={styles.item}>
-                    - Enter in an events via NFC or by scanning a QR Code.
-                </Text>
-                {/* Use a light status bar on iOS to account for the black space above the modal */}
-                <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'}/>
-            </Background4>
-        </View>
-    );
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    };
+    getBarCodeScannerPermissions();
+  }, []);
+
+const handleBarCodeScanned = async ({ data }) => {
+  const payload = JSON.parse(data)
+  setScanned(true);
+
+  if (data) {  
+    alert(`Scanned data ${payload.url}`) // @ts-ignore
+    return navigation.navigate({
+        name: "WalletSend",
+            params: {
+                payload
+            }
+        })
+  } else {
+    alert(`there was an error with your request`);
+    console.error("error");
+  } 
+
+};
+
+  
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+  return (
+    <View style={styles.container}>
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+    </View>
+  );
 }
+
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        padding: 10,
         alignItems: 'center',
-        backgroundColor: "#fff",
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
-    title: {
-        fontSize: 36,
-        fontFamily: 'Comfortaa_300Light',
+    text: {
+        marginTop: 15,
+        backgroundColor: 'white'
     },
-    description: {
-        fontWeight: 'bold',
-        flex: 0,
-        fontSize: 16,
-        lineHeight: 18,
-        paddingTop: 15,
-        // alignSelf: "flex-start",
-        fontFamily: 'Roboto_500Black',
-        textTransform: "uppercase",
-        width: '70%',
-        alignSelf: 'center'
-    },
-    section: {
-        fontWeight: 'bold',
-        flex: 0,
-        fontSize: 24,
-        lineHeight: 28,
-        paddingTop: 15,
-        paddingBottom: 25,
-        // alignSelf: "flex-start",
-        textTransform: "uppercase",
-        width: '70%',
-        alignSelf: 'center',
-        textAlign: "center",
-        fontFamily: 'Roboto_500Black',
-        textTransform: "uppercase"
-    },
-    item: {
-        fontWeight: 'bold',
-        paddingTop: 5,
-        alignSelf: "center"
-    },
-
-    separator: {
-        marginVertical: 30,
-        height: 1,
-        width: '80%',
-    },
+    textError: {
+        color: 'red'
+    }
 });

@@ -8,8 +8,6 @@ import {
 import { useStoreActions } from "../../hooks/storeHooks";
 import { Navigation } from "../../types";
 
-import { generateMnemonic, mnemonicToSeed, accountFromSeed } from "../../utils";
-
 type Props = {
     navigation: Navigation;
 };

@@ -1,50 +1,71 @@
 import React, { memo } from "react";
-import { Background, Button, Paragraph } from "../../components";
+import { Background, Button } from "../../components";
 import { Navigation } from "../../types";
-import {View, Text} from "react-native";
+import { View, Text } from "react-native";
+import { normalize } from "path";
 
 type Props = {
-    navigation: Navigation;
+  navigation: Navigation;
 };
 
 const OnboardingScreen = ({ navigation }: Props) => (
-    <Background position="bottom">
-        <View style={{
-            flexDirection: 'row',
-            height: 76,
-            width: '100%',
-            backgroundColor: '#714FF8',
-            // justifyContent: 'center',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-        }}>
-            <Button
-                // mode="contained"
-                style={{backgroundColor:'#FFF',
-                    borderColor:'#000',
-                    borderWidth: 5,
-                    marginLeft: '10%',
-                    width: '37.5%',
-                }}
-                onPress={() => navigation.navigate("LogUser")}
-            >
-                <Text style={{color: '#000'}}>LOGIN</Text>
-            </Button>
-            <Button
-                // mode="contained"
-                style={{backgroundColor:'#000',
-                    marginLeft:"5%",
-                    marginRight: '10%',
-                    borderColor:'#000',
-                    borderWidth: 5,
-                    width: '37.5%'
-                }}
-                onPress={() => navigation.navigate("CreateUser")}>
-                <Text style={{color: '#FFF'}}>Register</Text>
-            </Button>
+  <Background position="bottom">
+    <View
+      style={{
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "flex-end",
+        alignItems: "center",
+      }}
+    >
+      <Button
+        style={{
+          height: 52,
+          backgroundColor: "#FFF",
+          marginLeft: 16,
+          borderRadius: 6,
+          width: "44.4%",
+        }}
+        //onPress={() => navigation.navigate("CreateUser")}
+        onPress={() => navigation.navigate("SignUp")}
+      >
+        <View style={{ paddingTop: "5px" }}>
+          <Text
+            style={{
+              color: "#000",
+              fontSize: 16,
+              fontWeight: "800",
+            }}
+          >
+            SIGN UP
+          </Text>
         </View>
-
-    </Background>
+      </Button>
+      <Button
+        style={{
+          height: 52,
+          backgroundColor: "#353535",
+          marginLeft: "3.2%",
+          marginRight: 16,
+          borderRadius: 6,
+          width: "44.4%",
+        }}
+        onPress={() => navigation.navigate("LogUser")}
+      >
+        <View style={{ paddingTop: "5px" }}>
+          <Text
+            style={{
+              color: "#FFF",
+              fontSize: 16,
+              fontWeight: "700",
+            }}
+          >
+            RESTORE
+          </Text>
+        </View>
+      </Button>
+    </View>
+  </Background>
 );
 
 export default memo(OnboardingScreen);

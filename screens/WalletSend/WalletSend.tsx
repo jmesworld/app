@@ -1,80 +1,6 @@
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform, StyleSheet } from 'react-native';
-//
-// import { Text, View } from '../../components/Themed/Themed';
-// import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-// import {useEffect, useMemo, useState} from "react";
-// import {fetchAddressBalance} from "../../utils";
-// import Background4 from "../../components/Background4/Background4";
-//
-// export default function WalletScreen() {
-//     const mnemonic = useStoreState((state)=>state.wallet.mnemonic);
-//     const address = useStoreState((state)=>state.accounts[0].address)
-//     const balanceState = useStoreState((state)=>state.accounts[0].balance)
-//     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-//
-//     function updateStoreState(){
-//         updateAccount({index:0, balance: balance})
-//     }
-//     const [balance, setBalance] = useState(balanceState);
-//
-//     useEffect(() => {
-//         async function fetch() {
-//             const fetchedBalance = await fetchAddressBalance(address);
-//             console.log({fetchedBalance});
-//             setBalance(fetchedBalance);
-//         }
-//         fetch();
-//     }, [updateStoreState]);
-//     return (
-//         <View style={styles.container}>
-//             <Background4>
-//             <Text style={styles.title}>Balance</Text>
-//             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-//             <Text>Wallet</Text>
-//             <Text>Mnemonic: {mnemonic}</Text>
-//             <Text>Address: {address}</Text>
-//             <Text>Balance: {(parseFloat(balance)/1e18)}</Text>
-//
-//             {/* Use a light status bar on iOS to account for the black space above the modal */}
-//             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//             </Background4>
-//             </View>
-//     );
-// }
-//
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//     },
-//     separator: {
-//         marginVertical: 30,
-//         height: 1,
-//         width: '80%',
-//     },
-// });
-
+import {useEffect, useState} from "react";
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable, Image, TextInput, SafeAreaView, Animated} from 'react-native';
-
-import {Text, View} from '../../components/Themed/Themed';
-import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import React, {useEffect, useMemo, useState} from "react";
-import {
-    accountFromPrivateKey,
-    deriveSeed,
-    fetchAddressBalance,
-    mnemonicToSeed,
-    sendTransaction,
-    signMessage
-} from "../../utils";
-import Background4 from "../../components/Background4/Background4";
+import {Platform, StyleSheet, Pressable,TextInput, SafeAreaView, ActionSheetIOS} from 'react-native';
 import {
     useFonts,
     Comfortaa_300Light,
@@ -86,55 +12,55 @@ import {
 import {
     Roboto_900Black
 } from '@expo-google-fonts/roboto';
-import Web3 from "web3";
-import {Navigation} from "../../types";
+import {Text, View} from '../../components/Themed/Themed';
+import {useStoreState, useStoreActions} from "../../hooks/storeHooks";
 
+import {
+    accountFromPrivateKey,
+    LOCAL_SERVER_PATH,
+    sendTransaction,
+} from "../../utils";
+import Background4 from "../../components/Background4/Background4";
+import {Navigation} from "../../types";
+import {Route} from "@react-navigation/native";
+import { IQRCodePayload } from "../../lib/IQRCodePayload";
 
 type Props = {
     navigation: Navigation;
+    route: Route<any>
 };
 
-export default function WalletSendScreen({navigation}: Props) {
-    const mnemonic = useStoreState((state) => state.wallet.mnemonic);
-    // const address = useStoreState((state) => state.accounts[0].address)
-    // const username = useStoreState((state)=>state.accounts[0].username)
-    // const username = useStoreState((state) => state.user.username)
+export default function WalletSendScreen({navigation, route}: Props) {
+    
     const privateKey = useStoreState((state) => state.wallet.privateKey)
-    // const balanceState = useStoreState((state) => state.accounts[0].balance)
-    // const updateAccount = useStoreActions((actions) => actions.updateAccount);
+    //const [payload, setPayload] = useState<IQRCodePayload>(route.params);
+    const [username, setUsername] = useState('');
+    const [amount, setAmount] = useState(undefined);
+    const [address, setAddress] = useState('');
 
-    const [username, onChangeUsername] = React.useState('');
-    const [amount, onChangeAmount] = React.useState(0);
-    const [address, onChangeAddress] = React.useState('');
+    useEffect(() => {
+        if(route.params){
+            if(route.params.payload.amount)  setAmount(route.params.payload.amount);  
+            if(route.params.payload.username) setUsername(route.params.payload.username);  
+        } 
+    }, [route.params]);
 
-    let [fontsLoaded] = useFonts({
-        Comfortaa_300Light,
-        Comfortaa_400Regular,
-        Comfortaa_500Medium,
-        Comfortaa_600SemiBold,
-        Comfortaa_700Bold,
-        Roboto_900Black
-    });
-
-    const requestRetrieveAddress = async function (_username) {
-        const path = `http://3.72.109.56:3001/identity/${_username}`;
+    const handleSend = async function (_username) {
+        const path = `${LOCAL_SERVER_PATH}/users?username=${_username}`;
         const requestIdentity = await fetch(path);
-        const requestIdentityResponse = await requestIdentity.json();
-        if (!requestIdentityResponse.error) {
-            const {address} = requestIdentityResponse.identity;
-            await onChangeAddress(address);
+        const parsedRequest = await requestIdentity.json();
 
-
-            console.log(`Preparing tx of ${amount} to ${address}`)
-            console.log('Post request', username, amount, address)
-            // const seed = await mnemonicToSeed(mnemonic);
-
-            const {account} = await accountFromPrivateKey(privateKey);
-            console.log(account);
-            // const derivation = await deriveSeed(seed, 0, 0)
-            // const {signature} = await signMessage('jmesworld', derivation.privateKey);
-            await sendTransaction({amount, address}, account);
-            return navigation.navigate( {
+        if (!parsedRequest.error) {
+          
+            const address =  parsedRequest[0].address
+            await setAddress(address);
+            
+            console.log(`Preparing tx of ${amount} $JMES to User: ${username}, Address: ${address}`)// @ts-ignore
+            
+            const account = await accountFromPrivateKey(privateKey);
+            await sendTransaction({amount, address}, account);// @ts-ignore
+            
+            return navigation.navigate({
                 name: "WalletSendConfirm",
                 params: {
                     username,
@@ -143,11 +69,11 @@ export default function WalletSendScreen({navigation}: Props) {
                 }
             })
         } else {
-            console.error(requestIdentityResponse.error);
+            console.error(parsedRequest.error);
             return navigation.navigate( 'Balance');
         }
     }
-
+    
     return (
         <View style={styles.container}>
             <Background4>
@@ -157,23 +83,23 @@ export default function WalletSendScreen({navigation}: Props) {
                 <SafeAreaView>
                     <TextInput
                         style={styles.input}
-                        onChangeText={onChangeUsername}
+                        onChangeText={setUsername}
                         value={username}
-                        placeholder="Enter a recipient username"
+                        placeholder={'Enter recipients username'}
                     />
                 </SafeAreaView>
                 <Text style={styles.title}>Amount</Text>
                 <SafeAreaView>
                     <TextInput
                         style={styles.input}
-                        onChangeText={onChangeAmount}
+                        onChangeText={setAmount}
                         value={amount}
-                        placeholder="Enter an amout"
+                        placeholder={'Amount to send'}
                     />
                 </SafeAreaView>
                 <Pressable
                     onPress={async () => {
-                        await requestRetrieveAddress(username);
+                        await handleSend(username);
                     }}
                     style={styles.button}>
                     <Text style={styles.buttonText}>Send</Text>

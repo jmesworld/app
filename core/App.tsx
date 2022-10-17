@@ -1,11 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+//import "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { StoreProvider } from "easy-peasy";
 
-import useCachedResources from '../hooks/useCachedResources';
-import useColorScheme from '../hooks/useColorScheme';
-import Navigation from '../navigation';
+import useCachedResources from "../hooks/useCachedResources";
+import useColorScheme from "../hooks/useColorScheme";
+import Navigation from "../navigation";
 import store from "../store";
 import Background4 from "../components/Background4/Background4";
 
@@ -17,11 +18,11 @@ export default function App() {
     return null;
   } else {
     return (
-        <SafeAreaProvider>
-          <StoreProvider store={store}>
-            <Navigation colorScheme={colorScheme} />
-            <StatusBar />
-          </StoreProvider>
+      <SafeAreaProvider>
+        <StoreProvider store={store}>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar translucent={true} />
+        </StoreProvider>
       </SafeAreaProvider>
     );
   }

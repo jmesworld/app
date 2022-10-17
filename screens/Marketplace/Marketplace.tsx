@@ -1,5 +1,5 @@
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 
 import {Text, View} from '../../components/Themed/Themed';
 import Background4 from "../../components/Background4/Background4";

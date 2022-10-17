@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "JMESWorld",
-    "slug": "JMESWorld",
-    "owner": "jmesworld",
+    "slug": "jmes-test",
+    "owner": "huntersides",
     "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,6 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    
     "updates": {
       "url": "https://exp.host/@jmesworld/JMESWorld",
       "fallbackToCacheTimeout": 0
@@ -33,6 +34,19 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ddb15756-ad49-4845-8099-37806bd4a23a"
+      }
     }
   }
 }

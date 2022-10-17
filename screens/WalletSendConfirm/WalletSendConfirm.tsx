@@ -1,72 +1,12 @@
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform, StyleSheet } from 'react-native';
-//
-// import { Text, View } from '../../components/Themed/Themed';
-// import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-// import {useEffect, useMemo, useState} from "react";
-// import {fetchAddressBalance} from "../../utils";
-// import Background4 from "../../components/Background4/Background4";
-//
-// export default function WalletScreen() {
-//     const mnemonic = useStoreState((state)=>state.wallet.mnemonic);
-//     const address = useStoreState((state)=>state.accounts[0].address)
-//     const balanceState = useStoreState((state)=>state.accounts[0].balance)
-//     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-//
-//     function updateStoreState(){
-//         updateAccount({index:0, balance: balance})
-//     }
-//     const [balance, setBalance] = useState(balanceState);
-//
-//     useEffect(() => {
-//         async function fetch() {
-//             const fetchedBalance = await fetchAddressBalance(address);
-//             console.log({fetchedBalance});
-//             setBalance(fetchedBalance);
-//         }
-//         fetch();
-//     }, [updateStoreState]);
-//     return (
-//         <View style={styles.container}>
-//             <Background4>
-//             <Text style={styles.title}>Balance</Text>
-//             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-//             <Text>Wallet</Text>
-//             <Text>Mnemonic: {mnemonic}</Text>
-//             <Text>Address: {address}</Text>
-//             <Text>Balance: {(parseFloat(balance)/1e18)}</Text>
-//
-//             {/* Use a light status bar on iOS to account for the black space above the modal */}
-//             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//             </Background4>
-//             </View>
-//     );
-// }
-//
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//     },
-//     separator: {
-//         marginVertical: 30,
-//         height: 1,
-//         width: '80%',
-//     },
-// });
 
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable, Image} from 'react-native';
-
+import {Platform, StyleSheet, Pressable} from 'react-native';
 import {Text, View} from '../../components/Themed/Themed';
-import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import {useEffect, useMemo, useState} from "react";
-import {fetchAddressBalance} from "../../utils";
+import {useEffect, useState} from "react";
+import {
+    accountFromAddress, LOCAL_SERVER_PATH,
+} from "../../utils";
+import {useStoreState, useStoreActions} from "../../hooks/storeHooks";
 import Background4 from "../../components/Background4/Background4";
 import {
     useFonts,
@@ -90,38 +30,67 @@ type Props = {
 
 
 export default function WalletSendConfirmScreen({ navigation, route }: Props) {
-    const [recipientUsername, setRecipientUsername] = useState('');
-    const [recipientAmount, setRecipientAmount] = useState(0);
-    const [recipientAddress, setRecipientAddress] = useState('');
 
-    useEffect(() => {
-        console.log('params',route.params)
-        console.log('match',route.match)
-        if(route.params){
-            if(route.params.address)  setRecipientAddress(route.params.address);
-            if(route.params.username)  setRecipientUsername(route.params.username);
-            if(route.params.amount)  setRecipientAmount(route.params.amount);
+        const initiatorAddress = useStoreState((state) => state.accounts[0].address)
+        const [recipientUsername, setRecipientUsername] = useState('');
+        const [recipientAmount, setRecipientAmount] = useState();
+        const [recipientAddress, setRecipientAddress] = useState('');
+        
+        useEffect(() => {
+            console.log('params',route.params)
+            console.log('match',route.match)
+            if(route.params){
+                if(route.params.address)  setRecipientAddress(route.params.address);
+                if(route.params.username)  setRecipientUsername(route.params.username);
+                if(route.params.amount)  setRecipientAmount(route.params.amount);
+            }
+        }, [route.params]);
+        
+//refactor to combine update functions
+        async function handleRecipientUpdate(address: string) {
+            const account = await accountFromAddress(address)
+            const updatedBalance = await parseInt(account[0].balance) + parseInt(recipientAmount)
+
+            await fetch(`${LOCAL_SERVER_PATH}/users/${account[0].id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                        balance:updatedBalance,
+                })
+            });
+
         }
-    }, [route.params]);
 
+        async function handleInitiatorUpdate(address: string) {
+            const account = await accountFromAddress(address)
+            const updatedBalance = await parseInt(account[0].balance) - parseInt(recipientAmount)
 
+            await fetch(`${LOCAL_SERVER_PATH}/users/${account[0].id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                        balance:updatedBalance,
+                })
+            });
 
-    //     username,
-    //                         amount,
-    //                         address
-    // const mnemonic = useStoreState((state) => state.wallet.mnemonic);
-    // const address = useStoreState((state) => state.accounts[0].address)
-    // const username = useStoreState((state)=>state.accounts[0].username)
-    // const username = useStoreState((state) => state.user.username)
-    // const balanceState = useStoreState((state) => state.accounts[0].balance)
-    // const updateAccount = useStoreActions((actions) => actions.updateAccount);
+        }
 
-    async function sendTransaction(){
-        console.log('====')
-        console.log('==== SEND TRANSACTION')
-        console.log(`Sending ${recipientAmount} to ${recipientAddress}`);
-        return navigation.navigate("Balance")
-    }
+        async function sendTransaction(){
+            console.log('====')
+            console.log('==== SEND TRANSACTION')
+            console.log(`Sending ${recipientAmount} to ${recipientAddress}`);
+            console.log(`Initiator Address: ${initiatorAddress}`)
+
+            await handleRecipientUpdate(recipientAddress)
+            await handleInitiatorUpdate(initiatorAddress)
+            return navigation.navigate("Balance")
+        }
 
     let [fontsLoaded] = useFonts({
         Comfortaa_300Light,

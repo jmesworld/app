@@ -1,87 +1,14 @@
-// import { StatusBar } from 'expo-status-bar';
-// import { Platform, StyleSheet } from 'react-native';
-//
-// import { Text, View } from '../../components/Themed/Themed';
-// import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-// import {useEffect, useMemo, useState} from "react";
-// import {fetchAddressBalance} from "../../utils";
-// import Background4 from "../../components/Background4/Background4";
-//
-// export default function WalletScreen() {
-//     const mnemonic = useStoreState((state)=>state.wallet.mnemonic);
-//     const address = useStoreState((state)=>state.accounts[0].address)
-//     const balanceState = useStoreState((state)=>state.accounts[0].balance)
-//     const updateAccount = useStoreActions((actions) => actions.updateAccount);
-//
-//     function updateStoreState(){
-//         updateAccount({index:0, balance: balance})
-//     }
-//     const [balance, setBalance] = useState(balanceState);
-//
-//     useEffect(() => {
-//         async function fetch() {
-//             const fetchedBalance = await fetchAddressBalance(address);
-//             console.log({fetchedBalance});
-//             setBalance(fetchedBalance);
-//         }
-//         fetch();
-//     }, [updateStoreState]);
-//     return (
-//         <View style={styles.container}>
-//             <Background4>
-//             <Text style={styles.title}>Balance</Text>
-//             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-//             <Text>Wallet</Text>
-//             <Text>Mnemonic: {mnemonic}</Text>
-//             <Text>Address: {address}</Text>
-//             <Text>Balance: {(parseFloat(balance)/1e18)}</Text>
-//
-//             {/* Use a light status bar on iOS to account for the black space above the modal */}
-//             <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-//             </Background4>
-//             </View>
-//     );
-// }
-//
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 20,
-//         fontWeight: 'bold',
-//     },
-//     separator: {
-//         marginVertical: 30,
-//         height: 1,
-//         width: '80%',
-//     },
-// });
-
 import {StatusBar} from 'expo-status-bar';
-import {Platform, StyleSheet, Button, Pressable, Image} from 'react-native';
+import {Platform, StyleSheet, Pressable} from 'react-native';
 
 import {Text, View} from '../../components/Themed/Themed';
 import {useStoreActions, useStoreState} from "../../hooks/storeHooks";
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {fetchAddressBalance} from "../../utils";
 import Background4 from "../../components/Background4/Background4";
-import {
-    useFonts,
-    Comfortaa_300Light,
-    Comfortaa_400Regular,
-    Comfortaa_500Medium,
-    Comfortaa_600SemiBold,
-    Comfortaa_700Bold,
-} from '@expo-google-fonts/comfortaa';
-import {
-    Roboto_900Black
-} from '@expo-google-fonts/roboto';
+
 import Web3 from "web3";
 import {Navigation} from "../../types";
-import {useDispatch} from "react-redux";
 
 type Props = {
     navigation: Navigation;
@@ -91,7 +18,7 @@ type Props = {
 export default function WalletReceiveConfirmScreen({navigation}: Props) {
     const mnemonic = useStoreState((state) => state.wallet.mnemonic);
     const address = useStoreState((state) => state.accounts[0].address)
-    // const username = useStoreState((state)=>state.accounts[0].username)
+    
     const username = useStoreState((state) => state.user.username)
     const balanceState = useStoreState((state) => state.accounts[0].balance)
     const updateAccount = useStoreActions((actions) => actions.updateAccount);
@@ -100,30 +27,6 @@ export default function WalletReceiveConfirmScreen({navigation}: Props) {
     const [balance, setBalance] = useState(balanceState);
     const [balanceEur, setBalanceEur] = useState(balanceState);
 
-    function useUpdateStoreState(newBalance, options, deps = []) {
-            // const dispatch = useDispatch();
-
-            const updateStoreState = useCallback(async (newBalance) => {
-                console.log('Called with balance of', newBalance)
-                if(newBalance){
-                    await updateAccount({index: 0, balance: newBalance})
-                }
-                // updateAccount({index: 0, balance: newBalance})
-                // dispatch('UPDATE_STORE',{newBalance});
-            }, [newBalance]);
-
-            return updateStoreState;
-    }
-    // const updateStoreState = useUpdateStoreState();
-
-    let [fontsLoaded] = useFonts({
-        Comfortaa_300Light,
-        Comfortaa_400Regular,
-        Comfortaa_500Medium,
-        Comfortaa_600SemiBold,
-        Comfortaa_700Bold,
-        Roboto_900Black
-    });
    const updateStoreState = function() {
         console.log('UpdateStoreState');
         updateAccount({index: 0, balance: balance})
@@ -149,21 +52,13 @@ export default function WalletReceiveConfirmScreen({navigation}: Props) {
                 console.log({fetchedBalance});
                 setBalance(Web3.utils.fromWei(fetchedBalance, 'ether'));
                 const convertedBalance = (parseInt(fetchedBalance) * 0.1412840103).toString();
-                // const convertedBalance = (parseInt(fetchedBalance) * 0.001412840103).toString();
+
                 console.log({convertedBalance});
                 setBalanceEur(parseFloat(Web3.utils.fromWei(convertedBalance, 'ether')).toFixed(2))
                 console.log('Fetched.');
-                // return Web3.utils.fromWei(fetchedBalance, 'ether');
-                // await useUpdateStoreState(fetchedBalance, {}, [fetchedBalance])
+
                 console.log('UPDATED BALANCE WITH', fetchedBalance);
-                // updateAccount({index: 0, balance: fetchedBalance})
-                // useUpdateStoreState({index: 0, balance: fetchedBalance})
-                //     .then(() => {
-                // })
-                // })
-                // .catch((e) => {
-                // console.log(e);
-                // navigation.navigate("WalletReceiveConfirm")
+
                 return fetchedBalance;
             }
             const fetchedBalance = await requestBalance();
@@ -173,49 +68,15 @@ export default function WalletReceiveConfirmScreen({navigation}: Props) {
             }catch (e){
                 console.log('Impossible to update account');
             }
-            // if(balance){
-            //     try{
-            //         await updateStoreState(balance);
-            //     }catch (e){
-            //         console.log(`Cant updateStoreState`)
-            //     }
-                // await updateStoreState(balance);
-                // navigation.navigate("Balance")
-            // }
+           
         }catch (e){
             console.error(e);
-            // navigation.navigate("Balance")
+
         }
 
     }, [updateStoreState]);
 
 
-
-
-    // useEffect(()=>{
-    //     console.log('BALANCE CHANGED', balance);
-        // updateAccount({index: 0, balance: balance})
-    // }, [requestBalance])
-
-    // requestBalance().then((balance)=>{
-    //     console.log('BALANCE CHANGED2', balance);
-    //     updateAccount({index: 0, balance: balance});
-    // })
-    // useEffect(() => {
-    //     async function fetch() {
-    //         const fetchedBalance = await fetchAddressBalance(address);
-    //         console.log({fetchedBalance});
-    //         setBalance(Web3.utils.fromWei(fetchedBalance, 'ether'));
-    //         const convertedBalance = (parseInt(fetchedBalance) * 0.1412840103).toString();
-    //         // const convertedBalance = (parseInt(fetchedBalance) * 0.001412840103).toString();
-    //         console.log({convertedBalance});
-    //         setBalanceEur(parseFloat(Web3.utils.fromWei(convertedBalance, 'ether')).toFixed(2))
-    //         console.log('Fetched.');
-    //         return Web3.utils.fromWei(fetchedBalance, 'ether');
-    //     }
-    //
-    //     requestBalance();
-    // }, []);
     return (
         <View style={styles.container}>
             <Background4>
