@@ -1,18 +1,5 @@
 {
   "users": [
-    {
-      "address": "0xB2Ba76B2b6B05019195dfa078A6459Ae93f6FA84",
-      "username": "Hunter",
-      "balance": 11500,
-      "mnemonic": "toward follow differ opinion derive tuna pizza castle market woman inflict gown extra dune candy night upset club melody east live swamp salt pioneer",
-      "id": 1
-    },
-    {
-      "address": "0xc30b587d7463c163139302dDbf1753D19897ef38",
-      "username": "Hunter",
-      "balance": 10000,
-      "mnemonic": "settle cheese depth space pizza assist supreme moment color dinner tired ladder chuckle jaguar library mix bamboo bachelor little dirt modify junior company essence",
-      "id": 2
-    }
+    
   ]
 }

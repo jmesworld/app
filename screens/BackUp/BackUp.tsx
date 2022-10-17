@@ -26,14 +26,14 @@ import {
   Comfortaa_700Bold,
 } from "@expo-google-fonts/comfortaa";
 import { Roboto_900Black } from "@expo-google-fonts/roboto";
-
+import { GFSDidot_400Regular } from "@expo-google-fonts/gfs-didot";
 import { Navigation } from "../../types";
 
 type Props = {
   navigation: Navigation;
 };
 
-export default function CreateUserScreen({ navigation }: Props) {
+export default function BackUpScreen({ navigation }: Props) {
   const [username, onChangeUsername] = React.useState("");
   const [mnemonic, onChangeMnemonic] = React.useState("");
   const [address, onChangeAddress] = React.useState("");
@@ -44,6 +44,7 @@ export default function CreateUserScreen({ navigation }: Props) {
     Comfortaa_600SemiBold,
     Comfortaa_700Bold,
     Roboto_900Black,
+    GFSDidot_400Regular,
   });
 
   const addWallet = useStoreActions((actions) => actions.addWallet);
@@ -106,19 +107,19 @@ export default function CreateUserScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Background4>
-        <Text style={styles.title}>Register</Text>
+        <Text style={styles.title}>JMES</Text>
         <View
           style={styles.separator}
           lightColor="#eee"
           darkColor="rgba(255,255,255,0.1)"
         />
-        <Text style={styles.secondTitle}>Username</Text>
+
         <SafeAreaView>
           <TextInput
             style={styles.input}
             onChangeText={onChangeUsername}
             value={username}
-            placeholder="Enter a username"
+            placeholder="Full Name"
           />
         </SafeAreaView>
         <Text style={styles.secondTitle}>Mnemonic</Text>
@@ -134,7 +135,7 @@ export default function CreateUserScreen({ navigation }: Props) {
         />
 
         <Pressable onPress={() => performRegister()} style={styles.button}>
-          <Text style={styles.buttonText}>Register</Text>
+          <Text style={styles.buttonText}>Confirm</Text>
         </Pressable>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
@@ -151,6 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "center",
   },
+
   buttonText: {
     fontSize: 18,
     textAlign: "center",
@@ -180,9 +182,9 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_900Black",
   },
   title: {
-    fontSize: 36,
+    fontSize: 42,
+    fontFamily: "GFSDidot_400Regular",
     color: "#FFF",
-    fontFamily: "Comfortaa_300Light",
   },
   input: {
     backgroundColor: "white",

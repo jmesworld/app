@@ -1821,6 +1821,16 @@
   resolved "https://registry.npmjs.org/@expo-google-fonts/comfortaa/-/comfortaa-0.2.2.tgz"
   integrity sha512-onCKZ3igXI1DRwUBW4gaT5dsFysMGd7eXlUzJQWPgaF8l2LuUib9zNRxEiZHYgx9CQ17bP400ORRlfYo033whQ==
 
+"@expo-google-fonts/gfs-didot@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/gfs-didot/-/gfs-didot-0.2.2.tgz#20e6c1241f4ac0a96c91e6577023d3a9502d3a97"
+  integrity sha512-saUn1szi3U3GGhxGZj0yYuIH+Sl6N+XPQnWWuxYc68xQVHpCqGNyAxWqUV1iCRJhWWiVC0zvqgCRv8m3L/8vUg==
+
+"@expo-google-fonts/inter@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/inter/-/inter-0.2.2.tgz#bd5624be6c92e7621aa9ddb5bd72757604729121"
+  integrity sha512-dU6mSczI2xkRZbUhQQ5VB+D4AqLOF8ufCIfA1iBjrPZ/Qnka88E5Ez2Mvm41exdKR76norVvYD5GJIQYEEoO/Q==
+
 "@expo-google-fonts/roboto@^0.2.2":
   version "0.2.2"
   resolved "https://registry.npmjs.org/@expo-google-fonts/roboto/-/roboto-0.2.2.tgz"

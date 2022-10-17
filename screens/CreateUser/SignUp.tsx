@@ -26,16 +26,17 @@ import {
   Comfortaa_700Bold,
 } from "@expo-google-fonts/comfortaa";
 import { Roboto_900Black } from "@expo-google-fonts/roboto";
-
+import { GFSDidot_400Regular } from "@expo-google-fonts/gfs-didot";
 import { Navigation } from "../../types";
 
 type Props = {
   navigation: Navigation;
 };
 
-export default function CreateUserScreen({ navigation }: Props) {
+export default function SignUpScreen({ navigation }: Props) {
   const [username, onChangeUsername] = React.useState("");
   const [mnemonic, onChangeMnemonic] = React.useState("");
+  const [name, onChangeName] = React.useState("");
   const [address, onChangeAddress] = React.useState("");
   let [fontsLoaded] = useFonts({
     Comfortaa_300Light,
@@ -44,6 +45,7 @@ export default function CreateUserScreen({ navigation }: Props) {
     Comfortaa_600SemiBold,
     Comfortaa_700Bold,
     Roboto_900Black,
+    GFSDidot_400Regular,
   });
 
   const addWallet = useStoreActions((actions) => actions.addWallet);
@@ -78,6 +80,7 @@ export default function CreateUserScreen({ navigation }: Props) {
       },
       body: JSON.stringify({
         address: derivedAddress,
+        name,
         username,
         balance,
         mnemonic,
@@ -94,7 +97,6 @@ export default function CreateUserScreen({ navigation }: Props) {
       navigation.navigate("Root");
     }, 5000);
   };
-
   useEffect(() => {
     async function generate() {
       const mnemonic = await generateMnemonic();
@@ -102,40 +104,43 @@ export default function CreateUserScreen({ navigation }: Props) {
     }
     generate();
   }, []);
-
   return (
     <View style={styles.container}>
       <Background4>
-        <Text style={styles.title}>Register</Text>
+        <Text style={styles.title}>JMES</Text>
         <View
           style={styles.separator}
           lightColor="#eee"
           darkColor="rgba(255,255,255,0.1)"
         />
-        <Text style={styles.secondTitle}>Username</Text>
-        <SafeAreaView>
+        <Text style={styles.secondTitle}>SIGN UP TO JMES</Text>
+        <SafeAreaView style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeName}
+            value={name}
+            placeholder="Full Name"
+          />
+        </SafeAreaView>
+        <SafeAreaView style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             onChangeText={onChangeUsername}
             value={username}
-            placeholder="Enter a username"
+            placeholder="Username"
           />
         </SafeAreaView>
-        <Text style={styles.secondTitle}>Mnemonic</Text>
-
-        <TextInput
-          style={styles.inputMultiline}
-          multiline={true}
-          numberOfLines={4}
-          onChangeText={onChangeMnemonic}
-          value={mnemonic}
-          editable={false}
-          placeholder="Enter your mnemonic"
-        />
-
-        <Pressable onPress={() => performRegister()} style={styles.button}>
-          <Text style={styles.buttonText}>Register</Text>
-        </Pressable>
+        <View style={styles.buttonContainer}>
+          <Pressable onPress={() => performRegister()} style={styles.button}>
+            <Text style={styles.buttonText}>SIGN UP</Text>
+          </Pressable>
+        </View>
+        <View style={styles.policyContainer}>
+          <Text style={styles.policyText}>
+            By signing up you agree to our Terms, Privacy Policy and Cookies
+            Policy
+          </Text>
+        </View>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       </Background4>
@@ -146,116 +151,74 @@ export default function CreateUserScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: "50%",
     alignItems: "center",
     backgroundColor: "#fff",
     justifyContent: "center",
+  },
+  buttonContainer: {
+    width: "72%",
+    height: 52,
+    marginBottom: 13,
+    borderRadius: 6,
+  },
+  inputContainer: {
+    width: "72%",
+    marginBottom: 33,
+  },
+  policyContainer: {
+    backgroundColor: "transparent",
+    width: "72%",
+    height: 56,
+  },
+  policyText: {
+    fontSize: 15,
+    color: "#ABABAB",
   },
   buttonText: {
     fontSize: 18,
     textAlign: "center",
     textTransform: "uppercase",
     fontFamily: "Roboto_900Black",
-    color: "#FFF",
+    color: "#000",
   },
   iconImageView: {
     flexDirection: "row",
   },
 
   button: {
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: "80%",
-    paddingTop: 15,
-    paddingBottom: 15,
-    color: "#FFF",
-    backgroundColor: "#000",
+    paddingTop: 17,
+    paddingBottom: 17,
+    color: "#000",
+    backgroundColor: "#fff",
     borderRadius: 6,
-    paddingLeft: 25,
-    paddingRight: 25,
-    fontSize: 24,
+    paddingLeft: 52,
+    paddingRight: 53,
     textTransform: "uppercase",
     fontFamily: "Roboto_900Black",
-  },
-  title: {
-    fontSize: 36,
-    color: "#FFF",
-    fontFamily: "Comfortaa_300Light",
   },
   input: {
-    backgroundColor: "white",
-    height: 40,
-    margin: 12,
-    width: "90%",
-    borderWidth: 1,
-    padding: 10,
+    backgroundColor: "#5B5B5B",
+    height: 34,
+    borderRadius: 6,
+    paddingLeft: 18,
   },
-  inputMultiline: {
-    backgroundColor: "white",
-    margin: 12,
-    width: "90%",
-    borderWidth: 1,
-    padding: 10,
-  },
-  secondTitle: {
-    fontSize: 36,
-    fontFamily: "Comfortaa_300Light",
-    paddingTop: 40,
+  title: {
+    fontSize: 42,
+    fontFamily: "GFSDidot_400Regular",
     color: "#FFF",
   },
-  balanceJMES: {
-    fontWeight: "bold",
-    flex: 0,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "center",
-    fontFamily: "Roboto_900Black",
+
+  secondTitle: {
+    fontSize: 20,
+    fontFamily: "Comfortaa_300Light",
     textTransform: "uppercase",
-  },
-  balanceEUR: {
-    fontWeight: "bold",
-    flex: 0,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "center",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
-  },
-  buttonImage: {
-    padding: 10,
-  },
-  iconImage: {
-    width: 30,
-    height: 30,
-    margin: 10,
-  },
-  section: {
-    fontWeight: "bold",
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "flex-start",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
-  },
-  noAssetText: {
-    fontWeight: "bold",
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "center",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
+    paddingBottom: 26,
+    color: "#FFF",
   },
 
   separator: {
-    marginVertical: 30,
+    marginTop: 9,
+    marginBottom: 18,
     height: 1,
     width: "80%",
   },
