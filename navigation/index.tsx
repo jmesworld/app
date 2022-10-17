@@ -27,6 +27,7 @@ import {
 import LinkingConfiguration from "./LinkingConfiguration";
 import ScanScreen from "../screens/Scan/Scan";
 import CreateUserScreen from "../screens/CreateUser/CreateUser";
+import SignUpScreen from "../screens/CreateUser/SignUp";
 import LogUserScreen from "../screens/LogUser/LogUser";
 import GalleryScreen from "../screens/Gallery/Gallery";
 import Header from "../components/Header/Header";
@@ -159,10 +160,10 @@ function RootNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="CreateUser"
+          name="SignUp"
           style={{ backgroundColor: "#000", height: "100%" }}
-          component={CreateUserScreen}
-          options={{ headerShown: true, title: "Register" }}
+          component={SignUpScreen}
+          options={{ headerShown: true, title: "" }}
         />
         <Stack.Screen
           name="LogUser"
@@ -212,6 +213,21 @@ function BottomTabNavigator() {
       />
 
       <BottomTab.Screen
+        name="Profile"
+        style={{ backgroundColor: "#000" }}
+        component={ProfileScreen}
+        options={({ navigation }: RootTabScreenProps<"Profile">) => ({
+          title: "Profile",
+          tabBarLabel: "",
+          tabBarActiveBackgroundColor: "#222",
+
+          tabBarInactiveBackgroundColor: "#000",
+          tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
+          header: () => <Header navigation={navigation} />,
+        })}
+      />
+
+      <BottomTab.Screen
         name="Scanner"
         style={{ backgroundColor: "#000" }}
         component={ScanScreen}
@@ -226,22 +242,6 @@ function BottomTabNavigator() {
           header: () => <Header navigation={navigation} />,
         })}
       />
-
-      <BottomTab.Screen
-        name="Profile"
-        style={{ backgroundColor: "#000" }}
-        component={ProfileScreen}
-        options={({ navigation }: RootTabScreenProps<"Profile">) => ({
-          title: "Profile",
-          tabBarLabel: "",
-          tabBarActiveBackgroundColor: "#222",
-          tabBarInactiveBackgroundColor: "#000",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="contacts" color={color} />
-          ),
-          header: () => <Header navigation={navigation} />,
-        })}
-      />
       <BottomTab.Screen
         name="Balance"
         style={{ backgroundColor: "#000", width: "100%" }}
@@ -251,7 +251,9 @@ function BottomTabNavigator() {
           tabBarLabel: "",
           tabBarActiveBackgroundColor: "#222",
           tabBarInactiveBackgroundColor: "#000",
-          tabBarIcon: ({ color }) => <TabBarIcon name="wallet" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="account" color={color} />
+          ),
           header: () => <Header navigation={navigation} />,
         })}
       />
@@ -284,9 +286,20 @@ function TabBarIcon(props: { name: string; color: string }) {
         <Image source={require("../assets/icons/home.png")} style={style} />
       );
       break;
+    case "search":
+      return (
+        <Image
+          source={require("../assets/icons/search_icon.png")}
+          style={style}
+        />
+      );
+      break;
     case "profile":
       return (
-        <Image source={require("../assets/icons/profile.png")} style={style} />
+        <Image
+          source={require("../assets/icons/search_icon.png")}
+          style={style}
+        />
       );
       break;
     case "create":
@@ -310,10 +323,10 @@ function TabBarIcon(props: { name: string; color: string }) {
         />
       );
       break;
-    case "wallet":
+    case "account":
       return (
         <Image
-          source={require("../assets/icons/wallet_white.png")}
+          source={require("../assets/icons/account_icon.png")}
           style={style}
         />
       );
@@ -339,3 +352,4 @@ function TabBarIcon(props: { name: string; color: string }) {
   // @ts-ignore
   return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }
+

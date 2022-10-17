@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { Background, Button } from "../../components";
 import { Navigation } from "../../types";
 import { View, Text } from "react-native";
+import { normalize } from "path";
 
 type Props = {
   navigation: Navigation;
@@ -25,16 +26,18 @@ const OnboardingScreen = ({ navigation }: Props) => (
           borderRadius: 6,
           width: "44.4%",
         }}
-        onPress={() => navigation.navigate("LogUser")}
+        //onPress={() => navigation.navigate("CreateUser")}
+        onPress={() => navigation.navigate("SignUp")}
       >
         <View style={{ paddingTop: "5px" }}>
           <Text
             style={{
               color: "#000",
-              fontSize: 13,
+              fontSize: 16,
+              fontWeight: "800",
             }}
           >
-            LOGIN
+            SIGN UP
           </Text>
         </View>
       </Button>
@@ -47,16 +50,17 @@ const OnboardingScreen = ({ navigation }: Props) => (
           borderRadius: 6,
           width: "44.4%",
         }}
-        onPress={() => navigation.navigate("CreateUser")}
+        onPress={() => navigation.navigate("LogUser")}
       >
         <View style={{ paddingTop: "5px" }}>
           <Text
             style={{
               color: "#FFF",
-              fontSize: 13,
+              fontSize: 16,
+              fontWeight: "700",
             }}
           >
-            Register
+            RESTORE
           </Text>
         </View>
       </Button>

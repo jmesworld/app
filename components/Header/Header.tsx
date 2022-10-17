@@ -20,10 +20,10 @@ const Header = ({ navigation }: Props) => (
       })}
     >
       <Image
-        source={require("../../assets/images/logo192.png")}
+        source={require("../../assets/icons/chevron_backbutton.png")}
         style={{
-          width: 30,
-          height: 30,
+          width: 12,
+          height: 21,
           justifyContent: "flex-start",
           alignSelf: "flex-start",
         }}

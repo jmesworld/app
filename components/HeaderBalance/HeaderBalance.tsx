@@ -54,21 +54,21 @@ export default function HeaderBalance({ navigation }: Props) {
           flexDirection: "row",
           color: "#FFF",
           justifyContent: "flex-end",
+          paddingTop: 6,
         })}
       >
         <Image
-          source={require("../../assets/icons/jmes_droplet_logo.png")}
-          style={{ width: 17, height: 24 }}
+          source={require("../../assets/icons/J_logo_white_small.png")}
+          style={{ width: 8.89, height: 16.11 }}
         />
       </Pressable>
       <Text
         style={{
           color: "#FFF",
           fontSize: 20,
-          maxWidth: 125,
+
           paddingLeft: 5,
-          paddingRight: 12,
-          lineHeight: 23,
+          paddingRight: 5,
         }}
       >
         {parseFloat(balance).toFixed(4)}
@@ -80,13 +80,15 @@ export default function HeaderBalance({ navigation }: Props) {
           flexDirection: "row",
           color: "#FFF",
           justifyContent: "flex-end",
+          paddingTop: 10,
         })}
       >
         <Image
-          source={require("../../assets/icons/profile.png")}
-          style={{ width: 21, height: 21 }}
+          source={require("../../assets/icons/chevron_dropdown.png")}
+          style={{ width: 6, height: 9 }}
         />
       </Pressable>
     </View>
   );
 }
+
