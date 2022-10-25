@@ -6,16 +6,12 @@ import {
   TextInput,
   SafeAreaView,
 } from "react-native";
+import { Checkbox } from "react-native-paper";
 import { LOCAL_SERVER_PATH } from "../../utils";
 import { Text, View } from "../../components/Themed/Themed";
 import { useStoreActions, useStoreState } from "../../hooks/storeHooks";
-import React, { useEffect } from "react";
-import {
-  accountFromSeed,
-  generateMnemonic,
-  mnemonicToSeed,
-  signMessage,
-} from "../../utils";
+import { useEffect, useState } from "react";
+import { accountFromSeed, mnemonicToSeed, signMessage } from "../../utils";
 import Background4 from "../../components/Background4/Background4";
 import {
   useFonts,
@@ -28,15 +24,88 @@ import {
 import { Roboto_900Black } from "@expo-google-fonts/roboto";
 import { GFSDidot_400Regular } from "@expo-google-fonts/gfs-didot";
 import { Navigation } from "../../types";
-
+import { Route } from "@react-navigation/native";
 type Props = {
   navigation: Navigation;
+  route: Route<any>;
 };
 
-export default function BackUpScreen({ navigation }: Props) {
-  const [username, onChangeUsername] = React.useState("");
-  const [mnemonic, onChangeMnemonic] = React.useState("");
-  const [address, onChangeAddress] = React.useState("");
+export default function BackUpScreen({ navigation, route }: Props) {
+  const [username, setUsername] = useState("");
+  const [mnemonic, setMnemonic] = useState("");
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+
+  const [checked, setChecked] = useState(false);
+  useEffect(() => {
+    if (route.params) {
+      if (route.params.address) setAddress(route.params.address);
+      if (route.params.username) setUsername(route.params.username);
+      if (route.params.name) setName(route.params.name);
+      if (route.params.mnemonic) setMnemonic(route.params.mnemonic);
+    }
+  }, [route.params]);
+
+  const addWallet = useStoreActions((actions) => actions.addWallet);
+  const addUser = useStoreActions((actions) => actions.addUser);
+  const addAccount = useStoreActions((actions) => actions.addAccount);
+
+  const performRegister = async function () {
+    const seed = await mnemonicToSeed(mnemonic);
+    const account = await accountFromSeed(seed);
+    const balance = 10000;
+    const { signature } = await signMessage("jmesworld", account.privateKey);
+    const derivedAddress = account.address;
+    const path = `${LOCAL_SERVER_PATH}/users`;
+    await fetch(path, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        address: derivedAddress,
+        name,
+        username,
+        balance,
+        mnemonic,
+      }),
+    });
+    await addUser({
+      username,
+      signature: signature,
+    });
+    await addWallet({
+      mnemonic: mnemonic,
+      privateKey: account.privateKey,
+      seed: seed,
+    });
+    await addAccount({ index: 0, title: "default", address: derivedAddress });
+    setTimeout(() => {
+      navigation.navigate("Root");
+    }, 5000);
+  };
+
+  const SeedList = () => {
+    return (
+      <SafeAreaView style={styles.mnemonicContainer}>
+        {mnemonic.split(" ").map((word, index) => (
+          <View key={index} style={styles.seedWordContainer}>
+            <Text style={styles.seedWordText} key={word}>
+              {word}
+            </Text>
+            <View
+              style={styles.seedWordSeperator}
+              lightColor="#eee"
+              darkColor="rgba(255,255,255,0.1)"
+            />
+            <Text style={styles.seedWordNumber}> {index + 1} </Text>
+          </View>
+        ))}
+      </SafeAreaView>
+    );
+  };
+
   let [fontsLoaded] = useFonts({
     Comfortaa_300Light,
     Comfortaa_400Regular,
@@ -47,65 +116,8 @@ export default function BackUpScreen({ navigation }: Props) {
     GFSDidot_400Regular,
   });
 
-  const addWallet = useStoreActions((actions) => actions.addWallet);
-  const addUser = useStoreActions((actions) => actions.addUser);
-  const addAccount = useStoreActions((actions) => actions.addAccount);
-  //const balanceState = useStoreState((state) => state.accounts[0].balance)
-
-  const performRegister = async function () {
-    const seed = await mnemonicToSeed(mnemonic);
-    const account = await accountFromSeed(seed);
-    const balance = 10000;
-    const { signature } = await signMessage("jmesworld", account.privateKey);
-
-    await addUser({
-      username,
-      signature: signature,
-    });
-    await addWallet({
-      mnemonic: mnemonic,
-      privateKey: account.privateKey,
-      seed: seed,
-    });
-
-    const derivedAddress = account.address;
-    //const path = `http://localhost:3000/users`;
-    const path = `${LOCAL_SERVER_PATH}/users`;
-    const rawResponse = await fetch(path, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        address: derivedAddress,
-        username,
-        balance,
-        mnemonic,
-      }),
-    });
-
-    await onChangeAddress(derivedAddress);
-    await addAccount({ index: 0, title: "default", address: derivedAddress });
-
-    const contentResponse = await rawResponse.json();
-    console.log(contentResponse);
-
-    setTimeout(() => {
-      navigation.navigate("Root");
-    }, 5000);
-  };
-
-  useEffect(() => {
-    async function generate() {
-      const mnemonic = await generateMnemonic();
-      onChangeMnemonic(mnemonic);
-    }
-    generate();
-  }, []);
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Background4>
         <Text style={styles.title}>JMES</Text>
         <View
@@ -113,151 +125,152 @@ export default function BackUpScreen({ navigation }: Props) {
           lightColor="#eee"
           darkColor="rgba(255,255,255,0.1)"
         />
-
-        <SafeAreaView>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeUsername}
-            value={username}
-            placeholder="Full Name"
-          />
+        <Text style={styles.secondTitle}>BACKUP RECOVERY PHRASE</Text>
+        <SafeAreaView style={styles.textContainer}>
+          <Text style={styles.text}>
+            Write down your recovery phrase somewhere safe. If you lose or
+            damage this device, it's the only way to recover your account
+          </Text>
         </SafeAreaView>
-        <Text style={styles.secondTitle}>Mnemonic</Text>
-
-        <TextInput
-          style={styles.inputMultiline}
-          multiline={true}
-          numberOfLines={4}
-          onChangeText={onChangeMnemonic}
-          value={mnemonic}
-          editable={false}
-          placeholder="Enter your mnemonic"
-        />
-
-        <Pressable onPress={() => performRegister()} style={styles.button}>
-          <Text style={styles.buttonText}>Confirm</Text>
-        </Pressable>
+        <SeedList />
+        <SafeAreaView style={styles.checkboxContainer}>
+          <Checkbox
+            color="white"
+            status={checked ? "checked" : "unchecked"}
+            onPress={() => {
+              setChecked(!checked);
+            }}
+          />
+          <Text style={styles.text}>
+            I confirm I have written down a copy of my recovery phrase
+          </Text>
+        </SafeAreaView>
+        <SafeAreaView style={styles.buttonContainer}>
+          <Pressable
+            onPress={() => {
+              performRegister();
+            }}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>CONFIRM</Text>
+          </Pressable>
+        </SafeAreaView>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
       </Background4>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: "50%",
     alignItems: "center",
     backgroundColor: "#fff",
     justifyContent: "center",
   },
+  buttonContainer: {
+    width: "72%",
+    height: 52,
+    // marginTop: 35,
+    // marginBottom: 13,
+    margin: "auto",
+    borderRadius: 6,
+  },
 
+  textContainer: {
+    backgroundColor: "transparent",
+    width: "76.2%",
+    height: 68,
+    margin: "auto",
+  },
+  checkboxContainer: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    width: "76.2%",
+    height: 36,
+    marginTop: 29,
+  },
+  mnemonicContainer: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    width: "76.2%",
+    height: 314,
+    // marginTop: 22,
+    // marginBottom: 29,
+    margin: "auto",
+    gap: "10px 14px",
+  },
+  seedWordContainer: {
+    display: "flex",
+    backgroundColor: "transparent",
+    maxWidth: "33.3%",
+    minWidth: "16.65%",
+    maxHeight: "25%",
+    minHeight: "16.6%",
+    alignItems: "center",
+  },
+  seedWordText: {
+    color: "#FFFFFF",
+  },
+  seedWordSeperator: {
+    marginTop: 3,
+    marginBottom: 3,
+    height: 1,
+    width: "100%",
+  },
+  seedWordNumber: {
+    color: "#FFFFFF",
+  },
+  text: {
+    fontSize: 15,
+    color: "#ABABAB",
+  },
   buttonText: {
     fontSize: 18,
     textAlign: "center",
     textTransform: "uppercase",
     fontFamily: "Roboto_900Black",
-    color: "#FFF",
+    color: "#000",
   },
   iconImageView: {
     flexDirection: "row",
   },
-
   button: {
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: "80%",
-    paddingTop: 15,
-    paddingBottom: 15,
-    color: "#FFF",
-    backgroundColor: "#000",
+    paddingTop: 17,
+    paddingBottom: 17,
+    color: "#000",
+    backgroundColor: "#fff",
     borderRadius: 6,
-    paddingLeft: 25,
-    paddingRight: 25,
-    fontSize: 24,
+    paddingLeft: 52,
+    paddingRight: 53,
     textTransform: "uppercase",
     fontFamily: "Roboto_900Black",
+  },
+  input: {
+    backgroundColor: "#5B5B5B",
+    height: 34,
+    borderRadius: 6,
+    paddingLeft: 18,
   },
   title: {
     fontSize: 42,
     fontFamily: "GFSDidot_400Regular",
     color: "#FFF",
   },
-  input: {
-    backgroundColor: "white",
-    height: 40,
-    margin: 12,
-    width: "90%",
-    borderWidth: 1,
-    padding: 10,
-  },
-  inputMultiline: {
-    backgroundColor: "white",
-    margin: 12,
-    width: "90%",
-    borderWidth: 1,
-    padding: 10,
-  },
   secondTitle: {
-    fontSize: 36,
+    fontSize: 20,
     fontFamily: "Comfortaa_300Light",
-    paddingTop: 40,
+    textTransform: "uppercase",
+    // paddingBottom: 26,
     color: "#FFF",
   },
-  balanceJMES: {
-    fontWeight: "bold",
-    flex: 0,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "center",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
-  },
-  balanceEUR: {
-    fontWeight: "bold",
-    flex: 0,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "center",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
-  },
-  buttonImage: {
-    padding: 10,
-  },
-  iconImage: {
-    width: 30,
-    height: 30,
-    margin: 10,
-  },
-  section: {
-    fontWeight: "bold",
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "flex-start",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
-  },
-  noAssetText: {
-    fontWeight: "bold",
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: "center",
-    fontFamily: "Roboto_900Black",
-    textTransform: "uppercase",
-  },
-
   separator: {
-    marginVertical: 30,
+    marginTop: 9,
+    marginBottom: 18,
     height: 1,
     width: "80%",
   },

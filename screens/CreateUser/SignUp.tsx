@@ -6,16 +6,9 @@ import {
   TextInput,
   SafeAreaView,
 } from "react-native";
-import { LOCAL_SERVER_PATH } from "../../utils";
 import { Text, View } from "../../components/Themed/Themed";
-import { useStoreActions, useStoreState } from "../../hooks/storeHooks";
-import React, { useEffect } from "react";
-import {
-  accountFromSeed,
-  generateMnemonic,
-  mnemonicToSeed,
-  signMessage,
-} from "../../utils";
+import { useState, useEffect } from "react";
+import { generateMnemonic } from "../../utils";
 import Background4 from "../../components/Background4/Background4";
 import {
   useFonts,
@@ -32,12 +25,31 @@ import { Navigation } from "../../types";
 type Props = {
   navigation: Navigation;
 };
-
 export default function SignUpScreen({ navigation }: Props) {
-  const [username, onChangeUsername] = React.useState("");
-  const [mnemonic, onChangeMnemonic] = React.useState("");
-  const [name, onChangeName] = React.useState("");
-  const [address, onChangeAddress] = React.useState("");
+  const [username, onChangeUsername] = useState("");
+  const [mnemonic, onChangeMnemonic] = useState("");
+  const [name, onChangeName] = useState("");
+
+  useEffect(() => {
+    async function generate() {
+      const mnemonic = await generateMnemonic();
+      onChangeMnemonic(mnemonic);
+    }
+    generate();
+  }, []);
+
+  const handleSignUp = async function () {
+    // @ts-ignore
+    return navigation.navigate({
+      name: "BackUp",
+      params: {
+        username,
+        name,
+        mnemonic,
+      },
+    });
+  };
+
   let [fontsLoaded] = useFonts({
     Comfortaa_300Light,
     Comfortaa_400Regular,
@@ -48,62 +60,6 @@ export default function SignUpScreen({ navigation }: Props) {
     GFSDidot_400Regular,
   });
 
-  const addWallet = useStoreActions((actions) => actions.addWallet);
-  const addUser = useStoreActions((actions) => actions.addUser);
-  const addAccount = useStoreActions((actions) => actions.addAccount);
-  //const balanceState = useStoreState((state) => state.accounts[0].balance)
-
-  const performRegister = async function () {
-    const seed = await mnemonicToSeed(mnemonic);
-    const account = await accountFromSeed(seed);
-    const balance = 10000;
-    const { signature } = await signMessage("jmesworld", account.privateKey);
-
-    await addUser({
-      username,
-      signature: signature,
-    });
-    await addWallet({
-      mnemonic: mnemonic,
-      privateKey: account.privateKey,
-      seed: seed,
-    });
-
-    const derivedAddress = account.address;
-    //const path = `http://localhost:3000/users`;
-    const path = `${LOCAL_SERVER_PATH}/users`;
-    const rawResponse = await fetch(path, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        address: derivedAddress,
-        name,
-        username,
-        balance,
-        mnemonic,
-      }),
-    });
-
-    await onChangeAddress(derivedAddress);
-    await addAccount({ index: 0, title: "default", address: derivedAddress });
-
-    const contentResponse = await rawResponse.json();
-    console.log(contentResponse);
-
-    setTimeout(() => {
-      navigation.navigate("Root");
-    }, 5000);
-  };
-  useEffect(() => {
-    async function generate() {
-      const mnemonic = await generateMnemonic();
-      onChangeMnemonic(mnemonic);
-    }
-    generate();
-  }, []);
   return (
     <View style={styles.container}>
       <Background4>
@@ -131,7 +87,12 @@ export default function SignUpScreen({ navigation }: Props) {
           />
         </SafeAreaView>
         <View style={styles.buttonContainer}>
-          <Pressable onPress={() => performRegister()} style={styles.button}>
+          <Pressable
+            onPress={() => {
+              handleSignUp();
+            }}
+            style={styles.button}
+          >
             <Text style={styles.buttonText}>SIGN UP</Text>
           </Pressable>
         </View>

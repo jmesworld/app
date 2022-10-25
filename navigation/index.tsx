@@ -28,6 +28,7 @@ import LinkingConfiguration from "./LinkingConfiguration";
 import ScanScreen from "../screens/Scan/Scan";
 import CreateUserScreen from "../screens/CreateUser/CreateUser";
 import SignUpScreen from "../screens/CreateUser/SignUp";
+import BackUpScreen from "../screens/BackUp/BackUp";
 import LogUserScreen from "../screens/LogUser/LogUser";
 import GalleryScreen from "../screens/Gallery/Gallery";
 import Header from "../components/Header/Header";
@@ -163,6 +164,12 @@ function RootNavigator() {
           name="SignUp"
           style={{ backgroundColor: "#000", height: "100%" }}
           component={SignUpScreen}
+          options={{ headerShown: true, title: "" }}
+        />
+        <Stack.Screen
+          name="BackUp"
+          style={{ backgroundColor: "#000", height: "100%" }}
+          component={BackUpScreen}
           options={{ headerShown: true, title: "" }}
         />
         <Stack.Screen
@@ -352,4 +359,3 @@ function TabBarIcon(props: { name: string; color: string }) {
   // @ts-ignore
   return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }
-

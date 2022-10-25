@@ -1,3 +1,5 @@
+//old screen, can be deleted when new signup view is fully integrated
+
 import { StatusBar } from "expo-status-bar";
 import {
   Platform,
