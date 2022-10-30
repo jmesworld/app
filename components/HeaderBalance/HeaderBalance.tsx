@@ -5,8 +5,7 @@ import { Image, Pressable } from "react-native";
 import { Navigation } from "../../types";
 import { useStoreState } from "../../hooks/storeHooks";
 import { useEffect, useState } from "react";
-import { fetchAddressBalance } from "../../utils";
-import Web3 from "web3";
+import { fetchBalance } from "../../utils";
 
 type Props = {
   children: React.ReactNode;
@@ -15,27 +14,23 @@ type Props = {
 export default function HeaderBalance({ navigation }: Props) {
   const useBalanceState = useStoreState((state) => state.accounts[0].balance);
   const address = useStoreState((state) => state.accounts[0].address);
+  const [shouldFetch, setShouldFetch] = useState(true);
   const [balance, setBalance] = useState(
     parseFloat(useBalanceState).toFixed(4)
   );
-  const [balanceEur, setBalanceEur] = useState(useBalanceState);
+  const getBalance = async () => {
+    const fetchedBalance = await fetchBalance(address);
+    setBalance(fetchedBalance);
+  };
 
   useEffect(() => {
-    async function fetch() {
-      const fetchedBalance = await fetchAddressBalance(address);
-      console.log({ fetchedBalance });
-      setBalance(Web3.utils.fromWei(fetchedBalance, "ether"));
-      const convertedBalance = (
-        parseInt(fetchedBalance) * 0.1412840103
-      ).toString();
-
-      console.log({ convertedBalance });
-      setBalanceEur(
-        parseFloat(Web3.utils.fromWei(convertedBalance, "ether")).toFixed(2)
-      );
-    }
-
-    fetch();
+    getBalance();
+    setInterval(() => {
+      if (shouldFetch) {
+        getBalance();
+      }
+      console.log("interval");
+    }, 10 * 1000);
   }, []);
 
   return (
@@ -91,4 +86,3 @@ export default function HeaderBalance({ navigation }: Props) {
     </View>
   );
 }
-

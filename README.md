@@ -10,18 +10,7 @@
       - Your credentials will be saved in local storage and you will auto login upon page load
   6. Once logged in you are greeted with your profile view and then able to navigate between pages
 
-### Current Tasks:
-## 🧱 Production
-  1. Mock internal and API communications - done 
-      - RECOMMENDED: add additional error handling and validations
-  2. Implement QR code generation and scanning page - pending
-  3. Refactorization - pending
-      - CONTINUED: abstractions and layout improvements
-### Suggested
-## 💻 UI/UX
-  1. Implement prevent default react component behaviour
-## 🌐 Deployment & Config
-  1. Implement concurrent server and application deployment
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

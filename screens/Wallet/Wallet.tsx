@@ -4,7 +4,7 @@ import { Platform, StyleSheet, Pressable, Image } from "react-native";
 import { Text, View } from "../../components/Themed/Themed";
 import { useStoreState, useStoreActions } from "../../hooks/storeHooks";
 import { useEffect, useState } from "react";
-import { fetchAddressBalance } from "../../utils";
+
 import Background4 from "../../components/Background4/Background4";
 import {
   useFonts,
@@ -15,8 +15,7 @@ import {
   Comfortaa_700Bold,
 } from "@expo-google-fonts/comfortaa";
 import { Roboto_900Black } from "@expo-google-fonts/roboto";
-import Web3 from "web3";
-import { LOCAL_SERVER_PATH } from "../../utils";
+import { fetchBalance } from "../../utils";
 import { Navigation } from "../../types";
 import * as React from "react";
 
@@ -29,8 +28,31 @@ export default function WalletScreen({ navigation }: Props) {
   const updateAccount = useStoreActions((actions) => actions.updateAccount);
   const [shouldFetch, setShouldFetch] = useState(true);
   const [balance, setBalance] = useState(account.balanceState);
-  console.log(account.balanceState, "Account.balanceState");
   const [balanceEur, setBalanceEur] = useState(account.balanceState);
+
+  const updateStoreState = () => {
+    console.log("UpdateStoreState");
+    updateAccount({ ...account, balance: balance });
+  };
+
+  const getBalance = async () => {
+    const fetchedBalance = await fetchBalance(account.address);
+    setBalance(fetchedBalance);
+    const convertedBalance = (
+      parseInt(fetchedBalance) * 0.1412840103
+    ).toString();
+    setBalanceEur(parseFloat(convertedBalance).toFixed(2));
+  };
+
+  useEffect(() => {
+    getBalance();
+    setInterval(() => {
+      if (shouldFetch) {
+        getBalance();
+      }
+      console.log("interval");
+    }, 10 * 1000);
+  }, [updateStoreState]);
 
   let [fontsLoaded] = useFonts({
     Comfortaa_300Light,
@@ -40,43 +62,6 @@ export default function WalletScreen({ navigation }: Props) {
     Comfortaa_700Bold,
     Roboto_900Black,
   });
-
-  function updateStoreState() {
-    console.log("UpdateStoreState");
-    updateAccount({ ...account, balance: balance });
-  }
-
-  async function fetchFromLocal() {
-    const path = `${LOCAL_SERVER_PATH}/users?address=${account.address}`;
-    console.log(path, "CURRENT PATH");
-    const rawResponse = await fetch(path, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-    const parsedResponse = await rawResponse.json();
-    const balance = parsedResponse[0].balance.toString();
-    //console.log("balance:", balance)
-    setBalance(balance);
-
-    const convertedBalance = (parseInt(balance) * 0.1412840103).toString();
-
-    //console.log({convertedBalance});
-
-    setBalanceEur(parseFloat(convertedBalance).toFixed(2));
-  }
-
-  useEffect(() => {
-    fetchFromLocal();
-    setInterval(() => {
-      if (shouldFetch) {
-        fetchFromLocal();
-      }
-      console.log("interval");
-    }, 10 * 1000);
-  }, [updateStoreState]);
 
   return (
     <View style={styles.container}>

@@ -1,18 +1,11 @@
 /* eslint-disable no-case-declarations */
 import "react-native-get-random-values";
-import { ethers } from "ethers";
+import { Client, Mnemonic } from "jmes";
 import { Buffer } from "buffer";
 import * as bip39 from "bip39";
 import * as bip32 from "bip32";
-import ethereumjs from "ethereumjs-wallet";
 import Web3 from "web3";
-import Moralis from "moralis";
-import { Animated } from "react-native";
-// import tinysecp from 'rn-secp256k1'
-// import tinysecp from 'tiny-secp256k1'
-// import nacl from "tweetnacl";
 
-// console.log(tinysecp)
 // @ts-ignore
 export const DERIVATION_PATH = {
   bip44Change: "bip44Change",
@@ -21,17 +14,21 @@ export const DERIVATION_PATH = {
 export const SCHEMA_PREFIX = "jmes:";
 
 const JSON_RPC_PATH = "http://3.72.109.56:8545";
-//const LOCAL_SERVER_PATH = "http://localhost:3000"; //localhost
-const LOCAL_SERVER_PATH = "http://192.168.0.8:3000"; //lan
-// const REST_PATH = '52.59.220.121'
-// "mountain toilet almost birth forest ghost hand drum success enhance garment slice pipe option eager palace adult bridge speak gasp leopard jealous insane drama"
+const LOCAL_SERVER_PATH = "http://localhost:3001";
+//const LOCAL_SERVER_PATH = "http://192.168.0.8:3000"; //lan
+//const REST_PATH = '52.59.220.121'
+
+const client = new Client();
 
 const generateMnemonic = async () => {
   const randomBytes = crypto.getRandomValues(new Uint8Array(32));
-  console.log(randomBytes);
-  const mnemonic = ethers.utils.entropyToMnemonic(randomBytes);
-  console.log(mnemonic);
+  const mnemonic = Mnemonic.generateMnemonic(randomBytes);
   return mnemonic;
+};
+const generateAccount = async (mnemonic: string) => {
+  const wallet = client.createWallet(new Mnemonic(mnemonic));
+  const account = wallet.getAccount();
+  return account;
 };
 
 const mnemonicToSeed = async (mnemonic: string) => {
@@ -39,66 +36,6 @@ const mnemonicToSeed = async (mnemonic: string) => {
   const seed = await bip39.mnemonicToSeedSync(mnemonic);
   return seed.toString("hex");
   // return Buffer.from(seed).toString("hex");
-};
-
-const accountFromSeed = async (
-  seed: string,
-  walletIndex: number,
-  derivationPath: string,
-  accountIndex: 0
-) => {
-  const web3 = new Web3(
-    new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
-  );
-
-  const rootKey = await bip32.fromSeed(Buffer.from(seed, "hex"));
-  const derivedKey = rootKey.derivePath("m/0");
-
-  console.log("DERIVED KEY", derivedKey.toWIF());
-
-  const account = web3.eth.accounts.privateKeyToAccount(
-    derivedKey.privateKey.toString("hex")
-  );
-  console.log("Derived address:", { address: account.address });
-  const { address, privateKey, encrypt, sign, signTransaction } = account;
-  // @ts-ignore
-  return { accountIndex, walletIndex: 0, address, privateKey, account };
-  // @ts-ignore
-
-  const acc = {
-    stuff: true,
-  };
-  return acc;
-};
-
-const accountFromPrivateKey = (
-  privateKey: string,
-  walletIndex: 0,
-  derivationPath: "",
-  accountIndex: 0
-) => {
-  //console.log(`Derive from privateKey`, privateKey);
-
-  const web3 = new Web3(
-    new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
-  );
-  // @ts-ignore
-  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-  // console.log({account});
-  //console.log('Derived address:', {address: account.address})
-  const { address, encrypt, sign, signTransaction } = account;
-  // @ts-ignore
-  return { accountIndex, walletIndex: 0, address, privateKey, account };
-  // @ts-ignore
-  // web3.eth.getAccounts(console.log);
-
-  // const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
-
-  // const acc = new solanaWeb3.Keypair(keyPair);
-  const acc = {
-    stuff: true,
-  };
-  return acc;
 };
 
 const accountFromAddress = async (address: string) => {
@@ -120,11 +57,91 @@ const notateWeiValue = async (amount: number) => {
 
   return weiToBigInt;
 };
+const fetchBalance = async (address: string) => {
+  const path = `${LOCAL_SERVER_PATH}/users?address=${address}`;
+  const rawResponse = await fetch(path, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+
+  const parsedResponse = await rawResponse.json();
+  const balance = parsedResponse[0].balance.toString();
+  //const convertedBalance = (parseInt(balance) * 0.1412840103).toString();
+  //setBalanceEur(parseFloat(convertedBalance).toFixed(2));
+  return balance;
+};
+
 const maskedAddress = (address: string) => {
   if (!address) return;
   return `${address.slice(0, 8)}...${address.slice(address.length - 8)}`;
 };
 
+/****** Web 3 functions ******/
+// consider moving web3 functions to its own util file
+
+/** files in use **/
+// LogUser.tsx using accountFromSeed, deriveSeed,signMessage
+// WalletSend.tsx using accountFromPrivateKey,sendTransaction
+// WalletReceiveConfirm.tsx using fetchAddressBalance
+
+const accountFromSeed = async (
+  seed: string,
+  walletIndex: number,
+  derivationPath: string,
+  accountIndex: 0
+) => {
+  const web3 = new Web3(
+    new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
+  );
+  const rootKey = await bip32.fromSeed(Buffer.from(seed, "hex"));
+  const derivedKey = rootKey.derivePath("m/0");
+  console.log("DERIVED KEY", derivedKey.toWIF());
+
+  const account = web3.eth.accounts.privateKeyToAccount(
+    derivedKey.privateKey.toString("hex")
+  );
+  console.log("Derived address:", { address: account.address });
+  const { address, privateKey, encrypt, sign, signTransaction } = account;
+  // @ts-ignore
+  return { accountIndex, walletIndex: 0, address, privateKey, account };
+  // @ts-ignore
+
+  const acc = {
+    stuff: true,
+  };
+  return acc;
+};
+const accountFromPrivateKey = (
+  privateKey: string,
+  walletIndex: 0,
+  derivationPath: "",
+  accountIndex: 0
+) => {
+  //console.log(`Derive from privateKey`, privateKey);
+  const web3 = new Web3(
+    new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
+  );
+  // @ts-ignore
+  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+  // console.log({account});
+  //console.log('Derived address:', {address: account.address})
+  const { address, encrypt, sign, signTransaction } = account;
+  // @ts-ignore
+  return { accountIndex, walletIndex: 0, address, privateKey, account };
+  // @ts-ignore
+  // web3.eth.getAccounts(console.log);
+
+  // const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
+
+  // const acc = new solanaWeb3.Keypair(keyPair);
+  const acc = {
+    stuff: true,
+  };
+  return acc;
+};
 const deriveSeed = (
   seed: string,
   walletIndex: number,
@@ -172,7 +189,6 @@ const signMessage = (message: string, privateKey: string) => {
   console.log(web3.eth.accounts.recover(message, signatureData.signature));
   return signatureData;
 };
-
 const sendTransaction = async (transactionParams = {}, account) => {
   // @ts-ignore
   const { address, amount } = transactionParams;
@@ -209,6 +225,7 @@ const sendTransaction = async (transactionParams = {}, account) => {
     throw e;
   }
 };
+
 const sign = (message: string, privateKey: string) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(JSON_RPC_PATH));
   const signatureData = web3.eth.accounts.sign(message, privateKey);
@@ -218,8 +235,10 @@ const sign = (message: string, privateKey: string) => {
   console.log(web3.eth.accounts.recover(message, signatureData.signature));
   return signatureData;
 };
+
 export {
   LOCAL_SERVER_PATH,
+  fetchBalance,
   notateWeiValue,
   accountFromAddress,
   fetchAddressBalance,

@@ -7,11 +7,11 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
-import { LOCAL_SERVER_PATH } from "../../utils";
+import { LOCAL_SERVER_PATH, generateMnemonic } from "../../utils";
 import { Text, View } from "../../components/Themed/Themed";
 import { useStoreActions, useStoreState } from "../../hooks/storeHooks";
 import { useEffect, useState } from "react";
-import { accountFromSeed, mnemonicToSeed, signMessage } from "../../utils";
+import { mnemonicToSeed } from "../../utils";
 import Background4 from "../../components/Background4/Background4";
 import {
   useFonts,
@@ -25,6 +25,7 @@ import { Roboto_900Black } from "@expo-google-fonts/roboto";
 import { GFSDidot_400Regular } from "@expo-google-fonts/gfs-didot";
 import { Navigation } from "../../types";
 import { Route } from "@react-navigation/native";
+import { Client, Mnemonic } from "jmes";
 type Props = {
   navigation: Navigation;
   route: Route<any>;
@@ -34,15 +35,21 @@ export default function BackUpScreen({ navigation, route }: Props) {
   const [username, setUsername] = useState("");
   const [mnemonic, setMnemonic] = useState("");
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-
   const [checked, setChecked] = useState(false);
+
   useEffect(() => {
+    async function generate() {
+      const mnemonic = await generateMnemonic();
+
+      setMnemonic(mnemonic);
+    }
+    generate();
+    setMnemonic(mnemonic);
+
     if (route.params) {
-      if (route.params.address) setAddress(route.params.address);
       if (route.params.username) setUsername(route.params.username);
       if (route.params.name) setName(route.params.name);
-      if (route.params.mnemonic) setMnemonic(route.params.mnemonic);
+      //if (route.params.mnemonic) setMnemonic(route.params.mnemonic);
     }
   }, [route.params]);
 
@@ -51,11 +58,22 @@ export default function BackUpScreen({ navigation, route }: Props) {
   const addAccount = useStoreActions((actions) => actions.addAccount);
 
   const performRegister = async function () {
-    const seed = await mnemonicToSeed(mnemonic);
-    const account = await accountFromSeed(seed);
+    const client = new Client();
     const balance = 10000;
-    const { signature } = await signMessage("jmesworld", account.privateKey);
-    const derivedAddress = account.address;
+    const seed = await mnemonicToSeed(mnemonic);
+
+    const wallet = client.createWallet(new Mnemonic(mnemonic));
+    const account = wallet.getAccount();
+    const derivedAddress = account.getAddress();
+    const derivedPrivateKey = account.derivableAccountKey.privateKey;
+    //const { signature } = await signMessage("jmesworld", derivedPrivateKey);
+    const signature = wallet.signMessage({});
+    //const txid = wallet.broadcastsignature(signature);
+    console.log({ derivedAddress });
+    console.log({ mnemonic });
+    console.log({ wallet });
+    console.log({ account });
+    console.log({ account: account.derivableAccountKey.privateKey });
     const path = `${LOCAL_SERVER_PATH}/users`;
     await fetch(path, {
       method: "POST",
@@ -77,7 +95,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
     });
     await addWallet({
       mnemonic: mnemonic,
-      privateKey: account.privateKey,
+      privateKey: derivedPrivateKey,
       seed: seed,
     });
     await addAccount({ index: 0, title: "default", address: derivedAddress });
