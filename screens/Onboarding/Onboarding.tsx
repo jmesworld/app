@@ -3,28 +3,11 @@ import { Background, Button } from "../../components";
 import { Navigation } from "../../types";
 import { View, Text } from "react-native";
 import { normalize } from "path";
-import 'react-native-get-random-values'
-import {Client,Mnemonic} from 'jmes';
+import "react-native-get-random-values";
 
 type Props = {
   navigation: Navigation;
 };
-
-console.log(crypto.getRandomValues(new Uint8Array(32)));
-const client = new Client();
-// console.log(client);
-// console.log(new Mnemonic());
-const randomBytes = crypto.getRandomValues(new Uint8Array(32));
-// @ts-ignore
-const mnemonic = Mnemonic.generateMnemonic(randomBytes);
-console.log(mnemonic);
-//@ts-ignore
-const wallet = client.createWallet(new Mnemonic(mnemonic));
-console.log(wallet);
-// //@ts-ignore
-const account = wallet.getAccount();
-console.log(account);
-console.log(account.getAddress());
 
 const OnboardingScreen = ({ navigation }: Props) => (
   <Background position="bottom">
@@ -44,7 +27,6 @@ const OnboardingScreen = ({ navigation }: Props) => (
           borderRadius: 6,
           width: "44.4%",
         }}
-        //onPress={() => navigation.navigate("CreateUser")}
         onPress={() => navigation.navigate("SignUp")}
       >
         <View style={{ paddingTop: "5px" }}>

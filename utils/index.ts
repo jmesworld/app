@@ -1,45 +1,166 @@
 /* eslint-disable no-case-declarations */
 import "react-native-get-random-values";
-import { ethers } from "ethers";
 import { Buffer } from "buffer";
 import * as bip39 from "bip39";
 import * as bip32 from "bip32";
-import ethereumjs from "ethereumjs-wallet";
 import Web3 from "web3";
-import Moralis from "moralis";
-import { Animated } from "react-native";
-// import tinysecp from 'rn-secp256k1'
-// import tinysecp from 'tiny-secp256k1'
-// import nacl from "tweetnacl";
+import { Client, Mnemonic } from "jmes";
+import { stringify } from "querystring";
 
-// console.log(tinysecp)
-// @ts-ignore
-export const DERIVATION_PATH = {
-  bip44Change: "bip44Change",
+export const DERIVATION_PATH = { bip44Change: "bip44Change" };
+export const SCHEMA_PREFIX = "jmes:";
+const JSON_RPC_PATH = "http://3.72.109.56:8545";
+const LOCAL_SERVER_PATH = "http://localhost:3001";
+
+const client = new Client();
+
+export const mnemonic = Mnemonic.generateMnemonic(
+  crypto.getRandomValues(new Uint8Array(32))
+);
+export const wallet = client.createWallet(new Mnemonic(mnemonic));
+const identityAPI = client.providers.identityAPI;
+const marketplaceAPI = client.providers.marketplaceAPI;
+const account = wallet.getAccount();
+
+const createIdentity = async (username: string, account: any) => {
+  await identityAPI.createIdentity(username, account);
 };
 
-export const SCHEMA_PREFIX = "jmes:";
+const createUser = async (
+  username: string,
+  address: string,
+  name: string,
+  balance: number,
+  mnemonic: string,
+  identity: any,
+  account: any
+) => {
+  const path = `${LOCAL_SERVER_PATH}/users`;
+  await fetch(path, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      address,
+      name,
+      username,
+      balance,
+      mnemonic,
+      identity,
+      account,
+    }),
+  });
+};
 
-const JSON_RPC_PATH = "http://3.72.109.56:8545";
-//const LOCAL_SERVER_PATH = "http://localhost:3000"; //localhost
-const LOCAL_SERVER_PATH = "http://192.168.0.8:3000"; //lan
-// const REST_PATH = '52.59.220.121'
-// "mountain toilet almost birth forest ghost hand drum success enhance garment slice pipe option eager palace adult bridge speak gasp leopard jealous insane drama"
+const handleCreateIdentity = async (username: string, account: any) => {
+  const path = `${LOCAL_SERVER_PATH}/identity`;
 
-const generateMnemonic = async () => {
-  const randomBytes = crypto.getRandomValues(new Uint8Array(32));
-  console.log(randomBytes);
-  const mnemonic = ethers.utils.entropyToMnemonic(randomBytes);
-  console.log(mnemonic);
-  return mnemonic;
+  await fetch(path, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username,
+      account,
+    }),
+  });
+  await createIdentity(username, account)
+    .then((identity) => {
+      console.log(identity);
+      return identity;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const fetchIdentity = async (identityName: any) => {
+  const getIdentityReq = await identityAPI.getIdentity(identityName);
+  console.log({ getIdentity: getIdentityReq.data });
+};
+
+const fetchToken = async (account: any) => {
+  const getIdentityTokenReq = await identityAPI.getToken(account);
+  const fetchedToken = await getIdentityTokenReq.data.token;
+  console.log(fetchedToken);
+
+  return fetchedToken;
+};
+
+const getFeed = async (token: any) => {
+  const feed = await marketplaceAPI.getFeed({ token });
+  console.log(feed);
+
+  return feed;
+};
+
+const postItemVote = async (
+  identifier: string,
+  direction: number,
+  token: any
+) => {
+  const vote = await marketplaceAPI.postItemVote(
+    { identifier: "82f182ddbef3d7b80bafc06ee9e4a664", direction: 1 },
+    { token }
+  );
+  console.log(vote);
+
+  return vote;
 };
 
 const mnemonicToSeed = async (mnemonic: string) => {
-  // @ts-ignore
   const seed = await bip39.mnemonicToSeedSync(mnemonic);
+
   return seed.toString("hex");
-  // return Buffer.from(seed).toString("hex");
 };
+
+const accountFromAddress = async (address: string) => {
+  const response = await fetch(`${LOCAL_SERVER_PATH}/users?address=${address}`);
+  const account = await response.json();
+  console.log(account);
+
+  return account;
+};
+
+const notateWeiValue = async (amount: number) => {
+  const fmt /*: BigIntToLocaleStringOptions */ = {
+    notation: "scientific",
+    maximumFractionDigits: 20, // The default is 3, but 20 is the maximum supported by JS according to MDN.
+  };
+  const wei = amount * 10e17;
+  const weiToBigInt = BigInt(wei).toLocaleString("en-us", fmt);
+
+  return weiToBigInt;
+};
+
+const fetchBalance = async (address: string) => {
+  const path = `${LOCAL_SERVER_PATH}/users?address=${address}`;
+  const rawResponse = await fetch(path, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+
+  const parsedResponse = await rawResponse.json();
+  const balance = parsedResponse[0].balance.toString();
+
+  return balance;
+};
+
+const maskedAddress = (address: string) => {
+  if (!address) return;
+  return `${address.slice(0, 8)}...${address.slice(address.length - 8)}`;
+};
+
+/****** Web 3 functions ******/
+// consider moving web3 functions to its own util file
+//files in use below to replace with Jmes.js library
 
 const accountFromSeed = async (
   seed: string,
@@ -50,10 +171,8 @@ const accountFromSeed = async (
   const web3 = new Web3(
     new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
   );
-
   const rootKey = await bip32.fromSeed(Buffer.from(seed, "hex"));
   const derivedKey = rootKey.derivePath("m/0");
-
   console.log("DERIVED KEY", derivedKey.toWIF());
 
   const account = web3.eth.accounts.privateKeyToAccount(
@@ -70,7 +189,6 @@ const accountFromSeed = async (
   };
   return acc;
 };
-
 const accountFromPrivateKey = (
   privateKey: string,
   walletIndex: 0,
@@ -78,7 +196,6 @@ const accountFromPrivateKey = (
   accountIndex: 0
 ) => {
   //console.log(`Derive from privateKey`, privateKey);
-
   const web3 = new Web3(
     new Web3.providers.HttpProvider(JSON_RPC_PATH, { timeout: 10000 })
   );
@@ -100,31 +217,6 @@ const accountFromPrivateKey = (
   };
   return acc;
 };
-
-const accountFromAddress = async (address: string) => {
-  const response = await fetch(`${LOCAL_SERVER_PATH}/users?address=${address}`);
-
-  const account = await response.json();
-  console.log(account);
-  return account;
-};
-
-const notateWeiValue = async (amount: number) => {
-  const fmt /*: BigIntToLocaleStringOptions */ = {
-    notation: "scientific",
-    maximumFractionDigits: 20, // The default is 3, but 20 is the maximum supported by JS according to MDN.
-  };
-  //const weiValue = Web3.utils.toBN(Web3.utils.toWei(amount.toString(), "ether")).toString(16)
-  const wei = amount * 10e17;
-  const weiToBigInt = BigInt(wei).toLocaleString("en-us", fmt);
-
-  return weiToBigInt;
-};
-const maskedAddress = (address: string) => {
-  if (!address) return;
-  return `${address.slice(0, 8)}...${address.slice(address.length - 8)}`;
-};
-
 const deriveSeed = (
   seed: string,
   walletIndex: number,
@@ -172,7 +264,6 @@ const signMessage = (message: string, privateKey: string) => {
   console.log(web3.eth.accounts.recover(message, signatureData.signature));
   return signatureData;
 };
-
 const sendTransaction = async (transactionParams = {}, account) => {
   // @ts-ignore
   const { address, amount } = transactionParams;
@@ -218,13 +309,21 @@ const sign = (message: string, privateKey: string) => {
   console.log(web3.eth.accounts.recover(message, signatureData.signature));
   return signatureData;
 };
+
 export {
   LOCAL_SERVER_PATH,
+  postItemVote,
+  getFeed,
+  fetchToken,
+  fetchIdentity,
+  createIdentity,
+  createUser,
+  handleCreateIdentity,
+  fetchBalance,
   notateWeiValue,
   accountFromAddress,
-  fetchAddressBalance,
+  fetchAddressBalance, //replace with fetchBalance
   accountFromPrivateKey,
-  generateMnemonic,
   mnemonicToSeed,
   accountFromSeed,
   maskedAddress,

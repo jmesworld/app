@@ -12,12 +12,11 @@ import {
   LOCAL_SERVER_PATH,
   mnemonic,
   wallet,
+  account,
   mnemonicToSeed,
   createIdentity,
   fetchIdentity,
   handleCreateIdentity,
-  createUser,
-  fetchToken,
 } from "../../utils";
 import { Text, View } from "../../components/Themed/Themed";
 import { useStoreActions, useStoreState } from "../../hooks/storeHooks";
@@ -44,28 +43,67 @@ export default function BackUpScreen({ navigation, route }: Props) {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [checked, setChecked] = useState(false);
-  const [balance] = useState(10000);
+  const [identity, setIdentity] = useState("");
 
+  // async function create() {
+  //   await handleCreateIdentity(username, account);
+  // }
+  // async function fetch() {
+  //   await fetchIdentity(username);
+  // }
   useEffect(() => {
+    //create();
     if (route.params) {
       if (route.params.username) setUsername(route.params.username);
       if (route.params.name) setName(route.params.name);
     }
+    //fetch();
   }, [route.params]);
 
   const addWallet = useStoreActions((actions) => actions.addWallet);
   const addUser = useStoreActions((actions) => actions.addUser);
   const addAccount = useStoreActions((actions) => actions.addAccount);
 
-  const seed = mnemonicToSeed(mnemonic);
-  const account = wallet.getAccount();
-  const derivedAddress = account.getAddress();
-  const derivedPrivateKey = account.derivableAccountKey.privateKey;
-  const signedMessage = wallet.signMessage(derivedPrivateKey);
+  const handleCreateIdentity = async (username: string, account: any) => {
+    const path = `${LOCAL_SERVER_PATH}/identity`;
 
-  const createUser = async () => {
+    await fetch(path, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        account: account,
+      }),
+    });
+  };
+
+  const performRegister = async function () {
+    const balance = 10000;
+    const seed = await mnemonicToSeed(mnemonic);
+
+    const derivedAddress = account.getAddress();
+    const derivedPrivateKey = account.derivableAccountKey.privateKey;
+    const signedMessage = wallet.signMessage({});
+    const txid = wallet.broadcastSignedMessage(signedMessage);
+
+    console.log(identity);
+    //console.log(identity.data);
+    console.log({ identity });
+    console.log({ identity: identity });
+    //console.log({ identity: identity.data });
+    console.log({ seed });
+    console.log({ txid });
+    console.log({ derivedAddress });
+    console.log({ mnemonic });
+    console.log({ wallet });
+    console.log({ account });
+    console.log({ account: account.derivableAccountKey.privateKey });
+
+    //creates user in local db.json
     const path = `${LOCAL_SERVER_PATH}/users`;
-
     await fetch(path, {
       method: "POST",
       headers: {
@@ -78,39 +116,24 @@ export default function BackUpScreen({ navigation, route }: Props) {
         username,
         balance,
         mnemonic,
-        account,
+        identity: identity,
+        account: account,
       }),
     });
-  };
-
-  const createUserIdentity = async () => {
-    const identityPath = `${LOCAL_SERVER_PATH}/identity`;
-    await fetch(identityPath, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        account,
-      }),
-    });
-  };
-
-  const performRegister = async () => {
-    await createUser();
-    await createUserIdentity();
+    //stores user in localstorage
     await addUser({
       username,
       signature: signedMessage,
     });
+
+    //stores wallet in localstorage
     await addWallet({
       mnemonic: mnemonic,
       privateKey: derivedPrivateKey,
       seed: seed,
     });
 
+    //stores account in localstorage
     await addAccount({ index: 0, title: "default", address: derivedAddress });
 
     setTimeout(() => {

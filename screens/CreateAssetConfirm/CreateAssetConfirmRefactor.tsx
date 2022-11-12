@@ -16,7 +16,7 @@ import {
 import { Roboto_900Black } from "@expo-google-fonts/roboto";
 import { Navigation } from "../../types";
 import { Route } from "@react-navigation/native";
-import { ImagePayload } from "../../lib/ImagePayload";
+import { ImagePayload } from "../../store";
 
 type Props = {
   navigation: Navigation;

@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import Background4 from "../../components/Background4/Background4";
 import { Navigation } from "../../types";
 import { LOCAL_SERVER_PATH } from "../../utils";
-import { ImagePayload } from "../../lib/ImagePayload";
+import { ImagePayload } from "../../store";
 import { useStoreState, useStoreActions } from "../../hooks/storeHooks";
 
 type Props = {

@@ -7,8 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Text, View } from "../../components/Themed/Themed";
-import { useState, useEffect } from "react";
-import { generateMnemonic } from "../../utils";
+import { useState } from "react";
 import Background4 from "../../components/Background4/Background4";
 import {
   useFonts,
@@ -27,16 +26,7 @@ type Props = {
 };
 export default function SignUpScreen({ navigation }: Props) {
   const [username, onChangeUsername] = useState("");
-  const [mnemonic, onChangeMnemonic] = useState("");
   const [name, onChangeName] = useState("");
-
-  useEffect(() => {
-    async function generate() {
-      const mnemonic = await generateMnemonic();
-      onChangeMnemonic(mnemonic);
-    }
-    generate();
-  }, []);
 
   const handleSignUp = async function () {
     // @ts-ignore
@@ -45,7 +35,6 @@ export default function SignUpScreen({ navigation }: Props) {
       params: {
         username,
         name,
-        mnemonic,
       },
     });
   };
