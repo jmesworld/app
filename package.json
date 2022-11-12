@@ -8,6 +8,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest --watchAll",
+    "test-library": "node libraryTest.ts",
     "server": "node server.js",
     "serverTwo": "node serverTwo.js",
     "serverThree": "node serverThree.js",
@@ -91,7 +92,8 @@
     "stream-http": "^3.2.0",
     "tiny-secp256k1": "^2.1.1",
     "url": "^0.11.0",
-    "web3": "^1.7.3"
+    "web3": "^1.7.3",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

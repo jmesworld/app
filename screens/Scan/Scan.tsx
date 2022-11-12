@@ -1,46 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import {Navigation} from "../../types";
-import { useStoreActions, useStoreState } from '../../hooks/storeHooks';
-import { IQRCodePayload } from '../../lib/IQRCodePayload';
+import React, { useState, useEffect } from "react";
+import { Text, View, StyleSheet, Button } from "react-native";
+import { BarCodeScanner } from "expo-barcode-scanner";
+import { Navigation } from "../../types";
+import { useStoreActions, useStoreState } from "../../hooks/storeHooks";
 
 type Props = {
-    navigation: Navigation;
+  navigation: Navigation;
 };
 
-export default function ScanScreen({ navigation }: Props){
+export default function ScanScreen({ navigation }: Props) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
+      setHasPermission(status === "granted");
     };
     getBarCodeScannerPermissions();
   }, []);
 
-const handleBarCodeScanned = async ({ data }) => {
-  const payload = JSON.parse(data)
-  setScanned(true);
+  const handleBarCodeScanned = async ({ data }) => {
+    const payload = JSON.parse(data);
+    setScanned(true);
 
-  if (data) {  
-    alert(`Scanned data ${payload.url}`) // @ts-ignore
-    return navigation.navigate({
+    if (data) {
+      alert(`Scanned data ${payload.url}`); // @ts-ignore
+      return navigation.navigate({
         name: "WalletSend",
-            params: {
-                payload
-            }
-        })
-  } else {
-    alert(`there was an error with your request`);
-    console.error("error");
-  } 
+        params: {
+          payload,
+        },
+      });
+    } else {
+      alert(`there was an error with your request`);
+      console.error("error");
+    }
+  };
 
-};
-
-  
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
   }
@@ -54,24 +51,25 @@ const handleBarCodeScanned = async ({ data }) => {
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
-      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+      {scanned && (
+        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+      )}
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    text: {
-        marginTop: 15,
-        backgroundColor: 'white'
-    },
-    textError: {
-        color: 'red'
-    }
+  container: {
+    flex: 1,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    marginTop: 15,
+    backgroundColor: "white",
+  },
+  textError: {
+    color: "red",
+  },
 });

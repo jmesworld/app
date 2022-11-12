@@ -45,6 +45,7 @@ export default function WalletScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
+    console.log("account", account);
     getBalance();
     setInterval(() => {
       if (shouldFetch) {
