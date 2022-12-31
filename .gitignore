@@ -4,7 +4,11 @@
 .idea/
 
 .DS_Store
+
 node_modules
+
+lib
+library
 
 *.env
 .env
@@ -12,3 +16,5 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+
+*.notes
