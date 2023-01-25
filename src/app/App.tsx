@@ -1,20 +1,21 @@
 //import "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from 'expo-status-bar'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
-import { StoreProvider } from "easy-peasy";
+import { StoreProvider } from 'easy-peasy'
 
-import useCachedResources from "../hooks/useCachedResources";
-import useColorScheme from "../hooks/useColorScheme";
-import Navigation from "../navigation";
-import store from "../store";
+import useCachedResources from '../hooks/useCachedResources'
+import useColorScheme from '../hooks/useColorScheme'
+import Navigation from '../navigation'
+import store from '../store'
 
 export default function App() {
-  const isLoadingComplete = useCachedResources();
-  const colorScheme = useColorScheme();
+  const isLoadingComplete = useCachedResources()
+  const colorScheme = useColorScheme()
 
   if (!isLoadingComplete) {
-    return null;
+    console.log('isLoadingComplete is false')
+    return null
   } else {
     return (
       <SafeAreaProvider>
@@ -23,6 +24,6 @@ export default function App() {
           <StatusBar translucent={true} />
         </StoreProvider>
       </SafeAreaProvider>
-    );
+    )
   }
 }

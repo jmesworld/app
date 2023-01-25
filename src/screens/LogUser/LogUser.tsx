@@ -17,9 +17,10 @@ import {
   SafeAreaView,
 } from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
-import { restoreUserIdentity, storeInLocal } from '../../utils'
+import { restoreUserIdentity } from '../../utils'
 import Background4 from '../../components/Background4/Background4'
 import { Navigation } from '../../types'
+import { useStoreActions } from '../../hooks/storeHooks'
 
 type Props = {
   navigation: Navigation
@@ -28,11 +29,24 @@ type Props = {
 export default function LogUserScreen({ navigation }: Props) {
   const [mnemonic, onChangeMnemonic] = useState('')
 
+  const addAccount = useStoreActions((actions) => actions.addAccount)
+  const addToken = useStoreActions((actions) => actions.addToken)
+
   const handleAccountRestore = async (mnemonic: string) => {
     const identity = await restoreUserIdentity(mnemonic)
+
     if (identity) {
-      console.log(`Logged identity ${identity}`)
-      await storeInLocal(identity, mnemonic)
+      await addAccount({
+        index: 0,
+        title: 'default',
+        address: identity.account.address,
+        username: identity.username,
+        mnemonic: mnemonic,
+      })
+      await addToken({
+        token: identity.token,
+      })
+
       setTimeout(() => {
         navigation.navigate('Root')
       }, 5000)

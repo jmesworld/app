@@ -1,4 +1,10 @@
+/**
+ * If you are not familiar with React Navigation, refer to the "Fundamentals" guide:
+ * https://reactnavigation.org/docs/getting-started
+ *
+ */
 //@ts-nocheck
+
 import { FontAwesome } from '@expo/vector-icons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
@@ -11,9 +17,7 @@ import * as React from 'react'
 import { ColorSchemeName, Image } from 'react-native'
 import Colors from '../constants/Colors'
 import useColorScheme from '../hooks/useColorScheme'
-import { useStoreState, useStoreActions } from '../hooks/storeHooks'
-import { getToken } from '../utils'
-//import { secureStorage } from '../store'
+
 import {
   RootStackParamList,
   RootTabParamList,
@@ -33,6 +37,7 @@ import WalletScreen from '../screens/Wallet/Wallet'
 import WalletSendScreen from '../screens/WalletSend/WalletSend'
 import WalletSendConfirmScreen from '../screens/WalletSendConfirm/WalletSendConfirm'
 import WalletReceiveScreen from '../screens/WalletReceive/WalletReceive'
+import WalletReceiveConfirmScreen from '../screens/WalletReceiveConfirm/WalletReceiveConfirm'
 import CreateAssetScreen from '../screens/CreateAsset/CreateAsset'
 import CreateAssetConfirmScreen from '../screens/CreateAssetConfirm/CreateAssetConfirm'
 import SendAssetScreen from '../screens/SendAsset/SendAsset'
@@ -40,6 +45,7 @@ import SendAssetConfirmScreen from '../screens/SendAssetConfirm/SendAssetConfirm
 import OnboardingScreen from '../screens/Onboarding/Onboarding'
 import SetPinScreen from '../screens/SetPin/SetPin'
 import ArtworkScreen from '../screens/Artwork/Artwork'
+import { useStoreState } from '../hooks/storeHooks'
 
 export default function Navigation({
   colorScheme,
@@ -58,25 +64,16 @@ export default function Navigation({
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-//not currently working (reference alpha-demo)
-
 function RootNavigator() {
-  const hasToken = useStoreState((state) => state.hasToken) // add additional validation here to check for JWT && haswallet. Either by hasWallet && hasWallet.token or hasWallet && hasToken (unsure of association here)
+  const hasToken = useStoreState((state) => state.hasToken)
   const hasWallet = useStoreState((state) => state.hasWallet)
 
   console.log('HAS WALLET', hasWallet)
   console.log('HAS TOKEN', hasToken)
-  useStoreState((state) => console.log(state)) // create and pass auth function here
+  useStoreState((state) => console.log(state))
 
-  /*possibly replace this with below method and move to utils/index.ts ?
-  const account = useStoreState((state) => state.accounts[0])
-  const token = await getToken(account) 
-  //const getSecureToken = useStoreState((state) = state.getSecureToken(account))
-  //await secureStorage.encryptToken(token)
-    console.log('TOKEN', token)
-*/
-
-  if (hasWallet && hasToken) {
+  if (hasToken) {
+    console.log('USER AUTHORISED')
     return (
       <Stack.Navigator>
         <Stack.Screen
@@ -140,6 +137,7 @@ function RootNavigator() {
       </Stack.Navigator>
     )
   } else {
+    console.log('USER IS UNAUTHORISED')
     return (
       <Stack.Navigator
         style={{ backgroundColor: '#000', height: '100%' }}

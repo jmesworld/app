@@ -4,14 +4,36 @@ import * as bip39 from 'bip39'
 import { Client, Mnemonic } from 'jmes'
 import { convertToEur } from './convert'
 import { notateWeiValue } from './notateWei'
-import { useStoreActions } from '../hooks/storeHooks'
-//import { secureStorage } from '../store'
-import { secureStorage } from '../store/localStorage'
+
 const SCHEMA_PREFIX = 'jmes:'
-const client = new Client()
+const client = new Client({
+  providers: {
+    faucetAPI: {
+      endpoint: {
+        api_url: 'http://51.38.52.37:1889',
+      },
+    },
+    identityAPI: {
+      endpoint: {
+        api_url: 'http://51.38.52.37:3001',
+      },
+    },
+    // marketplaceAPI: {
+    //   endpoint: {
+    //     api_url: 'http://51.38.52.37:1317',
+    //   },
+    // },
+    // lcdClient: {
+    //   endpoint: {
+    //     api_url: 'http://51.38.52.37:26657',
+    //   },
+    // },
+  },
+})
+
 const randomBytes = crypto.getRandomValues(new Uint8Array(32))
 const mnemonic = Mnemonic.generateMnemonic(randomBytes)
-const wallet = client.createWallet(new Mnemonic(mnemonic)) //used to login/restore account,just pass in user entered mnemonic
+const wallet = client.createWallet(new Mnemonic(mnemonic))
 const account = wallet.getAccount()
 const lcdc = client.createLCDClient({
   chainID: 'jmes-888',
@@ -20,63 +42,61 @@ const lcdc = client.createLCDClient({
 })
 
 /* Test identities
+
     ACCOUNT #1:
-    address: jmes1w5znszpw7nj8ujm34nkcheaerxx5gf8zz0swmg
-    mnemonic: tube survey urban eight hawk museum cat broken castle ladder key fitness oblige trash oven diary decorate strike powder concert acid stone sugar steak
-  
+    address: jmes199kwsjs3j3up2uwqkn37j5lu0up68z2zepuw8z
+    username: zzxxxx
+    name: zzxxxx
+    mnemonic: eye dinner tuna mirror select build glimpse add parade record guilt scare visit imitate between syrup siege coach knee bread glory call news crunch
+    
+    
     ACCOUNT #2:
-    address: jmes1acm2q0uqtwx2ne5eevm57yumghamr0wt8hsscm
-    mnemonic: allow lonely point minor shoe chapter account position eagle green royal bundle first rifle slide elbow parent rescue bright tree produce inmate blouse stable 
-*/
+    address: jmes126c9dh4n523u9l9tefgxamgpm0fns7urtq3c5c
+    username: Hunter
+    name: HunterSides
+    mnemonic: absorb casual spread danger change document fatal chair doctor taxi marine fat evolve prison film vault million oil agent leg panda sketch stadium impose
+    
 
-/*Storage */
-const storeInLocal = async (identity: any, mnemonic?: string) => {
-  await useStoreActions((actions) => actions.addUser)({
-    username: identity.username,
-    signature: identity.account.signature,
-  })
-  await useStoreActions((actions) => actions.addWallet)({
-    mnemonic: mnemonic,
-    privateKey: identity.account.privateKey,
-  })
-  await useStoreActions((actions) => actions.addAccount)({
-    index: 0,
-    title: 'default',
-    address: identity.account.address,
-  })
-  await useStoreActions((actions) => actions.addToken)({
-    token: await getToken(identity.account.response), // getToken returns tokenReq.data
-  })
-
-  // await useStoreActions((actions) => actions.setSecureToken({
-  //   token: await getToken(identity.account.response)
-  // }))
-  // await secureStorage.encryptToken(
-  //   await getToken(identity.account.response)
-  // )
-
-  return identity
-}
+    */
 
 /*Wallet */
+const generateWallet = async (mnemonic: string) => {
+  const wallet = await client.createWallet(new Mnemonic(mnemonic))
+
+  return wallet
+}
 const getCoinBal = async (address: string) => {
   const [coins] = await lcdc.bank.balance(address)
   const balance = coins.get('ujmes')?.amount?.d[0]
 
   return balance || 0
 }
-const sendTransaction = async (address: string, amount: number) => {
-  try {
-    const res = await account.sendTransaction({
+const faucetRequest = async (address: string) => {
+  const res = await client.providers.faucetAPI.requestCredit(address)
+  console.log(res)
+  return res
+}
+
+const sendTransaction = async (
+  address: string,
+  amount: number,
+  mnemonic: string
+) => {
+  const wallet = await client.createWallet(new Mnemonic(mnemonic))
+  const account = await wallet.getAccount()
+  console.log({ address, amount, mnemonic })
+  console.log({ account })
+  console.log({ wallet })
+
+  const res = await account.sendTransaction(
+    {
       recipientAddress: address,
       recipientAmount: amount,
-    })
-    console.log(res)
-    return res
-  } catch (error) {
-    console.log(error)
-    return error
-  }
+    }
+    //'http://51.38.52.37:1317'
+  )
+  console.log({ res })
+  return res
 }
 
 /*Identity*/
@@ -87,20 +107,24 @@ const createUserIdentity = async (username: string, account: any) => {
       account
     )
   console.log(`CreateIdentity Request: ${createIdentityReq}`)
+  console.log({ createIdentity: createIdentityReq })
+  console.log({ createIdentity: createIdentityReq.data })
   return createIdentityReq
 }
+
 const getUserIdentity = async (identityName: string) => {
   const getIdentityReq =
     await client.providers.identityAPI.getIdentity(identityName)
-
+  console.log({ getIdentity: getIdentityReq })
   return getIdentityReq
 }
+
 const restoreUserIdentity = async (mnemonic: string) => {
   const account = await accountFromMnemonic(mnemonic)
   const tokenRes = await getToken(account.response)
   const { username } = tokenRes.identity
 
-  const identity = { username, account }
+  const identity = { username, account, token: tokenRes.token }
 
   return identity
 }
@@ -108,6 +132,7 @@ const restoreUserIdentity = async (mnemonic: string) => {
 /*Auth */
 const accountFromMnemonic = async (mnemonic: string) => {
   const wallet = client.createWallet(new Mnemonic(mnemonic))
+
   const response = wallet.getAccount()
 
   const publicKey = response.getPublic()
@@ -134,12 +159,9 @@ const getToken = async (account?: any) => {
   const tokenReq = await client.providers.identityAPI.getToken(
     account
   )
-  console.log(account)
-  console.log(`Token Request${tokenReq}`)
-  console.log(`Token Request.data${tokenReq.data}`)
+  console.log(tokenReq)
   return tokenReq.data
 }
-
 /*Marketplace */
 const getFeed = async (token: any) => {
   const feed = await client.providers.marketplaceAPI.getFeed({
@@ -149,6 +171,7 @@ const getFeed = async (token: any) => {
 
   return feed
 }
+
 const postItemVote = async (
   identifier: string,
   direction: number,
@@ -162,6 +185,7 @@ const postItemVote = async (
 
   return vote
 }
+
 const mnemonicToSeed = async (mnemonic: string) => {
   const seed = await bip39.mnemonicToSeedSync(mnemonic)
 
@@ -174,7 +198,6 @@ export {
   account,
   lcdc,
   SCHEMA_PREFIX,
-  storeInLocal,
   convertToEur,
   getCoinBal,
   sendTransaction,

@@ -8263,10 +8263,10 @@ jimp-compact@0.16.1:
   resolved "https://registry.yarnpkg.com/jimp-compact/-/jimp-compact-0.16.1.tgz#9582aea06548a2c1e04dd148d7c3ab92075aefa3"
   integrity sha512-dZ6Ra7u1G8c4Letq/B5EzAxj4tLFHL+cGtdpR+PVm4yzPDj+lCk+AbivWt1eOM+ikzkowtyV7qSqX6qr3t71Ww==
 
-jmes@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/jmes/-/jmes-1.0.0.tgz#ddd57b9f9521a6d26162e4654de53e483cc48793"
-  integrity sha512-6e6b2yKCHnFQ6kjwMKV3bY5/FYzV6IlJzenQi3/YKF8NIuMzaUXbuwJbG6nofAKKFjc/C9bWmp6ccwjfqEn7gw==
+jmes@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/jmes/-/jmes-1.2.1.tgz#824b508a8ff3d2956d093bc2f726ca68d0c9cca2"
+  integrity sha512-9ATnoE54UuJAEtY6MkMpyO4FRYk+CGfiqA3AonYEF/RTQbqH+0VbcdXR48774hnn4kV5EYc4rQBfyDQkVS7/xQ==
   dependencies:
     "@scure/bip32" "^1.1.1"
     "@terra-money/legacy.proto" "npm:@terra-money/terra.proto@^0.1.7"

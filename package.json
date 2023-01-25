@@ -14,6 +14,7 @@
   "jest": {
     "preset": "jest-expo"
   },
+
   "dependencies": {
     "@expo-google-fonts/comfortaa": "^0.2.2",
     "@expo-google-fonts/gfs-didot": "^0.2.2",
@@ -53,7 +54,7 @@
     "expo-updates": "~0.13.4",
     "expo-web-browser": "~10.2.1",
     "https-browserify": "^1.0.0",
-    "jmes": "^1.0.0",
+    "jmes": "^1.2.1",
     "node-libs-browser": "^2.2.1",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",

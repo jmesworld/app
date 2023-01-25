@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from 'react'
 import { Checkbox } from 'react-native-paper'
 import { Text, View } from '../../components/Themed/Themed'
+import { useStoreActions } from '../../hooks/storeHooks'
 import Background4 from '../../components/Background4/Background4'
 import {
   useFonts,
@@ -24,10 +25,10 @@ import { Route } from '@react-navigation/native'
 import {
   mnemonic,
   account,
+  getToken,
   createUserIdentity,
-  wallet,
-  storeInLocal,
 } from '../../utils'
+import { addWallet } from '../../lib/utils/keystore'
 
 type Props = {
   navigation: Navigation
@@ -46,14 +47,27 @@ export default function BackUpScreen({ navigation, route }: Props) {
     }
   }, [route.params])
 
-  const handleRegister = async () => {
-    const identity = await createUserIdentity(username, account)
-    await storeInLocal(identity)
+  const addAccount = useStoreActions((actions) => actions.addAccount)
+  const addToken = useStoreActions((actions) => actions.addToken)
+
+  const performRegister = async () => {
+    await createUserIdentity(username, account)
+    const tokenRes = await getToken(account)
+    console.log(mnemonic)
+    await addAccount({
+      index: 0,
+      title: 'default',
+      address: tokenRes.identity.address,
+      username: tokenRes.identity.username,
+      mnemonic: mnemonic,
+    })
+    await addToken({
+      token: tokenRes.token,
+    })
+
     setTimeout(() => {
       navigation.navigate('Root')
     }, 5000)
-
-    return identity
   }
 
   const SeedList = () => {
@@ -119,7 +133,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
         <SafeAreaView style={styles.buttonContainer}>
           <Pressable
             onPress={async () => {
-              await handleRegister()
+              await performRegister()
             }}
             style={styles.button}
           >

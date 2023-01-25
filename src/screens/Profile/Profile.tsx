@@ -25,9 +25,10 @@ type Props = {
 }
 
 export default function ProfileScreen({ navigation }: Props) {
-  const mnemonic = useStoreState((state) => state.wallet.mnemonic)
   const address = useStoreState((state) => state.accounts[0].address)
-  const username = useStoreState((state) => state.user.username)
+  const username = useStoreState(
+    (state) => state.accounts[0].username
+  )
 
   const resetStore = useStoreActions((actions) => actions.resetStore)
 
@@ -55,8 +56,6 @@ export default function ProfileScreen({ navigation }: Props) {
         />
         <Text style={styles.section}>Username</Text>
         <Text style={styles.username}>@{username}</Text>
-        <Text style={styles.section}>Mnemonic</Text>
-        <Text style={styles.mnemonic}>{mnemonic}</Text>
         <Text style={styles.section}>Address</Text>
         <Text style={styles.address}>{address}</Text>
 
