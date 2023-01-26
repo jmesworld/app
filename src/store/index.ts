@@ -163,7 +163,10 @@ const store = createStore<WalletModel>(
       }),
       setSecureToken: action((state, payload) => {
         state.token = {
-          token: SecureStore.setItemAsync('secure_token', payload),
+          token: SecureStore.setItemAsync(
+            'secure_token',
+            JSON.stringify(payload.token)
+          ),
         }
       }),
       getSecureToken: action((state, payload) => {

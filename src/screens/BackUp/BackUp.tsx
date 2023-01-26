@@ -49,7 +49,9 @@ export default function BackUpScreen({ navigation, route }: Props) {
 
   const addAccount = useStoreActions((actions) => actions.addAccount)
   const addToken = useStoreActions((actions) => actions.addToken)
-
+  const setSecureToken = useStoreActions(
+    (actions) => actions.setSecureToken
+  )
   const performRegister = async () => {
     await createUserIdentity(username, account)
     const tokenRes = await getToken(account)
@@ -60,6 +62,9 @@ export default function BackUpScreen({ navigation, route }: Props) {
       address: tokenRes.identity.address,
       username: tokenRes.identity.username,
       mnemonic: mnemonic,
+    })
+    await setSecureToken({
+      token: tokenRes.token,
     })
     await addToken({
       token: tokenRes.token,

@@ -60,17 +60,24 @@ const lcdc = client.createLCDClient({
     */
 
 /*Wallet */
+const createLCDClient = async (account: any) => {
+  const lcdc = await account.getLcdcClient('http://51.38.52.37:1888')
+  return lcdc
+}
 const generateWallet = async (mnemonic: string) => {
   const wallet = await client.createWallet(new Mnemonic(mnemonic))
 
   return wallet
 }
+
 const getCoinBal = async (address: string) => {
+  const lcdc = await createLCDClient(account)
   const [coins] = await lcdc.bank.balance(address)
   const balance = coins.get('ujmes')?.amount?.d[0]
 
   return balance || 0
 }
+
 const faucetRequest = async (address: string) => {
   const res = await client.providers.faucetAPI.requestCredit(address)
   console.log(res)
@@ -84,16 +91,13 @@ const sendTransaction = async (
 ) => {
   const wallet = await client.createWallet(new Mnemonic(mnemonic))
   const account = await wallet.getAccount()
-  console.log({ address, amount, mnemonic })
-  console.log({ account })
-  console.log({ wallet })
 
   const res = await account.sendTransaction(
     {
       recipientAddress: address,
       recipientAmount: amount,
     }
-    //'http://51.38.52.37:1317'
+    //'http://51.38.52.37:1888'
   )
   console.log({ res })
   return res
