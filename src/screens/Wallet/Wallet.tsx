@@ -85,7 +85,8 @@ export default function WalletScreen({ navigation }: Props) {
           darkColor="rgba(255,255,255,0.1)"
         />
 
-        <Text style={styles.balanceJMES}>JMES {balance}</Text>
+        <Text style={styles.balanceJMES}>ujmes: {balance * 1e6}</Text>
+        <Text style={styles.balanceJMES}>JMES: {balance}</Text>
         <Text style={styles.balanceEUR}>(EUR {balanceEur})</Text>
 
         <View style={styles.iconImageView}>

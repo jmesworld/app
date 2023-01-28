@@ -41,20 +41,16 @@ export default function WalletSendConfirmScreen({
     console.log('params', route.params)
     console.log('match', route.match)
     if (route.params) {
-      if (route.params.address)
-        setRecipientAddress(route.params.address)
+      if (route.params.userAddress)
+        setRecipientAddress(route.params.userAddress)
       if (route.params.username)
         setRecipientUsername(route.params.username)
-      if (route.params.amount) setRecipientAmount(route.params.amount)
+      if (route.params.amount)
+        setRecipientAmount(parseFloat(route.params.amount) * 1e6)
     }
   }, [route.params])
 
   const handleSend = async () => {
-    console.log('====')
-    console.log('==== SEND TRANSACTION')
-    console.log(`Sending ${recipientAmount} to ${recipientAddress}`)
-    console.log(`Initiator Address: ${initiatorAddress}`)
-
     await sendTransaction(
       recipientAddress,
       recipientAmount,
@@ -83,10 +79,14 @@ export default function WalletSendConfirmScreen({
           darkColor="rgba(255,255,255,0.1)"
         />
         <Text style={styles.secondTitle}>
-          Send $JMES {recipientAmount}
+          Send $JMES: {recipientAmount / 1e6}
         </Text>
+        <Text style={styles.secondTitle}>
+          Amount in $UJMES: {recipientAmount}
+        </Text>
+
         <Text style={styles.username}>
-          to user {recipientUsername}
+          To User: {recipientUsername}
         </Text>
         <Text style={styles.address}>{recipientAddress}</Text>
 

@@ -60,28 +60,24 @@ const lcdc = client.createLCDClient({
     */
 
 /*Wallet */
-const createLCDClient = async (account: any) => {
-  const lcdc = await account.getLcdcClient('http://51.38.52.37:1888')
-  return lcdc
-}
+
 const generateWallet = async (mnemonic: string) => {
   const wallet = await client.createWallet(new Mnemonic(mnemonic))
 
   return wallet
 }
 
-const getCoinBal = async (address: string) => {
-  const lcdc = await createLCDClient(account)
-  const [coins] = await lcdc.bank.balance(address)
-  const balance = coins.get('ujmes')?.amount?.d[0]
-
-  return balance || 0
-}
-
 const faucetRequest = async (address: string) => {
   const res = await client.providers.faucetAPI.requestCredit(address)
   console.log(res)
   return res
+}
+
+const getCoinBal = async (address: string) => {
+  const [coins] = await lcdc.bank.balance(address)
+  const ujmesBalance = parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 || 0 // 1 JMES = 1e6 uJMES
+
+  return ujmesBalance
 }
 
 const sendTransaction = async (
@@ -91,14 +87,15 @@ const sendTransaction = async (
 ) => {
   const wallet = await client.createWallet(new Mnemonic(mnemonic))
   const account = await wallet.getAccount()
-
+  console.log(amount / 1e6)
   const res = await account.sendTransaction(
     {
       recipientAddress: address,
-      recipientAmount: amount,
-    }
-    //'http://51.38.52.37:1888'
+      recipientAmount: amount, // 1 JMES = 1e6 uJMES
+    },
+    'http://51.38.52.37:1888'
   )
+
   console.log({ res })
   return res
 }
@@ -136,9 +133,7 @@ const restoreUserIdentity = async (mnemonic: string) => {
 /*Auth */
 const accountFromMnemonic = async (mnemonic: string) => {
   const wallet = client.createWallet(new Mnemonic(mnemonic))
-
   const response = wallet.getAccount()
-
   const publicKey = response.getPublic()
   const message = 'jmesworld'
   const signedMessage = response.signMessage(message)

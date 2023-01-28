@@ -8,20 +8,8 @@ import {
   SafeAreaView,
   ActionSheetIOS,
 } from 'react-native'
-import {
-  useFonts,
-  Comfortaa_300Light,
-  Comfortaa_400Regular,
-  Comfortaa_500Medium,
-  Comfortaa_600SemiBold,
-  Comfortaa_700Bold,
-} from '@expo-google-fonts/comfortaa'
-import { Roboto_900Black } from '@expo-google-fonts/roboto'
+
 import { Text, View } from '../../components/Themed/Themed'
-import {
-  useStoreState,
-  useStoreActions,
-} from '../../hooks/storeHooks'
 
 import { getUserIdentity } from '../../utils'
 import Background4 from '../../components/Background4/Background4'
@@ -37,11 +25,8 @@ export default function WalletSendScreen({
   navigation,
   route,
 }: Props) {
-  const privateKey = useStoreState((state) => state.wallet.privateKey)
-  //const [payload, setPayload] = useState<IQRCodePayload>(route.params);
   const [username, setUsername] = useState('')
   const [amount, setAmount] = useState('')
-  const [address, setAddress] = useState('')
 
   useEffect(() => {
     if (route.params) {
@@ -54,19 +39,15 @@ export default function WalletSendScreen({
 
   const handleTxParams = async (username: string) => {
     const requestedIdentity = await getUserIdentity(username)
-    console.log(requestedIdentity)
     const userAddress = await requestedIdentity.data.identity.address
-    const parsedAmount = await parseInt(amount)
-    console.log('PARSED AMOUNT', parsedAmount)
-    await setAddress(userAddress)
 
     // @ts-ignore
     return navigation.navigate({
       name: 'WalletSendConfirm',
       params: {
         username,
-        amount: parsedAmount,
-        address: userAddress,
+        amount,
+        userAddress,
       },
     })
   }
