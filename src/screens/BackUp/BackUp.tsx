@@ -4,20 +4,25 @@ import {
   StyleSheet,
   Pressable,
   SafeAreaView,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native'
 import { useEffect, useState } from 'react'
-import { Checkbox } from 'react-native-paper'
-import { Text, View } from '../../components/Themed/Themed'
+
 import { useStoreActions } from '../../hooks/storeHooks'
-import Background4 from '../../components/Background4/Background4'
+import { Text, View } from '../../components/Themed/Themed'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import {
-  useFonts,
-  Comfortaa_300Light,
-  Comfortaa_400Regular,
-  Comfortaa_500Medium,
-  Comfortaa_600SemiBold,
-  Comfortaa_700Bold,
-} from '@expo-google-fonts/comfortaa'
+  Backdrop,
+  Background4,
+  Input,
+  Navbar,
+  TextTitle,
+  TextInfo,
+  StyledButton,
+  Checkbox as CheckboxComponent,
+} from '../../components'
+
 import { Roboto_900Black } from '@expo-google-fonts/roboto'
 import { GFSDidot_400Regular } from '@expo-google-fonts/gfs-didot'
 import { Navigation } from '../../types'
@@ -28,7 +33,6 @@ import {
   getToken,
   createUserIdentity,
 } from '../../utils'
-import { addWallet } from '../../lib/utils/keystore'
 
 type Props = {
   navigation: Navigation
@@ -38,117 +42,93 @@ type Props = {
 export default function BackUpScreen({ navigation, route }: Props) {
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
+  const [recoveryPhrase, setPhrase] = useState('')
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
+    setPhrase(mnemonic)
     if (route.params) {
       if (route.params.username) setUsername(route.params.username)
       if (route.params.name) setName(route.params.name)
     }
   }, [route.params])
 
-  const addAccount = useStoreActions((actions) => actions.addAccount)
-  const addToken = useStoreActions((actions) => actions.addToken)
-  const setSecureToken = useStoreActions(
-    (actions) => actions.setSecureToken
-  )
-  const performRegister = async () => {
-    await createUserIdentity(username, account)
-    const tokenRes = await getToken(account)
-    console.log(mnemonic)
-    await addAccount({
-      index: 0,
-      title: 'default',
-      address: tokenRes.identity.address,
-      username: tokenRes.identity.username,
-      mnemonic: mnemonic,
+  const handleConfirm = async () => {
+    // @ts-ignore
+    return navigation.navigate({
+      name: 'Confirm',
+      params: {
+        username,
+        name,
+        recoveryPhrase,
+      },
     })
-    await setSecureToken({
-      token: tokenRes.token,
-    })
-    await addToken({
-      token: tokenRes.token,
-    })
-
-    setTimeout(() => {
-      navigation.navigate('Root')
-    }, 5000)
+  }
+  const Checkbox = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => setChecked(!checked)}
+        style={styles.uncheckedCheckbox}
+      >
+        {checked && (
+          <Ionicons
+            name="ios-checkmark"
+            size={32}
+            color="rgba(112, 79, 247, 0.8)"
+          />
+        )}
+      </TouchableOpacity>
+    )
   }
 
   const SeedList = () => {
     return (
-      <SafeAreaView style={styles.mnemonicContainer}>
+      <ScrollView contentContainerStyle={styles.mnemonicContainer}>
         {mnemonic.split(' ').map((word, index) => (
-          <View key={index} style={styles.seedWordContainer}>
-            <Text style={styles.seedWordText} key={word}>
-              {word}
-            </Text>
-            <View
-              style={styles.seedWordSeperator}
-              lightColor="#eee"
-              darkColor="rgba(255,255,255,0.1)"
-            />
+          <View key={index} style={styles.seedContentContainer}>
+            <View style={styles.seedWordContainer}>
+              <Text style={styles.seedWordText}>{word}</Text>
+            </View>
             <Text style={styles.seedWordNumber}> {index + 1} </Text>
           </View>
         ))}
-      </SafeAreaView>
+      </ScrollView>
     )
   }
 
-  let [fontsLoaded] = useFonts({
-    Comfortaa_300Light,
-    Comfortaa_400Regular,
-    Comfortaa_500Medium,
-    Comfortaa_600SemiBold,
-    Comfortaa_700Bold,
-    Roboto_900Black,
-    GFSDidot_400Regular,
-  })
-
   return (
-    <SafeAreaView style={styles.container}>
-      <Background4>
-        <Text style={styles.title}>JMES</Text>
-        <View
-          style={styles.separator}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        />
-        <Text style={styles.secondTitle}>BACKUP RECOVERY PHRASE</Text>
-        <SafeAreaView style={styles.textContainer}>
-          <Text style={styles.text}>
-            Write down your recovery phrase somewhere safe. If you
-            lose or damage this device, it's the only way to recover
-            your account
-          </Text>
-        </SafeAreaView>
+    <Background4>
+      <Backdrop>
+        <Navbar navigation={navigation} children="Signup" />
+        <TextTitle> Backup Recover Phrase</TextTitle>
+        <TextInfo>
+          Write down your recovery phrase somewhere safe. If you lose
+          or damage this device, it's the only way to recover your
+          account
+        </TextInfo>
         <SeedList />
+        <View style={{ paddingTop: 30 }} />
         <SafeAreaView style={styles.checkboxContainer}>
-          <Checkbox
-            color="white"
-            status={checked ? 'checked' : 'unchecked'}
-            onPress={() => {
-              setChecked(!checked)
-            }}
-          />
+          <Checkbox />
           <Text style={styles.text}>
             I confirm I have written down a copy of my recovery phrase
           </Text>
         </SafeAreaView>
         <SafeAreaView style={styles.buttonContainer}>
-          <Pressable
+          <StyledButton
+            enabled={checked}
+            disabled={!checked}
             onPress={async () => {
-              await performRegister()
+              await handleConfirm()
             }}
-            style={styles.button}
           >
-            <Text style={styles.buttonText}>CONFIRM</Text>
-          </Pressable>
+            <Text>Confirm</Text>
+          </StyledButton>
         </SafeAreaView>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      </Background4>
-    </SafeAreaView>
+      </Backdrop>
+    </Background4>
   )
 }
 
@@ -160,64 +140,88 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonContainer: {
-    width: '72%',
-    height: 52,
-    // marginTop: 35,
-    // marginBottom: 13,
-    margin: 'auto',
-    borderRadius: 6,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '93%',
+    height: 49,
+    marginTop: 42,
+    marginBottom: 14,
   },
 
   textContainer: {
     backgroundColor: 'transparent',
-    width: '76.2%',
+    width: '93%',
     height: 68,
     margin: 'auto',
   },
   checkboxContainer: {
+    alignItems: 'center',
     display: 'flex',
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    width: '76.2%',
-    height: 36,
-    marginTop: 29,
+    width: '93%',
+    height: 40,
+  },
+  uncheckedCheckbox: {
+    width: 32,
+    height: 32,
+    backgroundColor: 'rgba(112, 79, 247, 0.1)',
+    border: '1px solid rgba(112, 79, 247, 0.5)',
+    borderRadius: 4,
+  },
+  checkedCheckbox: {
+    width: 32,
+    height: 32,
+    backgroundColor: 'rgba(112, 79, 247, 0.5)',
   },
   mnemonicContainer: {
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    width: '76.2%',
-    height: 314,
-    // marginTop: 22,
-    // marginBottom: 29,
-    margin: 'auto',
-    gap: '10px 14px',
+    width: '100%',
+    height: 352,
+    marginTop: 44,
+    marginBottom: 52,
+    paddingLeft: 9,
+    paddingRight: 9,
+    gap: '30px 7px',
+  },
+  seedContentContainer: {
+    display: 'flex',
+    flexGrow: 1,
+    backgroundColor: 'transparent',
+    height: 64,
   },
   seedWordContainer: {
-    display: 'flex',
-    backgroundColor: 'transparent',
-    maxWidth: '33.3%',
-    minWidth: '16.65%',
-    maxHeight: '25%',
-    minHeight: '16.6%',
+    minWidth: 108,
+    height: 48,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(112, 79, 247, 0.1)',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: 'rgba(112, 79, 247, 0.5)',
+    borderRadius: 12,
+    boxShadow: '0px 3.5px 5.5px rgba(0, 0, 0, 0.02)',
   },
   seedWordText: {
-    color: '#FFFFFF',
+    color: '#0F0056',
+    fontSize: 14,
+    fontWeight: '400',
   },
-  seedWordSeperator: {
-    marginTop: 3,
-    marginBottom: 3,
-    height: 1,
-    width: '100%',
-  },
+
   seedWordNumber: {
-    color: '#FFFFFF',
+    color: '#704FF7',
+    alignSelf: 'center',
   },
   text: {
-    fontSize: 15,
-    color: '#ABABAB',
+    fontSize: 14,
+    color: '#0F0056',
+    paddingLeft: 10,
+    paddingRight: 43,
   },
   buttonText: {
     fontSize: 18,
@@ -257,11 +261,5 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     // paddingBottom: 26,
     color: '#FFF',
-  },
-  separator: {
-    marginTop: 9,
-    marginBottom: 18,
-    height: 1,
-    width: '80%',
   },
 })

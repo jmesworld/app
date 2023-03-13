@@ -26,7 +26,7 @@ const Header = ({ navigation }: Props) => (
       })}
     >
       <Image
-        source={require('../../assets/icons/chevron_backbutton.png')}
+        source={require('../../assets/icons/backbutton-lilac.svg')}
         style={{
           width: 12,
           height: 21,

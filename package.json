@@ -3,7 +3,8 @@
   "version": "1.1.1",
   "license": "MIT",
   "scripts": {
-    "start": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider expo start --dev-client ",
+    "start": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider expo start --dev-client",
+    "start-normal": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -75,6 +76,7 @@
     "react-native-stream": "^0.1.9",
     "react-native-svg": "12.3.0",
     "react-native-tcp": "^4.0.0",
+    "react-native-vector-icons": "^9.2.0",
     "react-native-web": "0.17.7",
     "react-query": "^3.39.2",
     "readable-stream": "1.0.33",

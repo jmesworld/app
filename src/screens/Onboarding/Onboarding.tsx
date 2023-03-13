@@ -1,71 +1,94 @@
-import React, { memo } from "react";
-import { Background, Button } from "../../components";
-import { Navigation } from "../../types";
-import { View, Text } from "react-native";
-import { normalize } from "path";
-import "react-native-get-random-values";
+import React, { memo } from 'react'
+import { Background, Button } from '../../components'
+import { Navigation } from '../../types'
+import { View, Text, SafeAreaView, StyleSheet } from 'react-native'
+import { normalize } from 'path'
+import 'react-native-get-random-values'
 
 type Props = {
-  navigation: Navigation;
-};
-
-const OnboardingScreen = ({ navigation }: Props) => (
-  <Background position="bottom">
-    <View
+  navigation: Navigation
+}
+const ButtonContainer = ({ navigation }) => {
+  return (
+    <SafeAreaView
       style={{
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "flex-end",
-        alignItems: "center",
+        display: 'flex',
+        flexDirection: 'column',
+        width: '95%',
+        marginLeft: 10,
+        marginRight: 10,
+        height: 80,
+        marginBottom: 10,
+        backgroundColor: '#FCFCFD',
+        borderRadius: 90,
       }}
     >
-      <Button
+      <View
         style={{
-          height: 52,
-          backgroundColor: "#FFF",
-          marginLeft: 16,
-          borderRadius: 6,
-          width: "44.4%",
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexDirection: 'row',
+          marginLeft: 20,
+          marginRight: 20,
+          marginTop: 17,
+          marginBottom: 15,
+          height: 48,
         }}
-        onPress={() => navigation.navigate("SignUp")}
       >
-        <View style={{ paddingTop: "5px" }}>
-          <Text
-            style={{
-              color: "#000",
-              fontSize: 16,
-              fontWeight: "800",
-            }}
-          >
-            SIGN UP
-          </Text>
-        </View>
-      </Button>
-      <Button
-        style={{
-          height: 52,
-          backgroundColor: "#353535",
-          marginLeft: "3.2%",
-          marginRight: 16,
-          borderRadius: 6,
-          width: "44.4%",
-        }}
-        onPress={() => navigation.navigate("LogUser")}
-      >
-        <View style={{ paddingTop: "5px" }}>
-          <Text
-            style={{
-              color: "#FFF",
-              fontSize: 16,
-              fontWeight: "700",
-            }}
-          >
-            RESTORE
-          </Text>
-        </View>
-      </Button>
-    </View>
-  </Background>
-);
+        <Button
+          style={{
+            width: '48%',
 
-export default memo(OnboardingScreen);
+            backgroundColor: '#FFF',
+            borderStyle: 'solid',
+            borderWidth: 1,
+            borderColor: '#C6B4FC',
+            borderRadius: 90,
+          }}
+          onPress={() => navigation.navigate('SignUp')}
+        >
+          <Text
+            style={{
+              textTransform: 'none',
+              fontStyle: 'normal',
+              color: '#23262F',
+              fontSize: 16,
+              fontWeight: '700',
+              lineHeight: 16,
+            }}
+          >
+            Sign up
+          </Text>
+        </Button>
+
+        <Button
+          style={{
+            width: '48%',
+            backgroundColor: '#704FF7',
+            borderRadius: 90,
+          }}
+          onPress={() => navigation.navigate('Restore')}
+        >
+          <Text
+            style={{
+              textTransform: 'none',
+              fontStyle: 'normal',
+              color: '#FCFCFD',
+              fontSize: 16,
+              fontWeight: '700',
+            }}
+          >
+            Restore
+          </Text>
+        </Button>
+      </View>
+    </SafeAreaView>
+  )
+}
+const OnboardingScreen = ({ navigation }: Props) => (
+  <Background position="bottom">
+    <ButtonContainer navigation={navigation} />
+  </Background>
+)
+
+export default memo(OnboardingScreen)

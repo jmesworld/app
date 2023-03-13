@@ -119,20 +119,6 @@ export default function WalletScreen({ navigation }: Props) {
           </Pressable>
         </View>
 
-        <Text style={styles.secondTitle}>Asset</Text>
-        <View
-          style={styles.separator}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        />
-        <Text style={styles.noAssetText}>No assets yet :)</Text>
-
-        <Pressable
-          onPress={() => navigation.navigate('CreateAsset')}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Mint</Text>
-        </Pressable>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Background4>
