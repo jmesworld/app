@@ -53,6 +53,7 @@ export interface Account {
   balance: string | number
   derivationPath: string
   mnemonic: string[]
+  pin: string[]
 }
 export interface Identity {
   address: string
@@ -157,8 +158,9 @@ const store = createStore<WalletModel>(
           address: payload.address,
           username: payload.username,
           balance: payload.balance,
-          mnemonic: payload.mnemonic,
+
           derivationPath: 'bip44Change',
+          pin: payload.pin,
         })
       }),
       setSecureToken: action((state, payload) => {

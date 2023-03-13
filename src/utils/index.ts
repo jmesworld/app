@@ -4,7 +4,9 @@ import * as bip39 from 'bip39'
 import { Client, Mnemonic } from 'jmes'
 import { convertToEur } from './convert'
 import { notateWeiValue } from './notateWei'
-
+import { validatePin } from './validatePin'
+import { navigateToScreen } from './navigate'
+import { handleLockout } from './lockout'
 const SCHEMA_PREFIX = 'jmes:'
 const client = new Client({
   providers: {
@@ -31,7 +33,7 @@ const client = new Client({
   },
 })
 
-const randomBytes = crypto.getRandomValues(new Uint8Array(32))
+const randomBytes = crypto.getRandomValues(new Uint8Array(16))
 const mnemonic = Mnemonic.generateMnemonic(randomBytes)
 const wallet = client.createWallet(new Mnemonic(mnemonic))
 const account = wallet.getAccount()
@@ -42,7 +44,7 @@ const lcdc = client.createLCDClient({
 })
 
 /* Test identities
-
+    
     ACCOUNT #1:
     address: jmes199kwsjs3j3up2uwqkn37j5lu0up68z2zepuw8z
     username: zzxxxx
@@ -56,6 +58,16 @@ const lcdc = client.createLCDClient({
     name: HunterSides
     mnemonic: absorb casual spread danger change document fatal chair doctor taxi marine fat evolve prison film vault million oil agent leg panda sketch stadium impose
     
+    ACCOUNT #3:
+    address: jmes1sd6xwp5gx8wynyql55lry07hk9hd6jhhg2fcdt
+    username: AlexHunterTest2801
+    name: AlexHunterTest2801
+    mnemonic: play into future horn acquire food appear bulb exile bacon squeeze dizzy dad obtain decorate curious orbit subject prison ring small canvas zoo private
+
+    ACCOUNT #4:
+    address: jmes1q2w3e4r5t6y7u8i9o0p1a2s3d4f5g6h7j8k9l0
+    username: HSIDESTESTACC
+    mnemonic: blade october seat huge clean cover pyramid pumpkin already feel match miracle
 
     */
 
@@ -67,6 +79,12 @@ const generateWallet = async (mnemonic: string) => {
   return wallet
 }
 
+const generateMnemonic = () => {
+  const randomBytes = crypto.getRandomValues(new Uint8Array(32))
+  const mnemonic = Mnemonic.generateMnemonic(randomBytes)
+
+  return mnemonic
+}
 const faucetRequest = async (address: string) => {
   const res = await client.providers.faucetAPI.requestCredit(address)
   console.log(res)
@@ -75,7 +93,8 @@ const faucetRequest = async (address: string) => {
 
 const getCoinBal = async (address: string) => {
   const [coins] = await lcdc.bank.balance(address)
-  const ujmesBalance = parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 || 0 // 1 JMES = 1e6 uJMES
+  const ujmesBalance =
+    parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 || 0 // 1 JMES = 1e6 uJMES
 
   return ujmesBalance
 }
@@ -120,13 +139,29 @@ const getUserIdentity = async (identityName: string) => {
   return getIdentityReq
 }
 
+// const restoreUserIdentity = async (mnemonic: string) => {
+//   const account = await accountFromMnemonic(mnemonic)
+//   console.log(account) // will log the account object even if the account is invalid
+//   if (account) {
+//     try {
+//       const tokenRes = await getToken(account.response)
+//       const { username } = tokenRes.identity
+//       const identity = { username, account, token: tokenRes.token }
+//       return identity
+//     } catch (error) {
+//       console.log('ERROR', error)
+//     }
+//   } else {
+//     console.log('ERROR')
+//   }
+// }
 const restoreUserIdentity = async (mnemonic: string) => {
   const account = await accountFromMnemonic(mnemonic)
+  console.log(account) // will log the account object even if the account is invalid
+
   const tokenRes = await getToken(account.response)
   const { username } = tokenRes.identity
-
   const identity = { username, account, token: tokenRes.token }
-
   return identity
 }
 
@@ -208,4 +243,8 @@ export {
   restoreUserIdentity,
   notateWeiValue,
   mnemonicToSeed,
+  generateMnemonic,
+  validatePin,
+  navigateToScreen,
+  handleLockout,
 }

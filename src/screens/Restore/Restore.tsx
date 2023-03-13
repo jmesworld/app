@@ -12,40 +12,71 @@ import {
   TextTitle,
 } from '../../components'
 
+import { getUserIdentity } from '../../utils'
 import { Navigation } from '../../types'
 
 type Props = {
   navigation: Navigation
 }
-export default function SignUpScreen({ navigation }: Props) {
+export default function RestoreMnemonicScreen({ navigation }: Props) {
   const [username, onChangeUsername] = useState('')
   const [name, onChangeName] = useState('')
   const [validated, setValidated] = useState(false)
+  // const validateUsername = async function () {
+  //   const account = await getUserIdentity(username)
 
-  const handleSignUp = async function () {
-    // @ts-ignore
-    return navigation.navigate({
-      name: 'BackUp',
-      params: {
-        username,
-        name,
-      },
-    })
+  //   if (account.data.identity.username === username) {
+  //     console.log('valid username', account.data.identity.username)
+  //     return true
+  //   } else {
+  //     console.log('invalid username', account.data.identity.username)
+  //     // setValidated(false)
+  //     return false
+  //   }
+  // }
+
+  const validateUsername = async function () {
+    try {
+      const account = await getUserIdentity(username)
+      if (account.data.identity.username === username) {
+        console.log('valid username', account.data.identity.username)
+        return true
+      } else {
+        console.log(
+          'invalid username',
+          account.data.identity.username
+        )
+        return false
+      }
+    } catch (error) {
+      console.log('error', error)
+      return false
+    }
+  }
+
+  const handleRestore = async function () {
+    const isValid = await validateUsername()
+    if (isValid) {
+      // @ts-ignore
+      return navigation.navigate({
+        name: 'RestoreMnemonic',
+        params: {
+          username,
+          name,
+        },
+      })
+    } else {
+      alert('Username does not exist')
+    }
+    return false
   }
 
   return (
     <Background4>
       <Backdrop>
         <Navbar navigation={navigation} children="Onboarding" />
-        <TextTitle> Create new account</TextTitle>
-        <Text style={styles.inputTag}>FULL NAME</Text>
-        <SafeAreaView style={styles.inputContainer}>
-          <Input
-            placeholder=""
-            onChangeText={onChangeName}
-            value={name}
-          />
-        </SafeAreaView>
+        <TextTitle> Restore </TextTitle>
+
         <Text style={styles.inputTag}>USERNAME</Text>
         <SafeAreaView style={styles.inputContainer}>
           <Input
@@ -56,12 +87,12 @@ export default function SignUpScreen({ navigation }: Props) {
         </SafeAreaView>
         <SafeAreaView style={styles.buttonContainer}>
           <StyledButton
-            enabled={username.length >= 5 && name.length > 0}
-            onPress={() => {
-              handleSignUp()
+            enabled={username.length >= 5}
+            onPress={async () => {
+              await handleRestore()
             }}
           >
-            <Text>Sign up</Text>
+            <Text>Restore</Text>
           </StyledButton>
         </SafeAreaView>
         <View style={styles.policyContainer}>

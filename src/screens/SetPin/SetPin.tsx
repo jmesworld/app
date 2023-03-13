@@ -1,71 +1,113 @@
-import React, { memo, useEffect, useState } from "react";
+import { Route } from '@react-navigation/native'
+import React, { memo, useEffect, useState } from 'react'
+import { SafeAreaView, StyleSheet } from 'react-native'
 import {
-    Background2 as Background,
-    BackButton,
-    Header,
-    NumberKeyboard,
-} from "../../components";
-import { useStoreActions } from "../../hooks/storeHooks";
-import { Navigation } from "../../types";
-
+  Backdrop,
+  Background4,
+  Navbar,
+  StyledButton,
+  TextInfo,
+  TextTitle,
+  PinInput,
+} from '../../components'
+import { navigateToScreen, validatePin } from '../../utils'
+import { Text, View } from '../../components/Themed/Themed'
+import { useStoreActions } from '../../hooks/storeHooks'
+import { Navigation } from '../../types'
 type Props = {
-    navigation: Navigation;
-};
+  navigation: Navigation
+  route: Route<any>
+}
 
-const SetPinScreen = ({ navigation }: Props) => {
-    const initialMessage = "Create your passcode";
-    const confirmMessage = "Confirm your passcode";
-    const [pinMessage, setPinMessage] = useState(initialMessage);
-    const [pin, setPin] = useState([]);
-    const [pin1, setPin1] = useState([]);
-    const [pinOk, setPinOk] = useState(false);
+const SetPinScreen = ({ navigation, route }: Props) => {
+  const [pinNumbers, setPinNumbers] = useState<string[]>([
+    '',
+    '',
+    '',
+    '',
+  ])
+  const [username, setUsername] = useState('')
+  const [name, setName] = useState('')
+  const [isPinComplete, setIsPinComplete] = useState(false)
+  useEffect(() => {
+    if (route.params) {
+      setName(route.params.name)
+      setUsername(route.params.username)
+    }
+  }, [route.params])
+  useEffect(() => {
+    setIsPinComplete(pinNumbers.every((value) => value !== ''))
+  }, [pinNumbers])
 
-    const addPasscode = useStoreActions((actions) => actions.addPasscode);
+  const validateInputPin = async () => {
+    if (pinNumbers.length === 4) {
+      return true
+    } else {
+      alert('Pin invalid')
+    }
+    return false
+  }
 
-    useEffect(() => {
-        if (pin.length === 4 && pin1.length === 0) {
-            setPin1(pin);
-            setPin([]);
-            setPinMessage(confirmMessage);
-        }
+  const handleNav = async () => {
+    const isValid = await validateInputPin()
+    if (isValid) {
+      // @ts-ignore
+      navigateToScreen(navigation, 'ConfirmPin', {
+        pinNumbers,
+        username,
+        name,
+      })
+    } else {
+      alert('Invalid pin')
+    }
+  }
 
-        if (pin.length === 4 && pin1.length === 4) {
-            if (JSON.stringify(pin) === JSON.stringify(pin1)) {
-                setPinOk(true);
-            } else {
-                setPinMessage("Create your passcode");
-                setPin([]);
-                setPin1([]);
-            }
-        }
-    }, [pin]);
+  return (
+    <Background4>
+      <Backdrop>
+        <Navbar navigation={navigation} children="Confirm" />
+        <TextTitle> Choose a 4 digit pin </TextTitle>
+        <TextInfo>
+          For quick access to you wallet and security, please set a
+          pin.
+        </TextInfo>
+        <PinInput
+          pinNumbers={pinNumbers}
+          setPinNumbers={setPinNumbers}
+        />
+        <SafeAreaView style={styles.buttonContainer}>
+          <StyledButton
+            enabled={isPinComplete}
+            disabled={!isPinComplete}
+            onPress={async () => {
+              await handleNav()
+            }}
+          >
+            <Text>Next</Text>
+          </StyledButton>
+        </SafeAreaView>
+      </Backdrop>
+    </Background4>
+  )
+}
 
-    const _onPressNumber = (n: number) => {
-        setPin([...pin, n]);
-    };
+export default memo(SetPinScreen)
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
 
-    useEffect(() => {
-        async function generate() {
-            addPasscode({
-                passcode: pin.join(""),
-            });
-            navigation.navigate("Root")
-
-        }
-
-        if (pinOk) {
-            generate();
-        }
-    }, [pinOk]);
-
-    return (
-        <Background noMenu skipHeader>
-            <BackButton goBack={() => navigation.navigate("Onboarding")} />
-            <Header>{pinMessage}</Header>
-
-            <NumberKeyboard onPress={_onPressNumber} pin={pin} />
-        </Background>
-    );
-};
-
-export default memo(SetPinScreen);
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '93%',
+    height: 49,
+    marginTop: 42,
+    marginBottom: 14,
+  },
+})

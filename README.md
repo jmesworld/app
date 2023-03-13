@@ -1,40 +1,29 @@
 
-# JMES Mobile App 
+# JMES Mobile Wallet App 
+
+BEFORE RUNNING: 
+   - If using a Node.js version > 17.0.0, your `start` command in package.json must be `npx cross-env NODE_OPTIONS=--openssl-legacy-provider expo start --dev-client`(default)
+   - Or if using Node.js < 17.0.0 it must be `expo start --dev-client`
+   - Otherwise the application will not run due to incompatible dependecy versions between Node and Expo (working on a fix for this)
 
 ## Instructions
 
-1. Install dependencies
+1. After configuring the start command for your environment, install dependencies with command
 
    ```bash
    $ yarn
    ```
 
-2. Get latest version of Jmes
-
-   ```bash
-    $ yarn add jmes (may have to run 'npm install jmes' if yarn add doesnt work)
-    ```
-
-3. CD into node_modules/jmes - Install and Build library with
- 
-   ```bash
-    $ yarn && yarn build
-    ```
-
-4. CD back into app directory and launch app via
+2. Then to launch the application run 
 
    ```bash
     $ yarn start
     ``` 
-
-   - Note: if you are using a Node.js version > 17.0.0 you need to add `npx cross-env NODE_OPTIONS=--openssl-legacy-provider` before `expo-start` in package.json as there is a breaking dependency between expo-cli & Node.js.
    
-5. In your console, choose the platform you wish to launch the application [web|android|ios]
+3. Then, in your console, choose the the platform you wish to launch the application [web|android|ios]
 
+4. Enjoy!
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-## Note
-
-1) An error after installing dependencies is normal due to the postinstall script and does not mean dependencies were not installed.

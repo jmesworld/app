@@ -24,27 +24,25 @@ import {
   RootTabScreenProps,
 } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
-
+import Header from '../components/Header/Header'
 import NotFoundScreen from '../screens/NotFound/NotFound'
 import ScanScreen from '../screens/Scan/Scan'
 import SignUpScreen from '../screens/CreateUser/SignUp'
 import BackUpScreen from '../screens/BackUp/BackUp'
-import LogUserScreen from '../screens/LogUser/LogUser'
-import Header from '../components/Header/Header'
-import HomeScreen from '../screens/Home/Home'
+import ConfirmScreen from '../screens/Confirm/Confirm'
+import ConfirmPinScreen from '../screens/SetPin/ConfirmPin'
 import ProfileScreen from '../screens/Profile/Profile'
+// import RestoreAccountScreen from '../screens/Restore/RestoreAccount'
+import RestoreScreen from '../screens/Restore/Restore'
+import RestoreMnemonicScreen from '../screens/Restore/RestoreMnemonic'
 import WalletScreen from '../screens/Wallet/Wallet'
 import WalletSendScreen from '../screens/WalletSend/WalletSend'
 import WalletSendConfirmScreen from '../screens/WalletSendConfirm/WalletSendConfirm'
 import WalletReceiveScreen from '../screens/WalletReceive/WalletReceive'
 import WalletReceiveConfirmScreen from '../screens/WalletReceiveConfirm/WalletReceiveConfirm'
-import CreateAssetScreen from '../screens/CreateAsset/CreateAsset'
-import CreateAssetConfirmScreen from '../screens/CreateAssetConfirm/CreateAssetConfirm'
-import SendAssetScreen from '../screens/SendAsset/SendAsset'
-import SendAssetConfirmScreen from '../screens/SendAssetConfirm/SendAssetConfirm'
 import OnboardingScreen from '../screens/Onboarding/Onboarding'
 import SetPinScreen from '../screens/SetPin/SetPin'
-import ArtworkScreen from '../screens/Artwork/Artwork'
+
 import { useStoreState } from '../hooks/storeHooks'
 
 export default function Navigation({
@@ -66,11 +64,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
   const hasToken = useStoreState((state) => state.hasToken)
-  const hasWallet = useStoreState((state) => state.hasWallet)
-
-  console.log('HAS WALLET', hasWallet)
   console.log('HAS TOKEN', hasToken)
-  useStoreState((state) => console.log(state))
+
+  useStoreState((state) =>
+    console.log(`Current store state: ${state}`)
+  )
 
   if (hasToken) {
     console.log('USER AUTHORIZED')
@@ -99,7 +97,6 @@ function RootNavigator() {
             options={{ presentation: 'card', title: 'Send to user' }}
           />
 
-          <Stack.Screen name="Artwork" component={ArtworkScreen} />
           <Stack.Screen
             name="WalletSendConfirm"
             component={WalletSendConfirmScreen}
@@ -117,22 +114,6 @@ function RootNavigator() {
             }}
           />
           <Stack.Screen name="Scan" component={ScanScreen} />
-          <Stack.Screen
-            name="CreateAsset"
-            component={CreateAssetScreen}
-          />
-          <Stack.Screen
-            name="CreateAssetConfirm"
-            component={CreateAssetConfirmScreen}
-          />
-          <Stack.Screen
-            name="SendAsset"
-            component={SendAssetScreen}
-          />
-          <Stack.Screen
-            name="SendAssetConfirm"
-            component={SendAssetConfirmScreen}
-          />
         </Stack.Group>
       </Stack.Navigator>
     )
@@ -151,23 +132,43 @@ function RootNavigator() {
           name="SignUp"
           style={{ backgroundColor: '#000', height: '100%' }}
           component={SignUpScreen}
-          options={{ headerShown: true, title: '' }}
+          options={{
+            //header: () => <Header navigation={navigation} />, // fix header balance or create new components for onboarding screens
+            headerShown: false,
+            title: 'SignUp',
+          }}
         />
         <Stack.Screen
           name="BackUp"
           style={{ backgroundColor: '#000', height: '100%' }}
           component={BackUpScreen}
-          options={{ headerShown: true, title: '' }}
+          options={{ headerShown: false, title: 'BackUp' }}
         />
         <Stack.Screen
-          name="LogUser"
-          component={LogUserScreen}
-          options={{ headerShown: true, title: 'Log in' }}
+          name="Confirm"
+          component={ConfirmScreen}
+          options={{ headerShown: false, title: 'Confirm' }}
         />
+
         <Stack.Screen
           name="SetPin"
           component={SetPinScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: 'SetPin' }}
+        />
+        <Stack.Screen
+          name="ConfirmPin"
+          component={ConfirmPinScreen}
+          options={{ headerShown: false, title: 'ConfirmPin' }}
+        />
+        <Stack.Screen
+          name="Restore"
+          component={RestoreScreen}
+          options={{ headerShown: false, title: 'Restore' }}
+        />
+        <Stack.Screen
+          name="RestoreMnemonic"
+          component={RestoreMnemonicScreen}
+          options={{ headerShown: false, title: 'RestoreMnemonic' }}
         />
       </Stack.Navigator>
     )
@@ -182,7 +183,7 @@ function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
       style={{ backgroundColor: '#000', height: '100%' }}
-      initialRouteName="Balance"
+      initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}
@@ -190,7 +191,7 @@ function BottomTabNavigator() {
       <BottomTab.Screen
         name="Home"
         style={{ backgroundColor: '#000', height: '100%' }}
-        component={HomeScreen}
+        component={WalletScreen}
         options={({ navigation }: RootTabScreenProps<'Home'>) => ({
           title: 'Home',
           tabBarLabel: '',
@@ -199,23 +200,6 @@ function BottomTabNavigator() {
 
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="home" color={color} />
-          ),
-          header: () => <Header navigation={navigation} />,
-        })}
-      />
-
-      <BottomTab.Screen
-        name="Profile"
-        style={{ backgroundColor: '#000' }}
-        component={ProfileScreen}
-        options={({ navigation }: RootTabScreenProps<'Profile'>) => ({
-          title: 'Profile',
-          tabBarLabel: '',
-          tabBarActiveBackgroundColor: '#222',
-
-          tabBarInactiveBackgroundColor: '#000',
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="search" color={color} />
           ),
           header: () => <Header navigation={navigation} />,
         })}
@@ -237,13 +221,14 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="Balance"
-        style={{ backgroundColor: '#000', width: '100%' }}
-        component={WalletScreen}
-        options={({ navigation }: RootTabScreenProps<'Balance'>) => ({
-          title: 'Balance',
+        name="Profile"
+        style={{ backgroundColor: '#000' }}
+        component={ProfileScreen}
+        options={({ navigation }: RootTabScreenProps<'Profile'>) => ({
+          title: 'Profile',
           tabBarLabel: '',
           tabBarActiveBackgroundColor: '#222',
+
           tabBarInactiveBackgroundColor: '#000',
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="account" color={color} />
@@ -255,18 +240,7 @@ function BottomTabNavigator() {
   )
 }
 
-function TabBarIconFontAwesome(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name']
-  color: string
-}) {
-  // @ts-ignore
-  return (
-    <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />
-  )
-}
-
 function TabBarIcon(props: { name: string; color: string }) {
-  let sourcePath
   const style = { width: 30, height: 30, marginLeft: 5 }
   switch (props.name) {
     case 'home':
@@ -277,38 +251,7 @@ function TabBarIcon(props: { name: string; color: string }) {
         />
       )
       break
-    case 'search':
-      return (
-        <Image
-          source={require('../assets/icons/search_icon.png')}
-          style={style}
-        />
-      )
-      break
-    case 'profile':
-      return (
-        <Image
-          source={require('../assets/icons/search_icon.png')}
-          style={style}
-        />
-      )
-      break
-    case 'create':
-      return (
-        <Image
-          source={require('../assets/icons/create.png')}
-          style={style}
-        />
-      )
-      break
-    case 'calendar':
-      return (
-        <Image
-          source={require('../assets/icons/events_white.png')}
-          style={style}
-        />
-      )
-      break
+
     case 'scanner':
       return (
         <Image
@@ -321,22 +264,6 @@ function TabBarIcon(props: { name: string; color: string }) {
       return (
         <Image
           source={require('../assets/icons/account_icon.png')}
-          style={style}
-        />
-      )
-      break
-    case 'contacts':
-      return (
-        <Image
-          source={require('../assets/icons/contacts_white.png')}
-          style={style}
-        />
-      )
-      break
-    case 'shop':
-      return (
-        <Image
-          source={require('../assets/icons/shop_white.png')}
           style={style}
         />
       )
