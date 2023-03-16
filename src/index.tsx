@@ -24,6 +24,9 @@ if (typeof Buffer === 'undefined') {
 global.btoa = global.btoa || require('base-64').encode
 global.atob = global.atob || require('base-64').decode
 
+import process from 'process'
+global.process = process
+
 process.version = 'v9.40'
 
 const { registerRootComponent } = require('expo')
