@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable, Image } from 'react-native'
-
+import TxHistoryList from './components/TxHistoryList'
 import {
   useStoreState,
   useStoreActions,
@@ -105,11 +105,11 @@ export default function TransactionHistoryScreen({
           navigation={navigation}
           children={'Root'}
         />
-
-        <RecentTransactions
+        <TxHistoryList address={address} />
+        {/* <RecentTransactions
           transactions={transactions}
           navigation={navigation}
-        />
+        /> */}
         {/* Use a light status bar on iOS to account for the black space above the modal */}
       </Background>
     </View>
