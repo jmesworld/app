@@ -7,6 +7,7 @@ import { notateWeiValue } from './notateWei'
 import { validatePin } from './validatePin'
 import { navigateToScreen } from './navigate'
 import { handleLockout } from './lockout'
+
 const SCHEMA_PREFIX = 'jmes:'
 const client = new Client({
   providers: {

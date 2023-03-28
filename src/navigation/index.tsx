@@ -15,9 +15,9 @@ import {
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import * as React from 'react'
 import { ColorSchemeName, Image } from 'react-native'
-import Colors from '../constants/Colors'
+import Colors from '../utils/Colors'
 import useColorScheme from '../hooks/useColorScheme'
-
+import { useStoreState } from '../hooks/storeHooks'
 import {
   RootStackParamList,
   RootTabParamList,
@@ -25,25 +25,31 @@ import {
 } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
 import Header from '../components/Header/Header'
-import NotFoundScreen from '../screens/NotFound/NotFound'
-import ScanScreen from '../screens/Scan/Scan'
-import SignUpScreen from '../screens/CreateUser/SignUp'
-import BackUpScreen from '../screens/BackUp/BackUp'
-import ConfirmScreen from '../screens/Confirm/Confirm'
-import ConfirmPinScreen from '../screens/SetPin/ConfirmPin'
-import ProfileScreen from '../screens/Profile/Profile'
-// import RestoreAccountScreen from '../screens/Restore/RestoreAccount'
-import RestoreScreen from '../screens/Restore/Restore'
-import RestoreMnemonicScreen from '../screens/Restore/RestoreMnemonic'
-import WalletScreen from '../screens/Wallet/Wallet'
-import WalletSendScreen from '../screens/WalletSend/WalletSend'
-import WalletSendConfirmScreen from '../screens/WalletSendConfirm/WalletSendConfirm'
-import WalletReceiveScreen from '../screens/WalletReceive/WalletReceive'
-import WalletReceiveConfirmScreen from '../screens/WalletReceiveConfirm/WalletReceiveConfirm'
-import OnboardingScreen from '../screens/Onboarding/Onboarding'
-import SetPinScreen from '../screens/SetPin/SetPin'
+import NotFoundScreen from '../components/NotFound/NotFound'
 
-import { useStoreState } from '../hooks/storeHooks'
+import {
+  WalletScreen,
+  WalletSendScreen,
+  WalletSendConfirmScreen,
+  WalletReceiveConfirmScreen,
+  WalletReceiveScreen,
+  ScanScreen,
+  ProfileScreen,
+  TransactionHistoryScreen,
+} from '../features/Wallet'
+import {
+  OnboardingScreen,
+  SignUpScreen,
+  BackUpScreen,
+  ConfirmScreen,
+} from '../features/Onboarding'
+
+import {
+  RestoreScreen,
+  RestoreMnemonicScreen,
+} from '../features/Restore'
+
+import { SetPinScreen, ConfirmPinScreen } from '../features/Pin'
 
 export default function Navigation({
   colorScheme,
@@ -74,9 +80,14 @@ function RootNavigator() {
     console.log('USER AUTHORIZED')
     return (
       <Stack.Navigator>
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Root"
           component={BottomTabNavigator}
+          options={{ headerShown: false }}
+        /> */}
+        <Stack.Screen
+          name="Root"
+          component={WalletScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -94,13 +105,18 @@ function RootNavigator() {
           <Stack.Screen
             name="WalletSend"
             component={WalletSendScreen}
-            options={{ presentation: 'card', title: 'Send to user' }}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Send to user',
+            }}
           />
 
           <Stack.Screen
             name="WalletSendConfirm"
             component={WalletSendConfirmScreen}
             options={{
+              headerShown: false,
               presentation: 'card',
               title: 'Confirm sending to user',
             }}
@@ -109,11 +125,25 @@ function RootNavigator() {
             name="WalletReceive"
             component={WalletReceiveScreen}
             options={{
+              headerShown: false,
               presentation: 'card',
               title: 'Receive request',
             }}
           />
-          <Stack.Screen name="Scan" component={ScanScreen} />
+          <Stack.Screen
+            name="TransactionHistory"
+            component={TransactionHistoryScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Transaction History',
+            }}
+          />
+          <Stack.Screen
+            name="Scan"
+            options={{ headerShown: false, title: 'Scan QR Code' }}
+            component={ScanScreen}
+          />
         </Stack.Group>
       </Stack.Navigator>
     )
@@ -173,105 +203,4 @@ function RootNavigator() {
       </Stack.Navigator>
     )
   }
-}
-
-const BottomTab = createBottomTabNavigator<RootTabParamList>()
-
-function BottomTabNavigator() {
-  const colorScheme = useColorScheme()
-
-  return (
-    <BottomTab.Navigator
-      style={{ backgroundColor: '#000', height: '100%' }}
-      initialRouteName="Home"
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-      }}
-    >
-      <BottomTab.Screen
-        name="Home"
-        style={{ backgroundColor: '#000', height: '100%' }}
-        component={WalletScreen}
-        options={({ navigation }: RootTabScreenProps<'Home'>) => ({
-          title: 'Home',
-          tabBarLabel: '',
-          tabBarActiveBackgroundColor: '#222',
-          tabBarInactiveBackgroundColor: '#000',
-
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="home" color={color} />
-          ),
-          header: () => <Header navigation={navigation} />,
-        })}
-      />
-
-      <BottomTab.Screen
-        name="Scanner"
-        style={{ backgroundColor: '#000' }}
-        component={ScanScreen}
-        options={({ navigation }: RootTabScreenProps<'Scanner'>) => ({
-          title: 'Scanner',
-          tabBarLabel: '',
-          tabBarActiveBackgroundColor: '#222',
-          tabBarInactiveBackgroundColor: '#000',
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="scanner" color={color} />
-          ),
-          header: () => <Header navigation={navigation} />,
-        })}
-      />
-      <BottomTab.Screen
-        name="Profile"
-        style={{ backgroundColor: '#000' }}
-        component={ProfileScreen}
-        options={({ navigation }: RootTabScreenProps<'Profile'>) => ({
-          title: 'Profile',
-          tabBarLabel: '',
-          tabBarActiveBackgroundColor: '#222',
-
-          tabBarInactiveBackgroundColor: '#000',
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="account" color={color} />
-          ),
-          header: () => <Header navigation={navigation} />,
-        })}
-      />
-    </BottomTab.Navigator>
-  )
-}
-
-function TabBarIcon(props: { name: string; color: string }) {
-  const style = { width: 30, height: 30, marginLeft: 5 }
-  switch (props.name) {
-    case 'home':
-      return (
-        <Image
-          source={require('../assets/icons/home.png')}
-          style={style}
-        />
-      )
-      break
-
-    case 'scanner':
-      return (
-        <Image
-          source={require('../assets/icons/scan_white.png')}
-          style={style}
-        />
-      )
-      break
-    case 'account':
-      return (
-        <Image
-          source={require('../assets/icons/account_icon.png')}
-          style={style}
-        />
-      )
-      break
-  }
-
-  // @ts-ignore
-  return (
-    <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />
-  )
 }

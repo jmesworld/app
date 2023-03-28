@@ -6,7 +6,7 @@ import {
   View,
   StatusBar,
 } from 'react-native'
-import HeaderBalance from '../HeaderBalance/HeaderBalance'
+import HeaderBalance from './HeaderBalance'
 
 import { Navigation } from '../../types'
 type Props = {
