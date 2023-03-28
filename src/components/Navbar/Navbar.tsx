@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   View,
+  Text,
   StatusBar,
 } from 'react-native'
 
@@ -11,22 +12,23 @@ import { Navigation } from '../../types'
 type Props = {
   children: string
   navigation: Navigation
+  backButton?: boolean
+  title?: string
 }
 
-const Navbar = ({ navigation, children }: Props) => (
+const Navbar = ({ navigation, children, title }: Props) => (
   <View style={styles.navbar}>
     <View style={styles.toolbar}>
       <Pressable
         onPress={() => navigation.navigate(children)}
         style={({ pressed }) => ({
           opacity: pressed ? 0.5 : 1,
-
           justifyContent: 'flex-start',
           alignSelf: 'flex-start',
         })}
       >
         <Image
-          source={require('../../assets/icons/lilac-backbutton.svg')}
+          source={require('../../assets/icons/backbutton-white.svg')}
           style={{
             marginTop: 2,
             width: 10,
@@ -34,34 +36,33 @@ const Navbar = ({ navigation, children }: Props) => (
           }}
         />
       </Pressable>
-      <Image
-        source={require('../../assets/images/JMESText.svg')}
-        style={{
-          // position: 'absolute',
-          // right: '42%',
-          // marginLeft: 'auto',
-          width: 80,
-          height: 23,
-          // justifyContent: 'center',
-          // alignSelf: 'center',
-        }}
-      />
+      <Text style={styles.title}>{title}</Text>
     </View>
   </View>
 )
 
 const styles = StyleSheet.create({
   navbar: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     width: '54.7%',
     marginRight: 'auto',
     marginLeft: 23,
-    marginTop: 21,
+
+    marginBottom: 21,
     height: 23,
+  },
+  title: {
+    marginLeft: 18,
+    lineHeight: 18,
+    fontSize: 18,
+    alignItems: 'center',
+    color: '#FFFFFF',
   },
   toolbar: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     width: '100%',
   },
 })
