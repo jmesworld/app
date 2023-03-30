@@ -6,11 +6,10 @@ import {
   TransactionList,
   BottomNav,
 } from '../../../components'
-import { Platform, Pressable, StyleSheet, Image } from 'react-native'
+import { Pressable, StyleSheet, Image } from 'react-native'
 
 import { Navigation, Transaction } from '../../../types'
-import { fetchTransactions } from '../../../utils/transactionUtils'
-import { useStoreState } from '../../../hooks/storeHooks'
+
 interface Props {
   children?: React.ReactNode
   navigation: Navigation
@@ -19,7 +18,7 @@ interface Props {
   textLink?: string
 }
 
-const RecentTransactions = ({
+const AllTransactions = ({
   children,
   transactions,
   navigation,
@@ -28,19 +27,6 @@ const RecentTransactions = ({
 }: Props) => {
   return (
     <BackdropSmall>
-      <View style={styles.heading}>
-        <Text style={styles.headingTitle}>{title}</Text>
-        <Pressable>
-          <Text
-            onPress={() => {
-              navigation.navigate('TransactionHistory')
-            }}
-            style={styles.headingSeeAll}
-          >
-            {textLink}
-          </Text>
-        </Pressable>
-      </View>
       <TransactionList
         transactions={transactions}
         navigation={navigation}
@@ -81,4 +67,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default memo(RecentTransactions)
+export default memo(AllTransactions)

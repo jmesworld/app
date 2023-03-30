@@ -12,55 +12,30 @@ import ConvertDenom from './components/ConvertDenom'
 import SendReceive from './components/SendReceive'
 import RecentTransactions from './components/RecentTransactions'
 import { getCoinBal } from '../../utils'
-import { Navigation } from '../../types'
+import { fetchTransactions } from '../../utils/transactionUtils'
+import { Navigation, Transaction } from '../../types'
 import * as React from 'react'
-
+import { faucetRequest } from '../../utils'
 type Props = {
   navigation: Navigation
 }
 
 export default function WalletScreen({ navigation }: Props) {
+  const [shouldFetch, setShouldFetch] = useState(true)
+  const [balance, setBalance] = useState(0)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+
   const account = useStoreState((state) => state.accounts[0])
   const updateAccount = useStoreActions(
     (actions) => actions.updateAccount
   )
   const address = useStoreState((state) => state.accounts[0].address)
-  const [shouldFetch, setShouldFetch] = useState(true)
-  const [balance, setBalance] = useState(0)
-  const [transactions, setTransactions] = useState([
-    {
-      id: '1',
-      type: 'Sent',
-      time: '9:30 am',
-      amount: '1000',
-      symbol: '$',
-      conversion: '1000',
-    },
-    {
-      id: '2',
-      type: 'Sent',
-      time: '8:00 am',
-      amount: '500',
-      symbol: '$',
-      conversion: '500',
-    },
-    {
-      id: '3',
-      type: 'Received',
-      time: '6:00 am',
-      amount: '2000',
-      symbol: 'BTC',
-      conversion: '2000',
-    },
-    {
-      id: '4',
-      type: 'Received',
-      time: '5:00 am',
-      amount: '100',
-      symbol: 'ETH',
-      conversion: '500',
-    },
-  ])
+
+  useEffect(() => {
+    fetchTransactions(address).then((res) => {
+      setTransactions(res)
+    })
+  }, [])
 
   const isIOS = Platform.OS === 'ios'
   const isAndroid = Platform.OS === 'android'
@@ -113,6 +88,7 @@ export default function WalletScreen({ navigation }: Props) {
         />
         <BalanceContainer>
           <Text style={{ marginTop: 16, fontSize: 16 }}>Balance</Text>
+
           <Text style={{ marginBottom: 11, fontSize: 42 }}>
             {balance}
           </Text>

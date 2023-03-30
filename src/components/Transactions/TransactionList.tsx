@@ -1,52 +1,24 @@
 import React, { memo, useState } from 'react'
-import { View, StyleSheet, Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { ReceiveItem } from './ReceiveItem'
 import { SentItem } from './SentItem'
-
-type Transaction = {
-  id: string
-  type: string
-  time: string
-  amount: string
-  symbol: string
-  conversion: string
-}
-
-type GroupedTransaction = {
-  date: string
-  transactions: Transaction[]
-}
+import { View, Text, BottomNav, BackdropSmall } from '../index'
+import { Navigation, Transaction } from '../../types'
+import { groupTransactionsByDate } from '../../utils/transactionUtils'
 
 type Props = {
   transactions?: Transaction[]
+  children?: React.ReactNode
+  navigation: Navigation
+  title?: string
 }
 
-const groupTransactionsByDate = (
-  transactions: Transaction[]
-): GroupedTransaction[] => {
-  const groupedTransactions: GroupedTransaction[] = []
-  transactions.forEach((transaction) => {
-    const transactionDate = new Date(
-      transaction.time
-    ).toLocaleDateString('en-US')
-    const existingGroup = groupedTransactions.find(
-      (group) => group.date === transactionDate
-    )
-
-    if (existingGroup) {
-      existingGroup.transactions.push(transaction)
-    } else {
-      groupedTransactions.push({
-        date: transactionDate,
-        transactions: [transaction],
-      })
-    }
-  })
-
-  return groupedTransactions
-}
-
-const TransactionList = ({ transactions }: Props) => {
+const TransactionList = ({
+  transactions,
+  children,
+  navigation,
+  title,
+}: Props) => {
   const [activeTab, setActiveTab] = useState('All')
   const filteredTransactions =
     activeTab === 'All'
@@ -93,19 +65,19 @@ const TransactionList = ({ transactions }: Props) => {
       <View style={styles.transactionList}>
         {groupedTransactions.map((group) => (
           <View key={group.date}>
-            <Text style={styles.date}>{group.date}</Text>
+            <Text style={styles.dateHeader}>{group.date}</Text>
             {group.transactions.map((transaction) => (
               <View key={transaction.id} style={styles.listItem}>
                 {transaction.type === 'Sent' ? (
                   <SentItem
                     symbol={transaction.symbol}
-                    value={transaction.amount}
+                    amount={transaction.amount[0].amount}
                     conversion={transaction.conversion}
                   />
                 ) : (
                   <ReceiveItem
                     symbol={transaction.symbol}
-                    value={transaction.amount}
+                    amount={transaction.amount[0].amount}
                     conversion={transaction.conversion}
                   />
                 )}
@@ -120,12 +92,15 @@ const TransactionList = ({ transactions }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'transparent',
   },
   tabContainer: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
     height: 40,
+    marginTop: 19,
   },
   tab: {
     flex: 1,

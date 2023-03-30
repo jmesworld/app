@@ -56,7 +56,6 @@ export default function WalletSendConfirmScreen({
       recipientAmount,
       account.mnemonic
     )
-
     return navigation.navigate('Balance')
   }
 
