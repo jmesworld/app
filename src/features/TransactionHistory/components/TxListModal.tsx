@@ -2,49 +2,36 @@ import { memo, useEffect, useState } from 'react'
 import {
   View,
   Text,
-  BackdropSmall,
   TransactionList,
   BottomNav,
+  BackdropSmall,
 } from '../../../components'
 import { Platform, Pressable, StyleSheet, Image } from 'react-native'
 
-import { Navigation, Transaction } from '../../../types'
-import { fetchTransactions } from '../../../utils/transactionUtils'
-import { useStoreState } from '../../../hooks/storeHooks'
+import { Navigation } from '../../../types'
 interface Props {
   children?: React.ReactNode
   navigation: Navigation
-  transactions?: Transaction[]
+  transactions: any
   title?: string
-  textLink?: string
 }
 
-const RecentTransactions = ({
+const TxListModal = ({
   children,
   transactions,
   navigation,
   title,
-  textLink,
 }: Props) => {
+  useEffect(() => {
+    console.log('TxListModal')
+  }, [])
+
   return (
     <BackdropSmall>
       <View style={styles.heading}>
         <Text style={styles.headingTitle}>{title}</Text>
-        <Pressable>
-          <Text
-            onPress={() => {
-              navigation.navigate('TransactionHistory')
-            }}
-            style={styles.headingSeeAll}
-          >
-            {textLink}
-          </Text>
-        </Pressable>
       </View>
-      <TransactionList
-        transactions={transactions}
-        navigation={navigation}
-      />
+      <TransactionList transactions={transactions} />
       <View style={styles.bottomNav}>
         <BottomNav navigation={navigation} />
       </View>
@@ -81,4 +68,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default memo(RecentTransactions)
+export default memo(TxListModal)

@@ -5,7 +5,7 @@ import WalletSendConfirmScreen from './WalletSendConfirm'
 import WalletReceiveScreen from './WalletReceive'
 import WalletReceiveConfirmScreen from './WalletReceiveConfirm'
 import ScanScreen from './Scan'
-import TransactionHistoryScreen from './TransactionHistory'
+import TransactionHistoryScreen from '../TransactionHistory/TransactionHistory'
 export {
   ProfileScreen,
   WalletScreen,

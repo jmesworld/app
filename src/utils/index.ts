@@ -99,14 +99,9 @@ const getCoinBal = async (address: string) => {
 
   return ujmesBalance
 }
-
-const sendTransaction = async (
-  address: string,
-  amount: number,
-  mnemonic: string
-) => {
-  const wallet = await client.createWallet(new Mnemonic(mnemonic))
-  const account = await wallet.getAccount()
+const sendTransaction = async (address: string, amount: number) => {
+  console.log('ACCOUNT', account)
+  console.log(account.getAddress())
   console.log(amount / 1e6)
   const res = await account.sendTransaction(
     {
@@ -119,6 +114,28 @@ const sendTransaction = async (
   console.log({ res })
   return res
 }
+
+// const sendTransaction = async (
+//   address: string,
+//   amount: number,
+//   mnemonic: string
+// ) => {
+//   const wallet = await client.createWallet(new Mnemonic(mnemonic))
+//   console.log('WALLET', wallet)
+//   const account = await wallet.getAccount()
+//   console.log('ACCOUNT', account)
+//   console.log(amount / 1e6)
+//   const res = await account.sendTransaction(
+//     {
+//       recipientAddress: address,
+//       recipientAmount: amount, // 1 JMES = 1e6 uJMES
+//     },
+//     'http://51.38.52.37:1888'
+//   )
+
+//   console.log({ res })
+//   return res
+// }
 
 /*Identity*/
 const createUserIdentity = async (username: string, account: any) => {
@@ -233,6 +250,7 @@ export {
   account,
   lcdc,
   SCHEMA_PREFIX,
+  faucetRequest,
   convertToEur,
   getCoinBal,
   sendTransaction,

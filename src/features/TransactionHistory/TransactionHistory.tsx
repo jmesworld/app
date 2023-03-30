@@ -1,18 +1,14 @@
-import { StatusBar } from 'expo-status-bar'
-import { Platform, StyleSheet, Pressable, Image } from 'react-native'
-import TxHistoryList from './components/TxHistoryList'
-import {
-  useStoreState,
-  useStoreActions,
-} from '../../hooks/storeHooks'
 import { useEffect, useState } from 'react'
-import { Background, Navbar, Text, View } from '../../components'
-import RecentTransactions from './components/RecentTransactions'
-import { Navigation } from '../../types'
-import * as React from 'react'
-
+import { StatusBar } from 'expo-status-bar'
+import { useStoreState } from '../../hooks/storeHooks'
+import { Platform, StyleSheet } from 'react-native'
+import { fetchTransactions } from '../../utils/transactionUtils'
+import { Background, Navbar, View } from '../../components'
+import { Navigation, Transaction } from '../../types'
+import AllTransactions from './components/AllTransactions'
 type Props = {
   navigation: Navigation
+  address: string
 }
 
 const transactions = [
@@ -49,44 +45,20 @@ const transactions = [
     conversion: '500',
   },
 ]
+const isIOS = Platform.OS === 'ios'
+const isWeb = Platform.OS === 'web'
 
 export default function TransactionHistoryScreen({
   navigation,
 }: Props) {
-  const account = useStoreState((state) => state.accounts[0])
-  const updateAccount = useStoreActions(
-    (actions) => actions.updateAccount
-  )
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const address = useStoreState((state) => state.accounts[0].address)
-  const [shouldFetch, setShouldFetch] = useState(true)
 
-  const isIOS = Platform.OS === 'ios'
-  const isAndroid = Platform.OS === 'android'
-  const isWeb = Platform.OS === 'web'
-
-  //   const updateStoreState = () => {
-  //     console.log('UpdateStoreState')
-  //     updateAccount({ ...account, balance: balance })
-  //   }
-
-  //   const getTransactions = async () => {
-  //     const fetchedtransactions = await getTransactionHistory(address)
-  //     setTransactions(fetchedtransactions)
-  //   }
-
-  //   useEffect(() => {
-  //     console.log('account', account)
-  //     getTransactions()
-  //     const interval = setInterval(() => {
-  //       if (shouldFetch) {
-  //         getTransactions()
-  //         updateStoreState()
-  //       }
-  //       console.log('interval')
-  //     }, 10 * 1000)
-
-  //     return () => clearInterval(interval)
-  //   }, [updateStoreState])
+  useEffect(() => {
+    fetchTransactions(address).then((res) => {
+      setTransactions(res)
+    })
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -105,18 +77,29 @@ export default function TransactionHistoryScreen({
           navigation={navigation}
           children={'Root'}
         />
-        <TxHistoryList address={address} />
-        {/* <RecentTransactions
+        <AllTransactions
           transactions={transactions}
           navigation={navigation}
-        /> */}
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
+        />
       </Background>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  cell: {
+    fontSize: 12,
+    textAlign: 'center',
+    flex: 1,
+    backgroundColor: 'lightblue', // Add a background color to see if the cell is being rendered
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: 'lightgray', // Add a background color to see if the row is being rendered
+  },
   container: {
     flex: 1,
     alignItems: 'center',

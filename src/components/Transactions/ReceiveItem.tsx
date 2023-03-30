@@ -9,11 +9,15 @@ import {
 
 type Props = {
   symbol?: React.ReactNode
-  value: string
+  amount?: any
   conversion?: string
 }
 
-export const SentItem = ({ symbol, value, conversion }: Props) => {
+export const ReceiveItem = ({
+  symbol,
+  amount,
+  conversion,
+}: Props) => {
   const time = new Date()
     .toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -24,7 +28,7 @@ export const SentItem = ({ symbol, value, conversion }: Props) => {
     <View style={styles.transactionListItem}>
       <Pressable>
         <Image
-          source={require('../../assets/icons/Send-midnight.svg')}
+          source={require('../../assets/icons/Receive-midnight.svg')}
           style={{
             width: 15,
             height: 15,
@@ -33,11 +37,11 @@ export const SentItem = ({ symbol, value, conversion }: Props) => {
         />
       </Pressable>
       <View style={styles.transactionType}>
-        <Text style={styles.topText}>Sent</Text>
-        <Text style={styles.bottomText}>{time}</Text>
+        <Text style={styles.topText}>Received</Text>
+        <Text style={styles.time}>{time}</Text>
       </View>
       <View style={styles.transactionValue}>
-        <Text style={styles.topText}>{value} JMES</Text>
+        <Text style={styles.topText}>{amount} JMES</Text>
         <Text style={styles.bottomText}>
           {symbol}
           {conversion}
@@ -72,11 +76,16 @@ const styles = StyleSheet.create({
     color: '#263047',
     fontWeight: '500',
   },
+  time: {
+    fontSize: 12,
+    color: '#454E62',
+    fontWeight: '400',
+    alignSelf: 'flex-start',
+  },
   bottomText: {
     fontSize: 12,
     color: '#454E62',
     fontWeight: '400',
-
     alignSelf: 'flex-end',
   },
 })
