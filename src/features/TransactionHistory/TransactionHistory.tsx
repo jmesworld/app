@@ -11,41 +11,6 @@ type Props = {
   address: string
 }
 
-const transactions = [
-  {
-    id: '1',
-    type: 'Sent',
-    time: '2022-01-01 9:30 am',
-    amount: '1000',
-    symbol: '$',
-    conversion: '1000',
-  },
-  {
-    id: '2',
-    type: 'Sent',
-    time: '2022-01-01 8:00 am',
-    amount: '500',
-    symbol: '$',
-    conversion: '500',
-  },
-  {
-    id: '3',
-    type: 'Received',
-    time: '2022-01-02 6:00 am',
-    amount: '2000',
-    symbol: 'BTC',
-    conversion: '2000',
-  },
-  {
-    id: '4',
-    type: 'Received',
-    time: '2022-01-02 5:00 am',
-    amount: '100',
-    symbol: 'ETH',
-    conversion: '500',
-  },
-]
-
 const isIOS = Platform.OS === 'ios'
 const isWeb = Platform.OS === 'web'
 

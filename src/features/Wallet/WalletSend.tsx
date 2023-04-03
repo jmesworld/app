@@ -8,11 +8,15 @@ import {
   SafeAreaView,
   ActionSheetIOS,
 } from 'react-native'
-
-import { Text, View } from '../../components/Themed/Themed'
-
 import { getUserIdentity } from '../../utils'
-import Background4 from '../../components/Background/Background4'
+import {
+  Background,
+  BackdropSmall,
+  Navbar,
+  View,
+  Text,
+  StyledButton as NextButton,
+} from '../../components'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 
@@ -20,6 +24,8 @@ type Props = {
   navigation: Navigation
   route: Route<any>
 }
+const isIOS = Platform.OS === 'ios'
+const isWeb = Platform.OS === 'web'
 
 export default function WalletSendScreen({
   navigation,
@@ -54,42 +60,52 @@ export default function WalletSendScreen({
 
   return (
     <View style={styles.container}>
-      <Background4>
-        <Text style={styles.title}>Send JMES</Text>
+      <Background>
         <View
-          style={styles.separator}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        />
-        <Text style={styles.title}>Recipient</Text>
-        <SafeAreaView>
-          <TextInput
-            style={styles.input}
-            onChangeText={setUsername}
-            value={username}
-            placeholder={'Enter recipients username'}
-          />
-        </SafeAreaView>
-        <Text style={styles.title}>Amount</Text>
-        <SafeAreaView>
-          <TextInput
-            style={styles.input}
-            onChangeText={setAmount}
-            value={amount}
-            placeholder={'Amount to send'}
-          />
-        </SafeAreaView>
-        <Pressable
-          onPress={async () => {
-            await handleTxParams(username)
-          }}
-          style={styles.button}
+          style={
+            isWeb
+              ? { height: 44, backgroundColor: 'transparent' }
+              : { height: 'auto', backgroundColor: 'transparent' }
+          }
         >
-          <Text style={styles.buttonText}>Send</Text>
-        </Pressable>
+          <StatusBar style={isIOS ? 'light' : 'auto'} />
+        </View>
+        <Navbar
+          title={'Send to'}
+          navigation={navigation}
+          children={'Root'}
+        />
+        <BackdropSmall>
+          <Text style={styles.title}>Recipient</Text>
+          <SafeAreaView>
+            <TextInput
+              style={styles.input}
+              onChangeText={setUsername}
+              value={username}
+              placeholder={'Search, Public Address or ENS'}
+            />
+          </SafeAreaView>
+          <Text style={styles.title}>Amount</Text>
+          <SafeAreaView>
+            <TextInput
+              style={styles.input}
+              onChangeText={setAmount}
+              value={amount}
+              placeholder={'Amount to send'}
+            />
+          </SafeAreaView>
+          <View style={styles.buttonContainer}>
+            <NextButton
+              onPress={() => handleTxParams(username)}
+              enabled={true}
+            >
+              Next
+            </NextButton>
+          </View>
+        </BackdropSmall>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      </Background4>
+      </Background>
     </View>
   )
 }
@@ -107,6 +123,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_900Black',
     color: '#000000',
   },
+  buttonContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginTop: 'auto',
+    marginBottom: 20,
+    width: '90%',
+    height: 48,
+
+    backgroundColor: 'transparent',
+  },
+
   iconImageView: {
     flexDirection: 'row',
   },
@@ -127,15 +156,25 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_900Black',
   },
   title: {
-    fontSize: 36,
-    fontFamily: 'Comfortaa_300Light',
+    color: 'black',
+    alignSelf: 'center',
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 24,
+    marginBottom: 10,
   },
   input: {
-    backgroundColor: 'white',
-    height: 40,
-    margin: 12,
+    placeholderTextColor: 'rgba(112, 79, 247, 0.5)',
+    paddingLeft: 19,
+    marginLeft: 14,
+    marginRight: 14,
     borderWidth: 1,
-    padding: 10,
+    borderStyle: 'solid',
+    borderColor: 'rgba(112, 79, 247, 0.5)',
+    borderRadius: 24,
+    backgroundColor: 'rgba(112, 79, 247, 0.1)',
+    width: '90%',
+    height: 60,
   },
   secondTitle: {
     fontSize: 36,

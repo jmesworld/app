@@ -24,7 +24,7 @@ export async function fetchTransactions(address) {
 
     const sentTransactions = sentData.txs.map((tx, index) => ({
       ...tx,
-      type: 'Sent',
+      tx_type: 'Sent',
       timestamp: sentData.tx_responses[index].timestamp,
       tx_hash: sentData.tx_responses[index].txhash,
       status:
@@ -36,7 +36,7 @@ export async function fetchTransactions(address) {
     const receivedTransactions = receivedData.txs.map(
       (tx, index) => ({
         ...tx,
-        type: 'Received',
+        tx_type: 'Received',
         timestamp: receivedData.tx_responses[index].timestamp,
         tx_hash: receivedData.tx_responses[index].txhash,
         status:

@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 import 'react-native-get-random-values'
 import * as bip39 from 'bip39'
-import { Client, Mnemonic } from 'jmes'
+import { Client, Mnemonic, Account, DerivableKey } from 'jmes'
 import { convertToEur } from './convert'
 import { notateWeiValue } from './notateWei'
 import { validatePin } from './validatePin'
@@ -44,34 +44,6 @@ const lcdc = client.createLCDClient({
   isClassic: false,
 })
 
-/* Test identities
-    
-    ACCOUNT #1:
-    address: jmes199kwsjs3j3up2uwqkn37j5lu0up68z2zepuw8z
-    username: zzxxxx
-    name: zzxxxx
-    mnemonic: eye dinner tuna mirror select build glimpse add parade record guilt scare visit imitate between syrup siege coach knee bread glory call news crunch
-    
-    
-    ACCOUNT #2:
-    address: jmes126c9dh4n523u9l9tefgxamgpm0fns7urtq3c5c
-    username: Hunter
-    name: HunterSides
-    mnemonic: absorb casual spread danger change document fatal chair doctor taxi marine fat evolve prison film vault million oil agent leg panda sketch stadium impose
-    
-    ACCOUNT #3:
-    address: jmes1sd6xwp5gx8wynyql55lry07hk9hd6jhhg2fcdt
-    username: AlexHunterTest2801
-    name: AlexHunterTest2801
-    mnemonic: play into future horn acquire food appear bulb exile bacon squeeze dizzy dad obtain decorate curious orbit subject prison ring small canvas zoo private
-
-    ACCOUNT #4:
-    address: jmes1q2w3e4r5t6y7u8i9o0p1a2s3d4f5g6h7j8k9l0
-    username: HSIDESTESTACC
-    mnemonic: blade october seat huge clean cover pyramid pumpkin already feel match miracle
-
-    */
-
 /*Wallet */
 
 const generateWallet = async (mnemonic: string) => {
@@ -99,9 +71,17 @@ const getCoinBal = async (address: string) => {
 
   return ujmesBalance
 }
-const sendTransaction = async (address: string, amount: number) => {
+
+const sendTransaction = async (
+  address: string,
+  amount: number,
+  mnemonic: string
+) => {
+  console.log(mnemonic)
+  const wallet = await client.createWallet(new Mnemonic(mnemonic))
+  console.log('WALLET', wallet)
+  const account = await wallet.getAccount()
   console.log('ACCOUNT', account)
-  console.log(account.getAddress())
   console.log(amount / 1e6)
   const res = await account.sendTransaction(
     {
@@ -114,28 +94,6 @@ const sendTransaction = async (address: string, amount: number) => {
   console.log({ res })
   return res
 }
-
-// const sendTransaction = async (
-//   address: string,
-//   amount: number,
-//   mnemonic: string
-// ) => {
-//   const wallet = await client.createWallet(new Mnemonic(mnemonic))
-//   console.log('WALLET', wallet)
-//   const account = await wallet.getAccount()
-//   console.log('ACCOUNT', account)
-//   console.log(amount / 1e6)
-//   const res = await account.sendTransaction(
-//     {
-//       recipientAddress: address,
-//       recipientAmount: amount, // 1 JMES = 1e6 uJMES
-//     },
-//     'http://51.38.52.37:1888'
-//   )
-
-//   console.log({ res })
-//   return res
-// }
 
 /*Identity*/
 const createUserIdentity = async (username: string, account: any) => {

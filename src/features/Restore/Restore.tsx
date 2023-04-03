@@ -21,19 +21,6 @@ type Props = {
 export default function RestoreScreen({ navigation }: Props) {
   const [username, onChangeUsername] = useState('')
   const [name, onChangeName] = useState('')
-  const [validated, setValidated] = useState(false)
-  // const validateUsername = async function () {
-  //   const account = await getUserIdentity(username)
-
-  //   if (account.data.identity.username === username) {
-  //     console.log('valid username', account.data.identity.username)
-  //     return true
-  //   } else {
-  //     console.log('invalid username', account.data.identity.username)
-  //     // setValidated(false)
-  //     return false
-  //   }
-  // }
 
   const validateUsername = async function () {
     try {
