@@ -7,21 +7,19 @@ import {
   BottomNav,
 } from '../../../components'
 import { Platform, Pressable, StyleSheet, Image } from 'react-native'
-
 import { Navigation, Transaction } from '../../../types'
-import { fetchTransactions } from '../../../utils/transactionUtils'
-import { useStoreState } from '../../../hooks/storeHooks'
+
 interface Props {
   children?: React.ReactNode
   navigation: Navigation
-  transactions?: Transaction[]
   title?: string
   textLink?: string
+  itemPressed?: (item: Transaction) => void
 }
 
 const RecentTransactions = ({
+  itemPressed,
   children,
-  transactions,
   navigation,
   title,
   textLink,
@@ -41,10 +39,7 @@ const RecentTransactions = ({
           </Text>
         </Pressable>
       </View>
-      <TransactionList
-        transactions={transactions}
-        navigation={navigation}
-      />
+      <TransactionList itemPressed={itemPressed} />
       <View style={styles.bottomNav}>
         <BottomNav navigation={navigation} />
       </View>

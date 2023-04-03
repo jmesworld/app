@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { useStoreState } from '../../hooks/storeHooks'
+
 import { Platform, StyleSheet } from 'react-native'
-import { fetchTransactions } from '../../utils/transactionUtils'
+
 import { Background, Navbar, View } from '../../components'
-import { Navigation, Transaction } from '../../types'
+import { Navigation } from '../../types'
 import AllTransactions from './components/AllTransactions'
+
 type Props = {
   navigation: Navigation
   address: string
@@ -45,21 +45,13 @@ const transactions = [
     conversion: '500',
   },
 ]
+
 const isIOS = Platform.OS === 'ios'
 const isWeb = Platform.OS === 'web'
 
 export default function TransactionHistoryScreen({
   navigation,
 }: Props) {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const address = useStoreState((state) => state.accounts[0].address)
-
-  useEffect(() => {
-    fetchTransactions(address).then((res) => {
-      setTransactions(res)
-    })
-  }, [])
-
   return (
     <View style={styles.container}>
       <Background>
@@ -77,10 +69,8 @@ export default function TransactionHistoryScreen({
           navigation={navigation}
           children={'Root'}
         />
-        <AllTransactions
-          transactions={transactions}
-          navigation={navigation}
-        />
+
+        <AllTransactions navigation={navigation} />
       </Background>
     </View>
   )

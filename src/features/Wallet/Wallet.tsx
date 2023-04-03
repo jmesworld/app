@@ -1,21 +1,20 @@
-import { StatusBar } from 'expo-status-bar'
+import { useEffect, useState } from 'react'
 import { Platform, StyleSheet, Pressable, Image } from 'react-native'
-
+import { StatusBar } from 'expo-status-bar'
 import {
   useStoreState,
   useStoreActions,
 } from '../../hooks/storeHooks'
-import { useEffect, useState } from 'react'
-import { Background, Text, View } from '../../components'
-import BalanceContainer from './components/BalanceContainer'
-import ConvertDenom from './components/ConvertDenom'
-import SendReceive from './components/SendReceive'
-import RecentTransactions from './components/RecentTransactions'
+import { Background, Text, View, Modal } from '../../components'
+import {
+  BalanceContainer,
+  ConvertDenom,
+  RecentTransactions,
+  SendReceive,
+} from './components'
 import { getCoinBal } from '../../utils'
-import { fetchTransactions } from '../../utils/transactionUtils'
 import { Navigation, Transaction } from '../../types'
-import * as React from 'react'
-import { faucetRequest } from '../../utils'
+import TransactionDetails from '../../components/Modal/TransactionDetails'
 type Props = {
   navigation: Navigation
 }
@@ -23,19 +22,14 @@ type Props = {
 export default function WalletScreen({ navigation }: Props) {
   const [shouldFetch, setShouldFetch] = useState(true)
   const [balance, setBalance] = useState(0)
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null)
   const account = useStoreState((state) => state.accounts[0])
   const updateAccount = useStoreActions(
     (actions) => actions.updateAccount
   )
   const address = useStoreState((state) => state.accounts[0].address)
-
-  useEffect(() => {
-    fetchTransactions(address).then((res) => {
-      setTransactions(res)
-    })
-  }, [])
 
   const isIOS = Platform.OS === 'ios'
   const isAndroid = Platform.OS === 'android'
@@ -88,7 +82,6 @@ export default function WalletScreen({ navigation }: Props) {
         />
         <BalanceContainer>
           <Text style={{ marginTop: 16, fontSize: 16 }}>Balance</Text>
-
           <Text style={{ marginBottom: 11, fontSize: 42 }}>
             {balance}
           </Text>
@@ -97,11 +90,29 @@ export default function WalletScreen({ navigation }: Props) {
         </BalanceContainer>
 
         <RecentTransactions
-          transactions={transactions}
+          itemPressed={(item) => {
+            setSelectedTransaction(item)
+            setModalVisible(true)
+            console.log('Selected Transaction:', item)
+          }}
           navigation={navigation}
           title="Recent Transactions"
           textLink="See all"
         />
+        <Modal
+          isVisible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(false)
+            setSelectedTransaction(null)
+          }}
+        >
+          {selectedTransaction && (
+            <TransactionDetails
+              closeModal={() => setModalVisible(false)}
+              transaction={selectedTransaction}
+            />
+          )}
+        </Modal>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
       </Background>
     </View>

@@ -24,6 +24,9 @@ export async function fetchTransactions(address) {
 
     const sentTransactions = sentData.txs.map((tx, index) => ({
       ...tx,
+      type: 'Sent',
+      timestamp: sentData.tx_responses[index].timestamp,
+      tx_hash: sentData.tx_responses[index].txhash,
       status:
         sentData.tx_responses[index].code === 0
           ? 'Success'
@@ -33,6 +36,9 @@ export async function fetchTransactions(address) {
     const receivedTransactions = receivedData.txs.map(
       (tx, index) => ({
         ...tx,
+        type: 'Received',
+        timestamp: receivedData.tx_responses[index].timestamp,
+        tx_hash: receivedData.tx_responses[index].txhash,
         status:
           receivedData.tx_responses[index].code === 0
             ? 'Success'

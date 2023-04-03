@@ -1,43 +1,46 @@
-import React, { memo, useState } from 'react'
-import { StyleSheet } from 'react-native'
-import { ReceiveItem } from './ReceiveItem'
-import { SentItem } from './SentItem'
-import { View, Text, BottomNav, BackdropSmall } from '../index'
+import { memo, useState, useEffect } from 'react'
+import { View, Text, Modal } from '../../components'
+import { Pressable, StyleSheet } from 'react-native'
+import { useStoreState } from '../../hooks/storeHooks'
 import { Navigation, Transaction } from '../../types'
-import { groupTransactionsByDate } from '../../utils/transactionUtils'
+import { TransactionListItem } from '../Transactions/TransactionListItem'
+import { fetchTransactions } from '../../api/transactionAPI'
+import TransactionDetails from '../Modal/TransactionDetails'
 
 type Props = {
-  transactions?: Transaction[]
-  children?: React.ReactNode
-  navigation: Navigation
-  title?: string
+  itemPressed?: (item: Transaction) => void
 }
-
-const TransactionList = ({
-  transactions,
-  children,
-  navigation,
-  title,
-}: Props) => {
+const TransactionList = ({ itemPressed }: Props) => {
+  const address = useStoreState((state) => state.accounts[0].address)
   const [activeTab, setActiveTab] = useState('All')
-  const filteredTransactions =
-    activeTab === 'All'
-      ? transactions
-      : transactions?.filter(
-          (transaction) => transaction.type === activeTab
-        )
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null)
+  const [modalVisible, setModalVisible] = useState(false) // 3. Add state variable
 
-  const groupedTransactions = groupTransactionsByDate(
-    filteredTransactions || []
-  )
+  useEffect(() => {
+    const getTransactions = async () => {
+      const data = await fetchTransactions(address)
+      setTransactions(data)
+    }
+    getTransactions()
+  }, [address])
 
+  const handleItemPress = (transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setModalVisible(true) // Set the modal visible
+  }
+
+  const closeModal = () => {
+    setModalVisible(false) // 4. Add a function to close the modal
+  }
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
         <Text
           style={[
             styles.tab,
-            activeTab === 'All' && styles.activeTab,
+            activeTab === 'All' ? styles.activeTab : null,
           ]}
           onPress={() => setActiveTab('All')}
         >
@@ -46,7 +49,7 @@ const TransactionList = ({
         <Text
           style={[
             styles.tab,
-            activeTab === 'Sent' && styles.activeTab,
+            activeTab === 'Sent' ? styles.activeTab : null,
           ]}
           onPress={() => setActiveTab('Sent')}
         >
@@ -55,7 +58,7 @@ const TransactionList = ({
         <Text
           style={[
             styles.tab,
-            activeTab === 'Received' && styles.activeTab,
+            activeTab === 'Received' ? styles.activeTab : null,
           ]}
           onPress={() => setActiveTab('Received')}
         >
@@ -63,32 +66,41 @@ const TransactionList = ({
         </Text>
       </View>
       <View style={styles.transactionList}>
-        {groupedTransactions.map((group) => (
-          <View key={group.date}>
-            <Text style={styles.dateHeader}>{group.date}</Text>
-            {group.transactions.map((transaction) => (
-              <View key={transaction.id} style={styles.listItem}>
-                {transaction.type === 'Sent' ? (
-                  <SentItem
-                    symbol={transaction.symbol}
-                    amount={transaction.amount[0].amount}
-                    conversion={transaction.conversion}
-                  />
-                ) : (
-                  <ReceiveItem
-                    symbol={transaction.symbol}
-                    amount={transaction.amount[0].amount}
-                    conversion={transaction.conversion}
-                  />
-                )}
-              </View>
-            ))}
-          </View>
-        ))}
+        {transactions.map((tx, index) => {
+          return (
+            <View key={index} style={styles.listItem}>
+              <Pressable
+                onPress={() => handleItemPress(tx)} // Call the new handler
+              >
+                <TransactionListItem
+                  timestamp={transactions[index].timestamp}
+                  tx_hash={transactions[index].tx_hash}
+                  tx_type={transactions[index].tx_type}
+                  to_address={tx.body.messages[0].to_address}
+                  from_address={tx.body.messages[0].from_address}
+                  denom={tx.body.messages[0].amount[0].denom}
+                  amount={tx.body.messages[0].amount[0].amount}
+                />
+              </Pressable>
+            </View>
+          )
+        })}
       </View>
+      {selectedTransaction && (
+        <Modal
+          isVisible={modalVisible}
+          onRequestClose={closeModal} // Close the modal when the user presses the hardware back button on Android
+        >
+          <TransactionDetails
+            transaction={selectedTransaction}
+            closeModal={closeModal}
+          />
+        </Modal>
+      )}
     </View>
   )
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -128,17 +140,8 @@ const styles = StyleSheet.create({
     marginRight: 21,
     backgroundColor: 'transparent',
   },
-  listItem: {},
-  dateHeader: {
-    backgroundColor: '#F7F7F7',
-    padding: 8,
-    marginTop: 16,
-    borderRadius: 4,
-  },
-  dateHeaderText: {
-    fontSize: 12,
-    color: '#777777',
-    fontWeight: '500',
+  listItem: {
+    backgroundColor: 'transparent',
   },
 })
 

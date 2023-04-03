@@ -1,17 +1,17 @@
-import { Navigation, Transaction } from '../types'
-
 type GroupedTransaction = {
   date: string
   transactions: Transaction[]
 }
 
-interface FetchTxProps extends Transaction {
-  address: string
+interface Transaction {
+  txhash: string
+  timestamp: string
+  from_address: string
+  to_address: string
+  amount: { denom: string; amount: string }[]
 }
 
-export const fetchTransactions = async ({
-  address,
-}: FetchTxProps) => {
+export const fetchTransactions = async ({ address }) => {
   const proxyURI = 'http://localhost:8080/'
   try {
     const sentResponse = await fetch(
@@ -32,6 +32,15 @@ export const fetchTransactions = async ({
           : 'Failed',
     }))
 
+    // const receivedTransactions = receivedData.tx_responses.logs.events.map(
+    //   (events, index) => ({
+    //     ...events,
+    //     type: receivedData.tx_responses[index].logs.events.type === 'transfer' ? 'transfer' : 'other',
+    //     recipient:
+    //     amount: receivedData.tx_responses[index].logs.events[0].attributes[1].value,
+
+    //   })
+    // )
     const receivedTransactions = receivedData.txs.map(
       (tx, index) => ({
         ...tx,

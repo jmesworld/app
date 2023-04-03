@@ -43,12 +43,19 @@ export type Navigation = {
 }
 
 export type Transaction = {
-  id: string
-  type: string
-  time: string
-  amount: { denom: string, amount: string }
-  symbol: string
-  conversion: string
-  from_address: string
-  to_address: string
+  tx_hash?: string
+  symbol?: React.ReactNode
+  amount?: any
+  timestamp?: string
+  conversion?: string
+  to_address?: string
+  from_address?: string
+  denom?: string
+  tx_type?: string
+}
+
+export type Transactions = {
+  transactions: Transaction[]
+  tx_responses: any
+  txs: any
 }
