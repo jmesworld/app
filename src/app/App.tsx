@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { StoreProvider } from 'easy-peasy'
-
+import { MnemonicProvider } from './MnemonicContext'
 import useCachedResources from '../hooks/useCachedResources'
 import useColorScheme from '../hooks/useColorScheme'
 import Navigation from '../navigation'
@@ -18,12 +18,14 @@ export default function App() {
     return null
   } else {
     return (
-      <SafeAreaProvider>
-        <StoreProvider store={store}>
-          <Navigation colorScheme={colorScheme} />
-          <StatusBar translucent={true} />
-        </StoreProvider>
-      </SafeAreaProvider>
+      <MnemonicProvider>
+        <SafeAreaProvider>
+          <StoreProvider store={store}>
+            <Navigation colorScheme={colorScheme} />
+            <StatusBar translucent={true} />
+          </StoreProvider>
+        </SafeAreaProvider>
+      </MnemonicProvider>
     )
   }
 }

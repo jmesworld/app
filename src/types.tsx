@@ -43,6 +43,7 @@ export type Navigation = {
 }
 
 export type Transaction = {
+  status?: string
   tx_hash?: string
   symbol?: React.ReactNode
   amount?: any

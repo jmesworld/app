@@ -10,6 +10,7 @@ import {
   TextTitle,
   PinInput,
 } from '../../components'
+import { useMnemonic } from '../../app/MnemonicContext'
 import { Text, View } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { Navigation } from '../../types'
@@ -20,6 +21,7 @@ import {
   validatePin,
   navigateToScreen,
 } from '../../utils'
+import { storeDataSecurely } from '../../store/storage'
 type Props = {
   navigation: Navigation
   route: Route<any>
@@ -32,6 +34,7 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
     '',
     '',
   ])
+  const [mnemonic, setMnemonic] = useState('')
   const [pin, setPin] = useState<string[]>(['', '', '', ''])
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
@@ -43,15 +46,13 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
 
   const addAccount = useStoreActions((actions) => actions.addAccount)
   const addToken = useStoreActions((actions) => actions.addToken)
-  const setSecureToken = useStoreActions(
-    (actions) => actions.setSecureToken
-  )
 
   useEffect(() => {
     if (route.params) {
       setName(route.params.name)
       setUsername(route.params.username)
       setPinNumbers(route.params.pinNumbers)
+      setMnemonic(route.params.mnemonic)
     }
   }, [route.params])
 
@@ -82,9 +83,9 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
       name: tokenRes.identity.name,
       pin: pin,
     })
-    await setSecureToken({
-      token: tokenRes.token,
-    })
+    await storeDataSecurely('mnemonic', mnemonic)
+    await storeDataSecurely('token', tokenRes.token)
+
     await addToken({
       token: tokenRes.token,
     })

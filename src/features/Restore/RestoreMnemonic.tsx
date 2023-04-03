@@ -28,6 +28,7 @@ import {
 import { Text, View } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { Navigation } from '../../types'
+import { storeDataSecurely } from '../../store/storage'
 
 type Props = {
   navigation: Navigation
@@ -48,9 +49,6 @@ export default function RestoreMnemonicScreen({
   const [isLocked, setIsLocked] = useState(false)
   const addAccount = useStoreActions((actions) => actions.addAccount)
   const addToken = useStoreActions((actions) => actions.addToken)
-  const setSecureToken = useStoreActions(
-    (actions) => actions.setSecureToken
-  )
 
   useEffect(() => {
     if (route.params) {
@@ -96,6 +94,7 @@ export default function RestoreMnemonicScreen({
       const identity = await restoreUserIdentity(
         mnemonicWords.join(' ')
       )
+
       if (identity) {
         await addAccount({
           index: 0,
@@ -103,9 +102,9 @@ export default function RestoreMnemonicScreen({
           address: identity.account.address,
           username: identity.username,
         })
-        await setSecureToken({
-          token: identity.token,
-        })
+
+        await storeDataSecurely('mnemonic', mnemonicWords.join(' '))
+        await storeDataSecurely('token', identity.token)
         await addToken({
           token: identity.token,
         })

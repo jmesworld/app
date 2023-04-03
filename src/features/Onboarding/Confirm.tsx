@@ -1,6 +1,7 @@
 import { Route } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
+import { useMnemonic } from '../../app/MnemonicContext'
 import {
   Platform,
   SafeAreaView,
@@ -28,10 +29,7 @@ export default function ConfirmScreen({ navigation, route }: Props) {
   const [mnemonic, setMnemonic] = useState('')
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
-  const [selectedWords, setSelectedWords] = useState<string[]>([])
-  const [inputWord, setInputWord] = useState('')
-  const [words, setWords] = useState<string[]>([])
-  const [amount, setWordAmount] = useState(Number)
+  const { mnemonicContext, setMnemonicContext } = useMnemonic()
   const [mnemonicWords, setMnemonicWords] = useState<string[]>([])
 
   useEffect(() => {
@@ -57,12 +55,14 @@ export default function ConfirmScreen({ navigation, route }: Props) {
   const handleConfirm = async () => {
     const isValid = await validateInputWords()
     if (isValid) {
+      // setMnemonicContext(mnemonic)
       // @ts-ignore
       return navigation.navigate({
         name: 'SetPin',
         params: {
           username: username,
           name: name,
+          recoveryPhrase: mnemonic,
         },
       })
     } else {

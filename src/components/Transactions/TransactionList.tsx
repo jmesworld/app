@@ -13,19 +13,55 @@ type Props = {
 const TransactionList = ({ itemPressed }: Props) => {
   const address = useStoreState((state) => state.accounts[0].address)
   const [activeTab, setActiveTab] = useState('All')
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
-  const [modalVisible, setModalVisible] = useState(false) // 3. Add state variable
+  const [modalVisible, setModalVisible] = useState(false)
+
+  const [allTransactions, setAllTransactions] = useState<
+    Transaction[]
+  >([])
+  const [sentTransactions, setSentTransactions] = useState<
+    Transaction[]
+  >([])
+  const [receivedTransactions, setReceivedTransactions] = useState<
+    Transaction[]
+  >([])
 
   useEffect(() => {
     const getTransactions = async () => {
-      const data = await fetchTransactions(address)
-      setTransactions(data)
+      const transactions = await fetchTransactions(address)
+      console.log('Transactions:', transactions)
+      setAllTransactions(transactions)
+      setSentTransactions(
+        transactions.filter(
+          (transaction) => transaction.tx_type === 'Sent'
+        )
+      )
+      setReceivedTransactions(
+        transactions.filter(
+          (transaction) => transaction.tx_type === 'Received'
+        )
+      )
     }
+
     getTransactions()
   }, [address])
 
+  const getDisplayedTransactions = () => {
+    switch (activeTab) {
+      case 'All':
+        return allTransactions
+      case 'Sent':
+        return sentTransactions
+      case 'Received':
+        return receivedTransactions
+      default:
+        return []
+    }
+  }
+
+  const displayedTransactions = getDisplayedTransactions()
   const handleItemPress = (transaction: Transaction) => {
     setSelectedTransaction(transaction)
     setModalVisible(true) // Set the modal visible
@@ -34,6 +70,7 @@ const TransactionList = ({ itemPressed }: Props) => {
   const closeModal = () => {
     setModalVisible(false) // 4. Add a function to close the modal
   }
+
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
@@ -66,16 +103,16 @@ const TransactionList = ({ itemPressed }: Props) => {
         </Text>
       </View>
       <View style={styles.transactionList}>
-        {transactions.map((tx, index) => {
+        {displayedTransactions.map((tx, index) => {
           return (
             <View key={index} style={styles.listItem}>
               <Pressable
                 onPress={() => handleItemPress(tx)} // Call the new handler
               >
                 <TransactionListItem
-                  timestamp={transactions[index].timestamp}
-                  tx_hash={transactions[index].tx_hash}
-                  tx_type={transactions[index].tx_type}
+                  timestamp={displayedTransactions[index].timestamp}
+                  tx_hash={displayedTransactions[index].tx_hash}
+                  tx_type={displayedTransactions[index].tx_type}
                   to_address={tx.body.messages[0].to_address}
                   from_address={tx.body.messages[0].from_address}
                   denom={tx.body.messages[0].amount[0].denom}

@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Transaction } from '../../types'
-
+import { formatDate } from '../../utils/formatDate'
 type Props = {
   transaction: Transaction | null
   closeModal: () => void
@@ -17,12 +17,29 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
       <Text style={styles.title}>Transaction Details</Text>
       <View style={styles.item}>
         <Text style={styles.textSmall}>Status</Text>
-        <Text style={styles.statusTextConfirmed}>Confirmed</Text>
+        <View>
+          {transaction.status === 'Success' ? (
+            <Text style={styles.statusTextConfirmed}>
+              {transaction.status}
+            </Text>
+          ) : transaction.status === 'Failed' ? (
+            <Text style={styles.statusTextFailed}>
+              {transaction.status}
+            </Text>
+          ) : (
+            <Text style={styles.statusTextPending}>
+              {transaction.status}
+            </Text>
+          )}
+        </View>
+
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>Date</Text>
-        <Text style={styles.textLarge}>{transaction.timestamp}</Text>
+        <Text style={styles.textLarge}>
+          {formatDate(transaction.timestamp)}
+        </Text>
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
@@ -42,7 +59,7 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
       <View style={styles.item}>
         <Text style={styles.textSmall}>Total Amount</Text>
         <Text style={styles.textLarge}>
-          {transaction.body.messages[0].amount[0].amount}
+          {transaction.body.messages[0].amount[0].amount} JMES
         </Text>
         <View style={styles.itemSeparator} />
       </View>
@@ -74,6 +91,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
   },
+  statusTextFailed: {
+    color: '#FF5C5C',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  statusTextPending: {
+    color: '#FFC05C',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+
   textSmall: {
     fontSize: 12,
     fontWeight: '400',

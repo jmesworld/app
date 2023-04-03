@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SecureStore from 'expo-secure-store'
-
+import localForage from 'localforage'
 // async storage should not be used for sensitive data and instead using a secure library like expo-secure-store
 const storage = {
   async getItem(key: any) {
@@ -26,32 +26,35 @@ const storage = {
   },
 }
 
-export default storage
-
-/**
-
-export const secureStorage = {
-  async getItem(key: any) {
-    return JSON.parse(await AsyncStorage.getItem(key))
-  },
-  async setItem(key: any, data: any) {
-    await AsyncStorage.setItem(key, JSON.stringify(data))
-  },
-  async removeItem(key: any) {
-    await AsyncStorage.removeItem(key)
-  },
-  async setEncryptedItem(key: any, data: any) {
-    await SecureStore.setItemAsync(key, data)
-  },
-  async getEncryptedItem(key: any) {
-    SecureStore.getItemAsync(key)
-  },
-  async encryptToken(payload: string) {
-    await SecureStore.setItemAsync('secure_token', payload)
-  },
-  async decryptToken() {
-    await SecureStore.getItemAsync('secure_token')
-  },
+const isWebPlatform = () => {
+  return typeof window !== 'undefined' && window.navigator
 }
 
- */
+// Store data securely
+export async function storeDataSecurely(key, value) {
+  try {
+    if (isWebPlatform()) {
+      await localForage.setItem(key, value)
+    } else {
+      await SecureStore.setItemAsync(key, value)
+    }
+  } catch (error) {
+    console.error(`Error storing ${key}:`, error)
+  }
+}
+
+// Retrieve data securely
+export async function getDataSecurely(key) {
+  try {
+    if (isWebPlatform()) {
+      const value = await localForage.getItem(key)
+      return value
+    } else {
+      const value = await SecureStore.getItemAsync(key)
+      return value
+    }
+  } catch (error) {
+    console.error(`Error retrieving ${key}:`, error)
+  }
+}
+export default storage

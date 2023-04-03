@@ -7,17 +7,18 @@ import {
   Image,
 } from 'react-native'
 import { Transaction } from '../../types'
-
+import { formatDate } from '../../utils/formatDate'
 export const TransactionListItem = (transaction: Transaction) => {
-  const tx_timestamp = new Date(
-    transaction.timestamp
-  ).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-  })
   const shortenAddress = (address) => {
     if (!address || address.length < 7) return address
     return address.slice(0, 4) + '...' + address.slice(-3)
+  }
+  const SendReceiveText = () => {
+    return (
+      <Text style={styles.topText}>
+        {transaction.tx_type === 'Sent' ? 'Sent' : 'Received'}
+      </Text>
+    )
   }
   const SendIcon = () => {
     return (
@@ -53,7 +54,9 @@ export const TransactionListItem = (transaction: Transaction) => {
         <Text style={styles.topText}>
           {transaction.tx_type === 'Sent' ? 'Sent' : 'Received'}
         </Text>
-        <Text style={styles.bottomText}>{transaction.timestamp}</Text>
+        <Text style={styles.bottomText}>
+          {formatDate(transaction.timestamp)}
+        </Text>
       </View>
       <View style={styles.transactionValue}>
         <Text style={styles.topText}>{transaction.amount} JMES</Text>

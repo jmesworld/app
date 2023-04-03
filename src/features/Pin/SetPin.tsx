@@ -28,11 +28,13 @@ const SetPinScreen = ({ navigation, route }: Props) => {
   ])
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
+  const [mnemonic, setMnemonic] = useState('')
   const [isPinComplete, setIsPinComplete] = useState(false)
   useEffect(() => {
     if (route.params) {
       setName(route.params.name)
       setUsername(route.params.username)
+      setMnemonic(route.params.mnemonic)
     }
   }, [route.params])
   useEffect(() => {
@@ -56,6 +58,7 @@ const SetPinScreen = ({ navigation, route }: Props) => {
         pinNumbers,
         username,
         name,
+        mnemonic,
       })
     } else {
       alert('Invalid pin')

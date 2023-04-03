@@ -2,7 +2,8 @@ import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable } from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
 import { useEffect, useState } from 'react'
-import { sendTransaction } from '../../utils'
+import { mnemonic, sendTransaction } from '../../utils'
+import { getDataSecurely } from '../../store/storage'
 import {
   useStoreState,
   useStoreActions,
@@ -29,17 +30,23 @@ export default function WalletSendConfirmScreen({
   navigation,
   route,
 }: Props) {
-  const account = useStoreState((state) => state.accounts[0])
-  const initiatorAddress = useStoreState(
-    (state) => state.accounts[0].address
-  )
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
+  const [mnemonic, setMnemonic] = useState('')
+  async function getMnemonic() {
+    const mnemonicFromSecureStorage = await getDataSecurely(
+      'mnemonic'
+    )
+    console.log('Mnemonic:', mnemonicFromSecureStorage)
+    setMnemonic(mnemonicFromSecureStorage)
+    return mnemonicFromSecureStorage
+  }
 
   useEffect(() => {
     console.log('params', route.params)
     console.log('match', route.match)
+    getMnemonic()
     if (route.params) {
       if (route.params.userAddress)
         setRecipientAddress(route.params.userAddress)
@@ -51,12 +58,16 @@ export default function WalletSendConfirmScreen({
   }, [route.params])
 
   const handleSend = async () => {
-    await sendTransaction(
-      recipientAddress,
-      recipientAmount,
-      account.mnemonic
-    )
-    return navigation.navigate('Balance')
+    try {
+      await sendTransaction(
+        recipientAddress,
+        recipientAmount,
+        mnemonic
+      )
+      return navigation.navigate('Root')
+    } catch (error) {
+      console.error('Error sending transaction:', error)
+    }
   }
 
   let [fontsLoaded] = useFonts({
