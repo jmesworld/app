@@ -31,7 +31,8 @@ export default function WalletSendScreen({
   navigation,
   route,
 }: Props) {
-  const [username, setUsername] = useState('')
+  const [data, setData] = useState('')
+  const [identity, setIdentity] = useState<any>()
   const [amount, setAmount] = useState('')
 
   useEffect(() => {
@@ -39,13 +40,36 @@ export default function WalletSendScreen({
       if (route.params.payload.amount)
         setAmount(route.params.payload.amount)
       if (route.params.payload.username)
-        setUsername(route.params.payload.username)
+        setIdentity(route.params.payload.username)
     }
   }, [route.params])
 
+  // const handleTxParams = async (data: string) => {
+  //   const requestedIdentity = await getUserIdentity(data)
+  //   if (requestedIdentity.statusText !== 'OK') {
+  //     //@ts-ignore
+  //     return navigation.navigate({
+  //       name: 'WalletSendConfirm',
+  //       params: {
+  //         identity: data,
+  //         amount,
+  //       },
+  //     })
+  //   } else {
+  //     //@ts-ignore
+  //     return navigation.navigate({
+  //       name: 'WalletSendConfirm',
+  //       params: {
+  //         identity: requestedIdentity.data.identity,
+  //         amount,
+  //       },
+  //     })
+  //   }
+  // }
   const handleTxParams = async (username: string) => {
     const requestedIdentity = await getUserIdentity(username)
-    const userAddress = await requestedIdentity.data.identity.address
+    const recipientAddress = await requestedIdentity.data.identity
+      .address
 
     // @ts-ignore
     return navigation.navigate({
@@ -53,7 +77,7 @@ export default function WalletSendScreen({
       params: {
         username,
         amount,
-        userAddress,
+        recipientAddress,
       },
     })
   }
@@ -80,8 +104,8 @@ export default function WalletSendScreen({
           <SafeAreaView>
             <TextInput
               style={styles.input}
-              onChangeText={setUsername}
-              value={username}
+              onChangeText={setData}
+              value={data}
               placeholder={'Search, Public Address or ENS'}
             />
           </SafeAreaView>
@@ -96,7 +120,7 @@ export default function WalletSendScreen({
           </SafeAreaView>
           <View style={styles.buttonContainer}>
             <NextButton
-              onPress={() => handleTxParams(username)}
+              onPress={() => handleTxParams(data)}
               enabled={true}
             >
               Next

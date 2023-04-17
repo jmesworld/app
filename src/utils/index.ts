@@ -52,12 +52,12 @@ const generateWallet = async (mnemonic: string) => {
   return wallet
 }
 
-const generateMnemonic = () => {
-  const randomBytes = crypto.getRandomValues(new Uint8Array(32))
-  const mnemonic = Mnemonic.generateMnemonic(randomBytes)
+// const generateMnemonic = () => {
+//   const randomBytes = crypto.getRandomValues(new Uint8Array(32))
+//   const mnemonic = Mnemonic.generateMnemonic(randomBytes)
 
-  return mnemonic
-}
+//   return mnemonic
+// }
 const faucetRequest = async (address: string) => {
   const res = await client.providers.faucetAPI.requestCredit(address)
   console.log(res)
@@ -77,12 +77,8 @@ const sendTransaction = async (
   amount: number,
   mnemonic: string
 ) => {
-  console.log(mnemonic)
-  const wallet = await client.createWallet(new Mnemonic(mnemonic))
-  console.log('WALLET', wallet)
-  const account = await wallet.getAccount()
-  console.log('ACCOUNT', account)
-  console.log(amount / 1e6)
+  const wallet = client.createWallet(new Mnemonic(mnemonic))
+  const account = wallet.getAccount()
   const res = await account.sendTransaction(
     {
       recipientAddress: address,
@@ -108,13 +104,21 @@ const createUserIdentity = async (username: string, account: any) => {
   return createIdentityReq
 }
 
+// const getUserIdentity = async (identityName: string) => {
+//   try {
+//     const identity = await client.providers.identityAPI.getIdentity(identityName)
+//     return identity
+//   } catch (error) {
+//     console.log(error)
+//     return error
+//   }
+// }
 const getUserIdentity = async (identityName: string) => {
-  const getIdentityReq =
-    await client.providers.identityAPI.getIdentity(identityName)
-  console.log({ getIdentity: getIdentityReq })
-  return getIdentityReq
+  const identity = await client.providers.identityAPI.getIdentity(
+    identityName
+  )
+  return identity
 }
-
 // const restoreUserIdentity = async (mnemonic: string) => {
 //   const account = await accountFromMnemonic(mnemonic)
 //   console.log(account) // will log the account object even if the account is invalid
@@ -220,7 +224,6 @@ export {
   restoreUserIdentity,
   notateWeiValue,
   mnemonicToSeed,
-  generateMnemonic,
   validatePin,
   navigateToScreen,
   handleLockout,

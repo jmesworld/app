@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable } from 'react-native'
-import { Text, View } from '../../components/Themed/Themed'
 import { useEffect, useState } from 'react'
 import { mnemonic, sendTransaction } from '../../utils'
 import { getDataSecurely } from '../../store/storage'
@@ -8,16 +7,15 @@ import {
   useStoreState,
   useStoreActions,
 } from '../../hooks/storeHooks'
-import Background4 from '../../components/Background/Background4'
 import {
-  useFonts,
-  Comfortaa_300Light,
-  Comfortaa_400Regular,
-  Comfortaa_500Medium,
-  Comfortaa_600SemiBold,
-  Comfortaa_700Bold,
-} from '@expo-google-fonts/comfortaa'
-import { Roboto_900Black } from '@expo-google-fonts/roboto'
+  Background,
+  BackdropSmall,
+  Navbar,
+  View,
+  Text,
+  StyledButton,
+} from '../../components'
+import { isIOS, isWeb } from '../../utils/platformDetect'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 
@@ -33,13 +31,14 @@ export default function WalletSendConfirmScreen({
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
-  const [mnemonic, setMnemonic] = useState('')
+  const [mnemonic, setMnemonic] = useState<any>()
+
   async function getMnemonic() {
     const mnemonicFromSecureStorage = await getDataSecurely(
       'mnemonic'
     )
-    console.log('Mnemonic:', mnemonicFromSecureStorage)
     setMnemonic(mnemonicFromSecureStorage)
+
     return mnemonicFromSecureStorage
   }
 
@@ -48,8 +47,8 @@ export default function WalletSendConfirmScreen({
     console.log('match', route.match)
     getMnemonic()
     if (route.params) {
-      if (route.params.userAddress)
-        setRecipientAddress(route.params.userAddress)
+      if (route.params.recipientAddress)
+        setRecipientAddress(route.params.recipientAddress)
       if (route.params.username)
         setRecipientUsername(route.params.username)
       if (route.params.amount)
@@ -70,47 +69,52 @@ export default function WalletSendConfirmScreen({
     }
   }
 
-  let [fontsLoaded] = useFonts({
-    Comfortaa_300Light,
-    Comfortaa_400Regular,
-    Comfortaa_500Medium,
-    Comfortaa_600SemiBold,
-    Comfortaa_700Bold,
-    Roboto_900Black,
-  })
-
   return (
     <View style={styles.container}>
-      <Background4>
-        <Text style={styles.title}>Send JMES</Text>
+      <Background>
         <View
-          style={styles.separator}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        />
-        <Text style={styles.secondTitle}>
-          Send $JMES: {recipientAmount / 1e6}
-        </Text>
-        <Text style={styles.secondTitle}>
-          Amount in $UJMES: {recipientAmount}
-        </Text>
-
-        <Text style={styles.username}>
-          To User: {recipientUsername}
-        </Text>
-        <Text style={styles.address}>{recipientAddress}</Text>
-
-        <Pressable
-          onPress={async () => {
-            await handleSend()
-          }}
-          style={styles.button}
+          style={
+            isWeb
+              ? { height: 44, backgroundColor: 'transparent' }
+              : { height: 'auto', backgroundColor: 'transparent' }
+          }
         >
-          <Text style={styles.buttonText}>Confirm</Text>
-        </Pressable>
+          <StatusBar style={isIOS ? 'light' : 'auto'} />
+        </View>
+        <Navbar
+          title={'Send to'}
+          navigation={navigation}
+          children={'Root'}
+        />
+        <BackdropSmall>
+          <Text style={styles.title}>Sender Account</Text>
+
+          <Text style={styles.title}>
+            Recipient Account {recipientUsername}
+          </Text>
+          <Text style={styles.secondTitle}>{recipientAddress}</Text>
+          <Text style={styles.secondTitle}>
+            Send $JMES: {recipientAmount / 1e6}
+          </Text>
+          <Text style={styles.secondTitle}>
+            Amount in $UJMES: {recipientAmount}
+          </Text>
+
+          <View style={styles.buttonContainer}>
+            <StyledButton
+              style={styles.sendButton}
+              onPress={async () => {
+                await handleSend()
+              }}
+              enabled={true}
+            >
+              Send
+            </StyledButton>
+          </View>
+        </BackdropSmall>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      </Background4>
+      </Background>
     </View>
   )
 }
@@ -122,43 +126,60 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
-  buttonText: {
-    fontSize: 24,
-    textTransform: 'uppercase',
-    fontFamily: 'Roboto_900Black',
-    color: '#000000',
+  buttonContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginTop: 'auto',
+    marginBottom: 20,
+    width: '90%',
+    height: 48,
+
+    backgroundColor: 'transparent',
   },
-  iconImageView: {
+
+  cancelButton: {
     flexDirection: 'row',
-  },
-  button: {
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+
+    borderColor: '#5136C2',
     backgroundColor: '#FFFFFF',
-    borderRadius: 6,
-    color: '#000000',
-    paddingTop: 5,
-    paddingBottom: 5,
-    paddingLeft: 25,
-    paddingRight: 25,
-    fontSize: 24,
-    textTransform: 'uppercase',
-    fontFamily: 'Roboto_900Black',
+    borderRadius: 90,
+    fontColor: '#23262F',
+    marginTop: 13,
+    marginBottom: 13,
+    fontSize: 16,
+    height: 48,
+    width: '48%',
+  },
+  sendButton: {
+    flexDirection: 'row',
+
+    backgroundColor: '#704FF7',
+    borderRadius: 90,
+    marginTop: 13,
+    marginBottom: 13,
+    fontSize: 16,
+    height: 48,
+    width: '48%',
   },
   title: {
-    color: '#FFF',
-
-    fontSize: 36,
-    fontFamily: 'Comfortaa_300Light',
+    color: 'black',
+    alignSelf: 'flex-start',
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 24,
+    marginBottom: 10,
+    paddingLeft: 17,
   },
   secondTitle: {
-    fontSize: 36,
-    color: '#FFF',
-
-    fontFamily: 'Comfortaa_300Light',
-    paddingTop: 40,
+    color: 'black',
+    alignSelf: 'flex-start',
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 24,
+    marginBottom: 10,
+    paddingLeft: 17,
   },
   username: {
     fontSize: 36,
