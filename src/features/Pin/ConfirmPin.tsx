@@ -52,7 +52,7 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
       setName(route.params.name)
       setUsername(route.params.username)
       setPinNumbers(route.params.pinNumbers)
-      setMnemonic(route.params.mnemonic)
+      setMnemonic(route.params.recoveryPhrase)
     }
   }, [route.params])
 
@@ -74,6 +74,7 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   const performRegister = async () => {
     await createUserIdentity(username, account)
     const tokenRes = await getToken(account)
+    console.log(mnemonic)
 
     await addAccount({
       index: 0,
