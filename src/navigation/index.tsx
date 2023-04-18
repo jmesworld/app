@@ -26,16 +26,16 @@ import {
 import LinkingConfiguration from './LinkingConfiguration'
 import Header from '../components/Header/Header'
 import NotFoundScreen from '../components/NotFound/NotFound'
-import TestScreen from '../features/TestScreen'
+
 import {
   WalletScreen,
-  WalletSendScreen,
-  WalletSendConfirmScreen,
-  WalletReceiveConfirmScreen,
-  WalletReceiveScreen,
+  SendScreen,
+  RequestScreen,
   ScanScreen,
   ProfileScreen,
   TransactionHistoryScreen,
+  SendConfirmScreen,
+  ReceiveScreen,
 } from '../features/Wallet'
 import {
   OnboardingScreen,
@@ -85,11 +85,7 @@ function RootNavigator() {
           component={WalletScreen}
           options={{ headerShown: false }}
         />
-        {/* <Stack.Screen
-          name="Root"
-          component={TestScreen}
-          options={{ headerShown: false }}
-        /> */}
+
         <Stack.Screen
           name="NotFound"
           component={NotFoundScreen}
@@ -104,7 +100,7 @@ function RootNavigator() {
         <Stack.Group screenOptions={{ presentation: 'modal' }}>
           <Stack.Screen
             name="WalletSend"
-            component={WalletSendScreen}
+            component={SendScreen}
             options={{
               headerShown: false,
               presentation: 'card',
@@ -114,7 +110,7 @@ function RootNavigator() {
 
           <Stack.Screen
             name="WalletSendConfirm"
-            component={WalletSendConfirmScreen}
+            component={SendConfirmScreen}
             options={{
               headerShown: false,
               presentation: 'card',
@@ -123,11 +119,20 @@ function RootNavigator() {
           />
           <Stack.Screen
             name="WalletReceive"
-            component={WalletReceiveScreen}
+            component={ReceiveScreen}
             options={{
               headerShown: false,
               presentation: 'card',
-              title: 'Receive request',
+              title: 'Receive',
+            }}
+          />
+          <Stack.Screen
+            name="ReceiveRequest"
+            component={RequestScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Request',
             }}
           />
           <Stack.Screen

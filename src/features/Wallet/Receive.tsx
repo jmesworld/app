@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import {
   Platform,
@@ -19,68 +19,18 @@ import {
 } from '../../components'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
+import { useStoreState } from '../../hooks/storeHooks'
+import QRCode from 'react-native-qrcode-svg' // Import QRCode component
 
 type Props = {
   navigation: Navigation
-  route: Route<any>
 }
+
 const isIOS = Platform.OS === 'ios'
 const isWeb = Platform.OS === 'web'
 
-export default function WalletSendScreen({
-  navigation,
-  route,
-}: Props) {
-  const [data, setData] = useState('')
-  const [identity, setIdentity] = useState<any>()
-  const [amount, setAmount] = useState('')
-
-  useEffect(() => {
-    if (route.params) {
-      if (route.params.payload.amount)
-        setAmount(route.params.payload.amount)
-      if (route.params.payload.username)
-        setIdentity(route.params.payload.username)
-    }
-  }, [route.params])
-
-  // const handleTxParams = async (data: string) => {
-  //   const requestedIdentity = await getUserIdentity(data)
-  //   if (requestedIdentity.statusText !== 'OK') {
-  //     //@ts-ignore
-  //     return navigation.navigate({
-  //       name: 'WalletSendConfirm',
-  //       params: {
-  //         identity: data,
-  //         amount,
-  //       },
-  //     })
-  //   } else {
-  //     //@ts-ignore
-  //     return navigation.navigate({
-  //       name: 'WalletSendConfirm',
-  //       params: {
-  //         identity: requestedIdentity.data.identity,
-  //         amount,
-  //       },
-  //     })
-  //   }
-  // }
-  const handleTxParams = async (username: string) => {
-    const requestedIdentity = await getUserIdentity(username)
-    const recipientAddress = await requestedIdentity.data.identity
-      .address
-
-    // @ts-ignore
-    return navigation.navigate({
-      name: 'WalletSendConfirm',
-      params: {
-        username,
-        amount,
-        recipientAddress,
-      },
-    })
-  }
+export default function ReceiveScreen({ navigation }: Props) {
+  const address = useStoreState((state) => state.accounts[0].address)
 
   return (
     <View style={styles.container}>
@@ -95,35 +45,82 @@ export default function WalletSendScreen({
           <StatusBar style={isIOS ? 'light' : 'auto'} />
         </View>
         <Navbar
-          title={'Send to'}
+          title={'Receive'}
           navigation={navigation}
           children={'Root'}
         />
         <BackdropSmall>
-          <Text style={styles.title}>Recipient</Text>
-          <SafeAreaView>
-            <TextInput
-              style={styles.input}
-              onChangeText={setData}
-              value={data}
-              placeholder={'Search, Public Address or ENS'}
-            />
-          </SafeAreaView>
-          <Text style={styles.title}>Amount</Text>
-          <SafeAreaView>
-            <TextInput
-              style={styles.input}
-              onChangeText={setAmount}
-              value={amount}
-              placeholder={'Amount to send'}
-            />
-          </SafeAreaView>
+          <Text style={styles.title}>Share Account</Text>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <QRCode value={address} size={168} color="#5136C2" />
+          </View>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 32,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <Text
+              style={{
+                color: '#454E62',
+                fontSize: 15,
+                fontWeight: '400',
+              }}
+            >
+              {address}
+            </Text>
+          </View>
+          <View
+            style={{
+              marginTop: 55,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <Text style={styles.title}>or</Text>
+          </View>
+
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 70,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <Pressable
+              style={styles.requestButton}
+              onPress={async () => {
+                navigation.navigate('ReceiveRequest')
+              }}
+            >
+              <Text
+                style={{
+                  color: '#23262F',
+                  fontSize: 16,
+                  fontWeight: '500',
+                  lineHeight: 16,
+                }}
+              >
+                Request
+              </Text>
+            </Pressable>
+          </View>
+
           <View style={styles.buttonContainer}>
             <NextButton
-              onPress={() => handleTxParams(data)}
+              onPress={() => navigation.navigate('Root')}
               enabled={true}
             >
-              Next
+              Done
             </NextButton>
           </View>
         </BackdropSmall>
@@ -133,13 +130,24 @@ export default function WalletSendScreen({
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#fff',
     justifyContent: 'center',
+  },
+
+  requestButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 90,
+    border: '1px solid #5136C2',
+    fontSize: 16,
+    height: 48,
+    width: '48%',
   },
   buttonText: {
     fontSize: 24,

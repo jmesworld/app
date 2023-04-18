@@ -1,35 +1,43 @@
 import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable } from 'react-native'
 import { useEffect, useState } from 'react'
-import { mnemonic, sendTransaction } from '../utils'
-import { getDataSecurely } from '../store/storage'
-import { useStoreState, useStoreActions } from '../hooks/storeHooks'
+import { mnemonic, sendTransaction } from '../../utils'
+import { getDataSecurely } from '../../store/storage'
+import {
+  useStoreState,
+  useStoreActions,
+} from '../../hooks/storeHooks'
 import {
   Background,
   BackdropSmall,
   Navbar,
   View,
   Text,
-  StyledButton,
-} from '../components'
-import { isIOS, isWeb } from '../utils/platformDetect'
-import { Navigation } from '../types'
+  Modal,
+  StyledButton as CloseButton,
+} from '../../components'
+import { isIOS, isWeb } from '../../utils/platformDetect'
+import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
-
+import SendTxStatusModal from '../../components/Modal/SendTxStatusModal'
 type Props = {
   navigation: Navigation
   route: Route<any>
 }
 
-export default function TestScreen({ navigation, route }: Props) {
+export default function SendConfirmScreen({
+  navigation,
+  route,
+}: Props) {
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
   const [mnemonic, setMnemonic] = useState<any>()
+  const [modalVisible, setModalVisible] = useState(false)
+  const [transactionStatus, setTransactionStatus] = useState(null)
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
-
   const address = useStoreState((state) => state.accounts[0].address)
 
   async function getMnemonic() {
@@ -37,7 +45,6 @@ export default function TestScreen({ navigation, route }: Props) {
       'mnemonic'
     )
     setMnemonic(mnemonicFromSecureStorage)
-
     return mnemonicFromSecureStorage
   }
 
@@ -56,15 +63,33 @@ export default function TestScreen({ navigation, route }: Props) {
   }, [route.params])
 
   const handleSend = async () => {
+    setModalVisible(true)
+    setTransactionStatus('Pending')
     try {
-      await sendTransaction(
+      const response = await sendTransaction(
         recipientAddress,
         recipientAmount,
         mnemonic
       )
-      return navigation.navigate('Root')
+      if (response.txhash) {
+        setTransactionStatus('Success')
+      } else {
+        setTransactionStatus('Failed')
+      }
     } catch (error) {
       console.error('Error sending transaction:', error)
+      setTransactionStatus('Failed')
+    }
+  }
+
+  const handleCloseModal = () => {
+    setModalVisible(false)
+    if (transactionStatus === 'Success') {
+      return navigation.navigate('Root')
+    } else if (transactionStatus === 'Failed') {
+      return navigation.navigate('WalletSend')
+    } else {
+      return navigation.navigate('Root')
     }
   }
 
@@ -114,7 +139,7 @@ export default function TestScreen({ navigation, route }: Props) {
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
               <Text style={styles.detailsTotal}>
-                {recipientAmount + 0.6948} JMES
+                {recipientAmount / 1e6 + 0.6948} JMES
               </Text>
             </View>
             <View style={styles.conversion}>
@@ -167,6 +192,21 @@ export default function TestScreen({ navigation, route }: Props) {
             </Pressable>
           </View>
         </BackdropSmall>
+        <Modal
+          isVisible={modalVisible}
+          onRequestClose={handleCloseModal}
+        >
+          <SendTxStatusModal
+            closeModal={handleCloseModal}
+            transactionStatus={transactionStatus}
+          />
+
+          <View style={styles.buttonContainer}>
+            <CloseButton onPress={handleCloseModal} enabled={true}>
+              Close
+            </CloseButton>
+          </View>
+        </Modal>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Background>
