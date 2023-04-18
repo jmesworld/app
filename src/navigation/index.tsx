@@ -26,7 +26,7 @@ import {
 import LinkingConfiguration from './LinkingConfiguration'
 import Header from '../components/Header/Header'
 import NotFoundScreen from '../components/NotFound/NotFound'
-
+import TestScreen from '../features/TestScreen'
 import {
   WalletScreen,
   WalletSendScreen,
@@ -80,16 +80,16 @@ function RootNavigator() {
     console.log('USER AUTHORIZED')
     return (
       <Stack.Navigator>
-        {/* <Stack.Screen
-          name="Root"
-          component={BottomTabNavigator}
-          options={{ headerShown: false }}
-        /> */}
         <Stack.Screen
           name="Root"
           component={WalletScreen}
           options={{ headerShown: false }}
         />
+        {/* <Stack.Screen
+          name="Root"
+          component={TestScreen}
+          options={{ headerShown: false }}
+        /> */}
         <Stack.Screen
           name="NotFound"
           component={NotFoundScreen}

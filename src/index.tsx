@@ -1,4 +1,4 @@
-//import { getStorybookUI, configure } from '@storybook/react-native'
+import { getStorybookUI, configure } from '@storybook/react-native'
 import { registerRootComponent } from 'expo'
 import { Platform, LogBox } from 'react-native'
 import process from 'process'

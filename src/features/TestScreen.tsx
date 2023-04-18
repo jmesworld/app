@@ -1,43 +1,35 @@
 import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable } from 'react-native'
 import { useEffect, useState } from 'react'
-import { mnemonic, sendTransaction } from '../../utils'
-import { getDataSecurely } from '../../store/storage'
-import {
-  useStoreState,
-  useStoreActions,
-} from '../../hooks/storeHooks'
+import { mnemonic, sendTransaction } from '../utils'
+import { getDataSecurely } from '../store/storage'
+import { useStoreState, useStoreActions } from '../hooks/storeHooks'
 import {
   Background,
   BackdropSmall,
   Navbar,
   View,
   Text,
-  Modal,
-  StyledButton as CloseButton,
-} from '../../components'
-import { isIOS, isWeb } from '../../utils/platformDetect'
-import { Navigation } from '../../types'
+  StyledButton,
+} from '../components'
+import { isIOS, isWeb } from '../utils/platformDetect'
+import { Navigation } from '../types'
 import { Route } from '@react-navigation/native'
-import SendTxStatusModal from '../../components/Modal/SendTxStatusModal'
+
 type Props = {
   navigation: Navigation
   route: Route<any>
 }
 
-export default function WalletSendConfirmScreen({
-  navigation,
-  route,
-}: Props) {
+export default function TestScreen({ navigation, route }: Props) {
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
   const [mnemonic, setMnemonic] = useState<any>()
-  const [modalVisible, setModalVisible] = useState(false)
-  const [transactionStatus, setTransactionStatus] = useState(null)
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
+
   const address = useStoreState((state) => state.accounts[0].address)
 
   async function getMnemonic() {
@@ -45,6 +37,7 @@ export default function WalletSendConfirmScreen({
       'mnemonic'
     )
     setMnemonic(mnemonicFromSecureStorage)
+
     return mnemonicFromSecureStorage
   }
 
@@ -63,33 +56,15 @@ export default function WalletSendConfirmScreen({
   }, [route.params])
 
   const handleSend = async () => {
-    setModalVisible(true)
-    setTransactionStatus('Pending')
     try {
-      const response = await sendTransaction(
+      await sendTransaction(
         recipientAddress,
         recipientAmount,
         mnemonic
       )
-      if (response.txhash) {
-        setTransactionStatus('Success')
-      } else {
-        setTransactionStatus('Failed')
-      }
+      return navigation.navigate('Root')
     } catch (error) {
       console.error('Error sending transaction:', error)
-      setTransactionStatus('Failed')
-    }
-  }
-
-  const handleCloseModal = () => {
-    setModalVisible(false)
-    if (transactionStatus === 'Success') {
-      return navigation.navigate('Root')
-    } else if (transactionStatus === 'Failed') {
-      return navigation.navigate('WalletSend')
-    } else {
-      return navigation.navigate('Root')
     }
   }
 
@@ -139,7 +114,7 @@ export default function WalletSendConfirmScreen({
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
               <Text style={styles.detailsTotal}>
-                {recipientAmount / 1e6 + 0.6948} JMES
+                {recipientAmount + 0.6948} JMES
               </Text>
             </View>
             <View style={styles.conversion}>
@@ -192,21 +167,6 @@ export default function WalletSendConfirmScreen({
             </Pressable>
           </View>
         </BackdropSmall>
-        <Modal
-          isVisible={modalVisible}
-          onRequestClose={handleCloseModal}
-        >
-          <SendTxStatusModal
-            closeModal={handleCloseModal}
-            transactionStatus={transactionStatus}
-          />
-
-          <View style={styles.buttonContainer}>
-            <CloseButton onPress={handleCloseModal} enabled={true}>
-              Close
-            </CloseButton>
-          </View>
-        </Modal>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Background>
@@ -221,18 +181,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
-  buttonContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 20,
-    width: '90%',
-    height: 48,
 
-    backgroundColor: 'transparent',
-  },
   username: {
     fontSize: 16,
     fontWeight: '500',
