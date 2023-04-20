@@ -106,9 +106,9 @@ export default function SendConfirmScreen({
           <StatusBar style={isIOS ? 'light' : 'auto'} />
         </View>
         <Navbar
-          title={'WalletSend'}
+          title={'Send Confirm'}
           navigation={navigation}
-          children={'WalletSendScreen'}
+          children={'WalletSend'}
         />
         <BackdropSmall>
           <Text style={styles.title}>Sender account</Text>

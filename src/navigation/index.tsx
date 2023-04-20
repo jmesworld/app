@@ -70,14 +70,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
   const hasToken = useStoreState((state) => state.hasToken)
-  console.log('HAS TOKEN', hasToken)
-
-  useStoreState((state) =>
-    console.log(`Current store state: ${state}`)
-  )
 
   if (hasToken) {
-    console.log('USER AUTHORIZED')
     return (
       <Stack.Navigator>
         <Stack.Screen
@@ -153,7 +147,6 @@ function RootNavigator() {
       </Stack.Navigator>
     )
   } else {
-    console.log('USER IS UNAUTHORIZED')
     return (
       <Stack.Navigator
         style={{ backgroundColor: '#000', height: '100%' }}

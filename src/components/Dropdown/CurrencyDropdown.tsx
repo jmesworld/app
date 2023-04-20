@@ -7,13 +7,13 @@ interface Props {
   onSelect: (currency: { code: string; symbol: string }) => void
 }
 
-const CurrencyDropdown: React.FC<Props> = ({ onSelect }) => {
+const CurrencyDropdown = ({ onSelect }: Props) => {
   return (
     <View style={styles.dropdown}>
       {CURRENCIES.map((currency) => (
         <Pressable
           key={currency.code}
-          style={styles.dropdownItem}
+          style={styles.item}
           onPress={() => onSelect(currency)}
         >
           <Text style={styles.text}>
@@ -28,17 +28,16 @@ const CurrencyDropdown: React.FC<Props> = ({ onSelect }) => {
 const styles = StyleSheet.create({
   dropdown: {
     position: 'absolute',
-    top: 20,
-    right: 0,
-    left: 20,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 5,
-    zIndex: 2,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    zIndex: 1000, // Make sure the dropdown is rendered above other components
   },
-  dropdownItem: {
-    paddingVertical: 5,
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   text: {
     fontSize: 14,

@@ -23,5 +23,5 @@ export { default as NumberKeyboard } from './NumberKeyboard/NumberKeyboard'
 export { default as TransactionList } from './Transactions/TransactionList'
 export { default as TransactionDetails } from './Modal/TransactionDetails'
 export { default as CurrencyDropdown } from './Dropdown/CurrencyDropdown'
-export { default as CurrencyDropdownItem } from './Dropdown/CurrencyDropdownItem'
+
 export * from './Themed/Themed'
