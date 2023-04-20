@@ -6,7 +6,13 @@ import {
   TransactionList,
   BottomNav,
 } from '../../../components'
-import { Platform, Pressable, StyleSheet, Image } from 'react-native'
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  Image,
+  ScrollView,
+} from 'react-native'
 import { Navigation, Transaction } from '../../../types'
 
 interface Props {
@@ -39,7 +45,9 @@ const RecentTransactions = ({
           </Text>
         </Pressable>
       </View>
-      <TransactionList itemPressed={itemPressed} />
+      <ScrollView>
+        <TransactionList itemPressed={itemPressed} />
+      </ScrollView>
       <View style={styles.bottomNav}>
         <BottomNav navigation={navigation} />
       </View>

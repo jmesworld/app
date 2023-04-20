@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
-import { Platform, StyleSheet, Pressable, Image } from 'react-native'
+import { useEffect, useState, useCallback } from 'react'
+import { Platform, StyleSheet, Image } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import {
   useStoreState,
   useStoreActions,
 } from '../../hooks/storeHooks'
+import useFetchBalance from '../../hooks/useFetchBalance'
 import {
   Background,
   Text,
   View,
   Modal,
   TransactionDetails,
-  CurrencyDropdownItem,
+  CurrencyDropdown,
 } from '../../components'
 import {
   BalanceContainer,
@@ -37,6 +38,7 @@ export default function WalletScreen({ navigation }: Props) {
   const [selectedCurrency, setSelectedCurrency] = useState(
     CURRENCIES[0]
   )
+
   const account = useStoreState((state) => state.accounts[0])
   const updateAccount = useStoreActions(
     (actions) => actions.updateAccount
@@ -44,41 +46,37 @@ export default function WalletScreen({ navigation }: Props) {
   const address = useStoreState((state) => state.accounts[0].address)
 
   const isIOS = Platform.OS === 'ios'
-  const isAndroid = Platform.OS === 'android'
   const isWeb = Platform.OS === 'web'
 
-  const updateStoreState = () => {
-    console.log('UpdateStoreState')
+  const updateStoreState = useCallback(() => {
     updateAccount({ ...account, balance: balance })
-  }
+  }, [account, balance, updateAccount])
 
-  const getBalance = async () => {
+  const getBalance = useCallback(async () => {
     const fetchedBalance = await getCoinBal(address)
     setBalance(fetchedBalance)
-  }
+  }, [address])
 
   useEffect(() => {
-    console.log('account', account)
     getBalance()
     const interval = setInterval(() => {
       if (shouldFetch) {
         getBalance()
         updateStoreState()
       }
-      console.log('interval')
     }, 10 * 1000)
 
     return () => clearInterval(interval)
-  }, [updateStoreState])
+  }, [updateStoreState, getBalance, shouldFetch])
 
-  const toggleDropdown = () => {
+  const toggleDropdown = useCallback(() => {
     setShowDropdown(!showDropdown)
-  }
+  }, [showDropdown])
 
-  const handleCurrencySelection = ({ code, symbol }) => {
+  const handleCurrencySelection = useCallback(({ code, symbol }) => {
     setSelectedCurrency({ code, symbol })
     setShowDropdown(false)
-  }
+  }, [])
   return (
     <View style={styles.container}>
       <Background>
@@ -94,11 +92,7 @@ export default function WalletScreen({ navigation }: Props) {
 
         <Image
           source={require('../../assets/images/JMESText.svg')}
-          style={{
-            marginTop: 7,
-            width: 80,
-            height: 23,
-          }}
+          style={styles.image}
         />
         <BalanceContainer>
           <Text style={{ marginTop: 16, fontSize: 16 }}>Balance</Text>
@@ -114,40 +108,18 @@ export default function WalletScreen({ navigation }: Props) {
           <SendReceive navigation={navigation} />
         </BalanceContainer>
         {showDropdown && (
-          <View style={styles.dropdown}>
-            {CURRENCIES.map((currency) => (
-              <CurrencyDropdownItem
-                key={currency.code}
-                currency={currency}
-                onSelect={handleCurrencySelection}
-              />
-            ))}
-          </View>
+          <CurrencyDropdown onSelect={handleCurrencySelection} />
         )}
         <RecentTransactions
           itemPressed={(item) => {
             setSelectedTransaction(item)
             setModalVisible(true)
-            console.log('Selected Transaction:', item)
           }}
           navigation={navigation}
           title="Recent Transactions"
           textLink="See all"
         />
-        <Modal
-          isVisible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(false)
-            setSelectedTransaction(null)
-          }}
-        >
-          {selectedTransaction && (
-            <TransactionDetails
-              closeModal={() => setModalVisible(false)}
-              transaction={selectedTransaction}
-            />
-          )}
-        </Modal>
+
         {/* Use a light status bar on iOS to account for the black space above the modal */}
       </Background>
     </View>
@@ -155,6 +127,11 @@ export default function WalletScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  image: {
+    marginTop: 7,
+    width: 80,
+    height: 23,
+  },
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -162,14 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
-  dropdown: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    zIndex: 1000, // Make sure the dropdown is rendered above other components
-  },
+
   buttonText: {
     fontSize: 24,
     textTransform: 'uppercase',

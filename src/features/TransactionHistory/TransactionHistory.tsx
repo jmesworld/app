@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar'
 
 import { Platform, StyleSheet } from 'react-native'
-
+import { Modal } from '../../components'
 import { Background, Navbar, View } from '../../components'
-import { Navigation } from '../../types'
-import AllTransactions from './components/AllTransactions'
+import { Navigation, Transaction } from '../../types'
 
+import { RecentTransactions } from '../Wallet/components'
+import { useState } from 'react'
 type Props = {
   navigation: Navigation
   address: string
@@ -17,6 +18,9 @@ const isWeb = Platform.OS === 'web'
 export default function TransactionHistoryScreen({
   navigation,
 }: Props) {
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null)
+  const [modalVisible, setModalVisible] = useState(false)
   return (
     <View style={styles.container}>
       <Background>
@@ -34,8 +38,17 @@ export default function TransactionHistoryScreen({
           navigation={navigation}
           children={'Root'}
         />
+        <RecentTransactions
+          itemPressed={(item) => {
+            setSelectedTransaction(item)
+            setModalVisible(true)
+          }}
+          navigation={navigation}
+          title="Recent Transactions"
+          textLink="See all"
+        />
 
-        <AllTransactions navigation={navigation} />
+        {/* <AllTransactions navigation={navigation} /> */}
       </Background>
     </View>
   )

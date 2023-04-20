@@ -64,9 +64,8 @@ export default function RequestScreen({ navigation }: Props) {
   }
 
   const handleGenerateQR = async () => {
+    //implement case switch to determine type of transaction being made (request,transfer, etc)
     if (data) {
-      //implement case switch to determine type of transaction being made (request,transfer, etc)
-
       await parsePayload()
     } else {
       alert('Please enter a valid Amount')
@@ -105,7 +104,7 @@ export default function RequestScreen({ navigation }: Props) {
         <Navbar
           title={'Request'}
           navigation={navigation}
-          children={'WalletReceiveScreen'}
+          children={'WalletReceive'}
         />
         <BackdropSmall>
           <Text style={styles.title}>Amount</Text>
@@ -127,33 +126,6 @@ export default function RequestScreen({ navigation }: Props) {
             </Text>
             {payload ? <GeneratedQRCode payload={payload} /> : null}
           </SafeAreaView>
-
-          {/* <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 80,
-              backgroundColor: 'transparent',
-            }}
-          >
-            <Pressable
-              style={styles.cancelButton}
-              onPress={async () => {
-                await handleGenerateQR()
-              }}
-            >
-              <Text
-                style={{
-                  color: '#23262F',
-                  fontSize: 16,
-                  fontWeight: '500',
-                  lineHeight: 16,
-                }}
-              >
-                Request
-              </Text>
-            </Pressable>
-          </View> */}
 
           <View style={styles.buttonContainer}>
             <Pressable

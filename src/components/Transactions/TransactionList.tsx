@@ -32,14 +32,21 @@ const TransactionList = ({ itemPressed }: Props) => {
     const getTransactions = async () => {
       const transactions = await fetchTransactions(address)
       console.log('Transactions:', transactions)
-      setAllTransactions(transactions)
+
+      const sortedTransactions = transactions.sort(
+        (a, b) =>
+          new Date(b.timestamp).valueOf() -
+          new Date(a.timestamp).valueOf()
+      )
+
+      setAllTransactions(sortedTransactions)
       setSentTransactions(
-        transactions.filter(
+        sortedTransactions.filter(
           (transaction) => transaction.tx_type === 'Sent'
         )
       )
       setReceivedTransactions(
-        transactions.filter(
+        sortedTransactions.filter(
           (transaction) => transaction.tx_type === 'Received'
         )
       )
