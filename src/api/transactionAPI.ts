@@ -1,13 +1,5 @@
 import axios from 'axios'
 
-interface Transaction {
-  txhash: string
-  timestamp: string
-  from_address: string
-  to_address: string
-  amount: { denom: string; amount: string }[]
-}
-
 const proxyURI = 'http://localhost:8080/'
 
 export async function fetchTransactions(address) {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+// ConvertDenom.tsx
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -7,68 +8,45 @@ import {
   Image,
 } from 'react-native'
 
+import { useCurrencyRates } from '../../../hooks/useCurrencyRates'
+
 interface Props {
   cryptoValue: number
+  toggleDropdown: () => void
+  selectedCurrency: {
+    code: string
+    symbol: string
+  }
+  setSelectedCurrency: (currency: {
+    code: string
+    symbol: string
+  }) => void
 }
 
-interface CurrencyRate {
-  code: string
-  rate: number
-}
+const ConvertDenom: React.FC<Props> = ({
+  cryptoValue,
+  toggleDropdown,
+  selectedCurrency,
+  setSelectedCurrency,
+}) => {
+  const { data: currencyRates, isLoading } =
+    useCurrencyRates(selectedCurrency)
 
-const CURRENCIES = [
-  'USD $',
-  'EUR €',
-  'JPY ¥',
-  'GBP £',
-  'AUD $',
-  'CAD $',
-]
+  if (isLoading) {
+    return <Text>Loading...</Text>
+  }
 
-const ConvertDenom = ({ cryptoValue }: Props) => {
-  const [currencyRates, setCurrencyRates] = useState<CurrencyRate[]>(
-    []
-  )
-  const [selectedCurrency, setSelectedCurrency] = useState('USD $')
-  const [showDropdown, setShowDropdown] = useState(false)
-  const convertedValue =
-    currencyRates.find((rate) => rate.code === selectedCurrency)
+  const selectedRate =
+    currencyRates?.find((rate) => rate.code === selectedCurrency.code)
       ?.rate || 0
-
-  useEffect(() => {
-    const fetchCurrencyRates = async () => {
-      try {
-        const response = await fetch(
-          `https://api.exchangerate-api.com/v4/latest/${selectedCurrency}`
-        )
-        const data = await response.json()
-        const rates = CURRENCIES.map((code) => ({
-          code,
-          rate: data.rates[code],
-        }))
-        setCurrencyRates(rates)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    fetchCurrencyRates()
-  }, [selectedCurrency])
-
-  const handleCurrencyChange = (code: string) => {
-    setSelectedCurrency(code)
-    setShowDropdown(false)
-  }
-
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown)
-  }
+  const convertedValue = selectedRate * cryptoValue
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
-        ≈ {selectedCurrency}
-        {(convertedValue * cryptoValue).toFixed(2)}
+        ≈ {selectedCurrency.code}
+        {selectedCurrency.symbol}
+        {convertedValue.toFixed(2)}
       </Text>
       <Pressable style={styles.button} onPress={toggleDropdown}>
         <Image
@@ -79,20 +57,6 @@ const ConvertDenom = ({ cryptoValue }: Props) => {
           }}
         />
       </Pressable>
-
-      {showDropdown && (
-        <View style={styles.dropdown}>
-          {CURRENCIES.map((currency) => (
-            <Pressable
-              key={currency}
-              style={styles.dropdownItem}
-              onPress={() => handleCurrencyChange(currency)}
-            >
-              <Text style={styles.text}>{currency}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
     </View>
   )
 }
@@ -111,24 +75,6 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: 'none',
-  },
-  downArrow: {
-    fontSize: 14,
-    color: '#C6B4FC',
-  },
-  dropdown: {
-    position: 'absolute',
-    top: 20,
-    right: 0,
-    left: 20,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 5,
-    zIndex: 2,
-  },
-  dropdownItem: {
-    paddingVertical: 5,
   },
 })
 

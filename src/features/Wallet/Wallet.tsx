@@ -5,7 +5,14 @@ import {
   useStoreState,
   useStoreActions,
 } from '../../hooks/storeHooks'
-import { Background, Text, View, Modal } from '../../components'
+import {
+  Background,
+  Text,
+  View,
+  Modal,
+  TransactionDetails,
+  CurrencyDropdownItem,
+} from '../../components'
 import {
   BalanceContainer,
   ConvertDenom,
@@ -14,7 +21,8 @@ import {
 } from './components'
 import { getCoinBal } from '../../utils'
 import { Navigation, Transaction } from '../../types'
-import TransactionDetails from '../../components/Modal/TransactionDetails'
+import { CURRENCIES } from '../../constants'
+
 type Props = {
   navigation: Navigation
 }
@@ -25,6 +33,10 @@ export default function WalletScreen({ navigation }: Props) {
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [selectedCurrency, setSelectedCurrency] = useState(
+    CURRENCIES[0]
+  )
   const account = useStoreState((state) => state.accounts[0])
   const updateAccount = useStoreActions(
     (actions) => actions.updateAccount
@@ -59,6 +71,14 @@ export default function WalletScreen({ navigation }: Props) {
     return () => clearInterval(interval)
   }, [updateStoreState])
 
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown)
+  }
+
+  const handleCurrencySelection = ({ code, symbol }) => {
+    setSelectedCurrency({ code, symbol })
+    setShowDropdown(false)
+  }
   return (
     <View style={styles.container}>
       <Background>
@@ -85,10 +105,25 @@ export default function WalletScreen({ navigation }: Props) {
           <Text style={{ marginBottom: 11, fontSize: 42 }}>
             {balance}
           </Text>
-          <ConvertDenom cryptoValue={balance} />
+          <ConvertDenom
+            cryptoValue={balance}
+            toggleDropdown={toggleDropdown}
+            selectedCurrency={selectedCurrency}
+            setSelectedCurrency={setSelectedCurrency}
+          />
           <SendReceive navigation={navigation} />
         </BalanceContainer>
-
+        {showDropdown && (
+          <View style={styles.dropdown}>
+            {CURRENCIES.map((currency) => (
+              <CurrencyDropdownItem
+                key={currency.code}
+                currency={currency}
+                onSelect={handleCurrencySelection}
+              />
+            ))}
+          </View>
+        )}
         <RecentTransactions
           itemPressed={(item) => {
             setSelectedTransaction(item)
@@ -122,9 +157,18 @@ export default function WalletScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#fff',
     justifyContent: 'center',
+  },
+  dropdown: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    zIndex: 1000, // Make sure the dropdown is rendered above other components
   },
   buttonText: {
     fontSize: 24,
