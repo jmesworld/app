@@ -6,8 +6,10 @@ import {
   StyleSheet,
   Image,
 } from 'react-native'
+
 import { Transaction } from '../../types'
 import { formatDate } from '../../utils/formatDate'
+
 export const TransactionListItem = (transaction: Transaction) => {
   const shortenAddress = (address) => {
     if (!address || address.length < 7) return address
@@ -20,10 +22,11 @@ export const TransactionListItem = (transaction: Transaction) => {
       </Text>
     )
   }
+
   const SendIcon = () => {
     return (
       <Image
-        source={require('../../assets/icons/Send-midnight.svg')}
+        source={require('../../../assets/icons/send-midnight.png')}
         style={{
           width: 15,
           height: 15,
@@ -35,7 +38,7 @@ export const TransactionListItem = (transaction: Transaction) => {
   const ReceiveIcon = () => {
     return (
       <Image
-        source={require('../../assets/icons/Receive-midnight.svg')}
+        source={require('../../../assets/icons/receive-midnight.png')}
         style={{
           width: 18.5,
           height: 17,

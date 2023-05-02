@@ -1,11 +1,11 @@
 import React, { memo } from 'react'
 import {
-  Image,
   Pressable,
   StyleSheet,
   View,
   Text,
   StatusBar,
+  Image,
 } from 'react-native'
 
 import { Navigation } from '../../types'
@@ -28,7 +28,7 @@ const Navbar = ({ navigation, children, title }: Props) => (
         })}
       >
         <Image
-          source={require('../../assets/icons/backbutton-white.svg')}
+          source={require('../../../assets/icons/backarrow.png')}
           style={{
             marginTop: 2,
             width: 10,

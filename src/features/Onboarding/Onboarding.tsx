@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { Background, Button } from '../../components'
 import { Navigation } from '../../types'
 import { View, Text, SafeAreaView, StyleSheet } from 'react-native'

@@ -5,29 +5,28 @@ import {
   KeyboardAvoidingView,
 } from 'react-native'
 
-import { Navigation } from '../../types'
-
 type Props = {
   children: React.ReactNode
+  position?: String
 }
 
-const Background2 = ({ children }: Props) => {
-  return (
-    <ImageBackground
-      source={require('../../assets/images/background.svg')}
-      resizeMode="cover"
-      style={styles.background}
+const Background = ({ children, position }: Props) => (
+  <ImageBackground
+    source={require('../../../assets/images/background.jpg')}
+    resizeMode="cover"
+    style={styles.background}
+  >
+    <KeyboardAvoidingView
+      style={[
+        styles.container,
+        position === 'bottom' ? styles.bottom : undefined,
+      ]}
+      behavior="padding"
     >
-      <KeyboardAvoidingView
-        style={[styles.container]}
-        keyboardVerticalOffset={200}
-        behavior="padding"
-      >
-        {children}
-      </KeyboardAvoidingView>
-    </ImageBackground>
-  )
-}
+      {children}
+    </KeyboardAvoidingView>
+  </ImageBackground>
+)
 
 const styles = StyleSheet.create({
   background: {
@@ -36,13 +35,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    //padding: 20,
     width: '100%',
-    // maxWidth: 340,
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  bottom: {
+    justifyContent: 'flex-end',
+  },
 })
 
-export default memo(Background2)
+export default memo(Background)

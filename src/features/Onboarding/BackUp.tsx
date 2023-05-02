@@ -23,8 +23,6 @@ import {
   Checkbox as CheckboxComponent,
 } from '../../components'
 
-import { Roboto_900Black } from '@expo-google-fonts/roboto'
-import { GFSDidot_400Regular } from '@expo-google-fonts/gfs-didot'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 import {
@@ -187,7 +185,6 @@ const styles = StyleSheet.create({
     marginBottom: 52,
     paddingLeft: 9,
     paddingRight: 9,
-    gap: '30px 7px',
   },
   seedContentContainer: {
     display: 'flex',

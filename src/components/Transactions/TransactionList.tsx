@@ -1,5 +1,6 @@
 import { memo, useState, useEffect } from 'react'
-import { View, Text, Modal } from '../../components'
+import { View, Text } from '../Themed/Themed'
+import Modal from '../Modal/Modal'
 import { Pressable, StyleSheet } from 'react-native'
 import { useStoreState } from '../../hooks/storeHooks'
 import { Navigation, Transaction } from '../../types'

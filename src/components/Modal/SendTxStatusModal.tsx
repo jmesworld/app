@@ -31,7 +31,7 @@ const SendTxStatusModal = ({
               height: 51.67,
               alignSelf: 'center',
             }}
-            source={require('../../assets/icons/tx-complete.svg')}
+            source={require('../../../assets/icons/tx-complete.png')}
           />
           <Text style={styles.statusTextComplete}>
             Transaction {transactionStatus}!
