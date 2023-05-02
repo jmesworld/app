@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
     marginBottom: 52,
     paddingLeft: 9,
     paddingRight: 9,
-    gap: '30px 7px',
   },
   seedContentContainer: {
     display: 'flex',

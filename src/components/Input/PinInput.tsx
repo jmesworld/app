@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
     marginBottom: 127,
     paddingLeft: 14,
     paddingRight: 14,
-    gap: '7px',
   },
   pinInputBox: {
     display: 'flex',

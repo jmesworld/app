@@ -14,7 +14,7 @@ import {
 } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import * as React from 'react'
-import { ColorSchemeName, Image } from 'react-native'
+import { ColorSchemeName } from 'react-native'
 import Colors from '../utils/Colors'
 import useColorScheme from '../hooks/useColorScheme'
 import { useStoreState } from '../hooks/storeHooks'
@@ -24,7 +24,7 @@ import {
   RootTabScreenProps,
 } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
-import Header from '../components/Header/Header'
+
 import NotFoundScreen from '../components/NotFound/NotFound'
 
 import {
@@ -161,7 +161,6 @@ function RootNavigator() {
           style={{ backgroundColor: '#000', height: '100%' }}
           component={SignUpScreen}
           options={{
-            //header: () => <Header navigation={navigation} />, // fix header balance or create new components for onboarding screens
             headerShown: false,
             title: 'SignUp',
           }}

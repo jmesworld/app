@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { View, Text } from '../../components'
+import { View, Text } from '../Themed/Themed'
 import { Platform, Pressable, StyleSheet, Image } from 'react-native'
 import { Navigation } from '../../types'
 
@@ -18,7 +18,7 @@ const BottomNav = ({ children, navigation }: Props) => {
         style={styles.button}
       >
         <Image
-          source={require('../../assets/icons/Wallet.svg')}
+          source={require('../../../assets/icons/wallet.png')}
           style={{
             width: 19,
             height: 18.67,
@@ -34,7 +34,7 @@ const BottomNav = ({ children, navigation }: Props) => {
         style={styles.button}
       >
         <Image
-          source={require('../../assets/icons/Scan.svg')}
+          source={require('../../../assets/icons/scan.png')}
           style={{
             width: 52,
             height: 52,
@@ -49,7 +49,7 @@ const BottomNav = ({ children, navigation }: Props) => {
         style={styles.button}
       >
         <Image
-          source={require('../../assets/icons/Settings.svg')}
+          source={require('../../../assets/icons/settings.png')}
           style={{
             width: 18,
             height: 19,

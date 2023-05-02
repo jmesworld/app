@@ -50,7 +50,7 @@ const ConvertDenom: React.FC<Props> = ({
       </Text>
       <Pressable style={styles.button} onPress={toggleDropdown}>
         <Image
-          source={require('../../../assets/icons/dropdown-arrow.svg')}
+          source={require('../../../../assets/icons/arrow-down.png')}
           style={{
             width: 16,
             height: 16,

@@ -4,22 +4,28 @@
     "slug": "jmes-test",
     "owner": "huntersides",
     "version": "1.1.1",
+    // "runtimeVersion": "48.0.0",
+    // "sdkVersion": "48.0.0",
+    "runtimeVersion": {
+      "policy":"sdkVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "jmesworld-app",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    
     "updates": {
-      "url": "https://exp.host/@jmesworld/JMESWorld",
+      "url": "https://u.expo.dev/ddb15756-ad49-4845-8099-37806bd4a23a",
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/images/*",
+      "assets/fonts/*",
+      "assets/icons/*"
     ],
     "ios": {
       "supportsTablet": true,
@@ -30,7 +36,10 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jmesworld"
+      "package": "com.jmesworld",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

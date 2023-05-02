@@ -1,17 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Platform, StyleSheet, Image } from 'react-native'
+
 import { StatusBar } from 'expo-status-bar'
 import {
   useStoreState,
   useStoreActions,
 } from '../../hooks/storeHooks'
-import useFetchBalance from '../../hooks/useFetchBalance'
+
 import {
   Background,
   Text,
   View,
-  Modal,
-  TransactionDetails,
   CurrencyDropdown,
 } from '../../components'
 import {
@@ -91,7 +90,7 @@ export default function WalletScreen({ navigation }: Props) {
         </View>
 
         <Image
-          source={require('../../assets/images/JMESText.svg')}
+          source={require('../../../assets/images/jmes-text.png')}
           style={styles.image}
         />
         <BalanceContainer>

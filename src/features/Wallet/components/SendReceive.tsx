@@ -18,7 +18,7 @@ const SendReceive = ({ children, navigation }: Props) => {
         style={styles.button}
       >
         <Image
-          source={require('../../../assets/icons/Send.svg')}
+          source={require('../../../../assets/icons/send.png')}
           style={{
             width: 20,
             height: 20,
@@ -48,7 +48,7 @@ const SendReceive = ({ children, navigation }: Props) => {
         style={styles.button}
       >
         <Image
-          source={require('../../../assets/icons/Receive.svg')}
+          source={require('../../../../assets/icons/receive.png')}
           style={{
             width: 18.5,
             height: 17,

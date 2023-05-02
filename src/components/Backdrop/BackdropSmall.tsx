@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { View } from '../../components'
+import { View } from '../Themed/Themed'
 import { StyleSheet } from 'react-native'
 
 interface Props {
