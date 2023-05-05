@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Background, Button } from '../../components'
+import { OnboardingBackground, Button } from '../../components'
 import { Navigation } from '../../types'
 import { View, Text, SafeAreaView, StyleSheet } from 'react-native'
 import { normalize } from 'path'
@@ -38,7 +38,7 @@ const ButtonContainer = ({ navigation }) => {
         <Button
           style={{
             width: '48%',
-
+            height: '100%',
             backgroundColor: '#FFF',
             borderStyle: 'solid',
             borderWidth: 1,
@@ -54,7 +54,6 @@ const ButtonContainer = ({ navigation }) => {
               color: '#23262F',
               fontSize: 16,
               fontWeight: '700',
-              lineHeight: 16,
             }}
           >
             Sign up
@@ -64,6 +63,7 @@ const ButtonContainer = ({ navigation }) => {
         <Button
           style={{
             width: '48%',
+            height: '100%',
             backgroundColor: '#704FF7',
             borderRadius: 90,
           }}
@@ -86,9 +86,9 @@ const ButtonContainer = ({ navigation }) => {
   )
 }
 const OnboardingScreen = ({ navigation }: Props) => (
-  <Background position="bottom">
+  <OnboardingBackground position="bottom">
     <ButtonContainer navigation={navigation} />
-  </Background>
+  </OnboardingBackground>
 )
 
 export default memo(OnboardingScreen)

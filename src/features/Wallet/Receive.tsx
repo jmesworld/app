@@ -30,7 +30,7 @@ const isIOS = Platform.OS === 'ios'
 const isWeb = Platform.OS === 'web'
 
 export default function ReceiveScreen({ navigation }: Props) {
-  const address = useStoreState((state) => state.accounts[0].address)
+  const address = useStoreState((state) => state.accounts[0]?.address)
 
   return (
     <View style={styles.container}>

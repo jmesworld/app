@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 type GroupedTransaction = {
   date: string
   transactions: Transaction[]
@@ -12,17 +14,18 @@ interface Transaction {
 }
 
 export const fetchTransactions = async ({ address }) => {
-  const proxyURI = 'http://localhost:8080/'
+  const proxyURI = 'http://localhost:8080/' // pass infront of the url to avoid CORS error in web browser like so ${proxyURI}http://51.38.52.37:1317/cosmos/'
+
   try {
-    const sentResponse = await fetch(
-      `${proxyURI}http://51.38.52.37:1317/cosmos/tx/v1beta1/txs?events=message.sender='${address}'`
+    const sentResponse = await axios.get(
+      `http://51.38.52.37:1317/cosmos/tx/v1beta1/txs?events=message.sender='${address}'`
     )
-    const receivedResponse = await fetch(
-      `${proxyURI}http://51.38.52.37:1317/cosmos/tx/v1beta1/txs?events=transfer.recipient='${address}'`
+    const receivedResponse = await axios.get(
+      `http://51.38.52.37:1317/cosmos/tx/v1beta1/txs?events=transfer.recipient='jmes1am0unl73eqjkk230c2cvanqln62k05ezj0kkt'`
     )
 
-    const sentData = await sentResponse.json()
-    const receivedData = await receivedResponse.json()
+    const sentData = sentResponse.data
+    const receivedData = receivedResponse.data
 
     const sentTransactions = sentData.txs.map((tx, index) => ({
       ...tx,
@@ -32,15 +35,6 @@ export const fetchTransactions = async ({ address }) => {
           : 'Failed',
     }))
 
-    // const receivedTransactions = receivedData.tx_responses.logs.events.map(
-    //   (events, index) => ({
-    //     ...events,
-    //     type: receivedData.tx_responses[index].logs.events.type === 'transfer' ? 'transfer' : 'other',
-    //     recipient:
-    //     amount: receivedData.tx_responses[index].logs.events[0].attributes[1].value,
-
-    //   })
-    // )
     const receivedTransactions = receivedData.txs.map(
       (tx, index) => ({
         ...tx,
@@ -62,6 +56,7 @@ export const fetchTransactions = async ({ address }) => {
     return allTransactions
   } catch (error) {
     console.error('Error fetching transactions:', error)
+
     return []
   }
 }

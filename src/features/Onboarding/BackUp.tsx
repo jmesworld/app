@@ -185,6 +185,8 @@ const styles = StyleSheet.create({
     marginBottom: 52,
     paddingLeft: 9,
     paddingRight: 9,
+    rowGap: 30,
+    columnGap: 7,
   },
   seedContentContainer: {
     display: 'flex',

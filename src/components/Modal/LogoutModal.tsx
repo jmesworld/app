@@ -1,117 +1,40 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Transaction } from '../../types'
-import { formatDate } from '../../utils/formatDate'
+import { View, Text, StyleSheet, Image } from 'react-native'
+
 type Props = {
-  transaction: Transaction | null
   closeModal: () => void
 }
 
-const TransactionDetails = ({ transaction, closeModal }: Props) => {
-  if (!transaction) {
-    return null
-  }
-
+const LogoutModal = ({ closeModal }: Props) => {
   return (
-    <View>
-      <Text style={styles.title}>Transaction Details</Text>
-      <View style={styles.item}>
-        <Text style={styles.textSmall}>Status</Text>
-        <View>
-          {transaction.status === 'Success' ? (
-            <Text style={styles.statusTextConfirmed}>
-              {transaction.status}
-            </Text>
-          ) : transaction.status === 'Failed' ? (
-            <Text style={styles.statusTextFailed}>
-              {transaction.status}
-            </Text>
-          ) : (
-            <Text style={styles.statusTextPending}>
-              {transaction.status}
-            </Text>
-          )}
-        </View>
-
-        <View style={styles.itemSeparator} />
-      </View>
-      <View style={styles.item}>
-        <Text style={styles.textSmall}>Date</Text>
-        <Text style={styles.textLarge}>
-          {formatDate(transaction.timestamp)}
+    <View style={styles.container}>
+      <View>
+        <Image
+          style={{
+            width: 51.67,
+            height: 51.67,
+            alignSelf: 'center',
+          }}
+          source={require('../../../assets/icons/logout.png')}
+        />
+        <Text style={styles.text}>
+          Are you sure you want to logout?
         </Text>
-        <View style={styles.itemSeparator} />
-      </View>
-      <View style={styles.item}>
-        <Text style={styles.textSmall}>From</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].from_address}
-        </Text>
-        <View style={styles.itemSeparator} />
-      </View>
-      <View style={styles.item}>
-        <Text style={styles.textSmall}>To</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].to_address}
-        </Text>
-        <View style={styles.itemSeparator} />
-      </View>
-      <View style={styles.item}>
-        <Text style={styles.textSmall}>Total Amount</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].amount[0].amount} JMES
-        </Text>
-        <View style={styles.itemSeparator} />
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  title: {
+  container: {
+    marginTop: 82,
+  },
+  text: {
     fontWeight: '500',
     fontSize: 24,
     alignSelf: 'center',
-    marginTop: 24,
-    marginBottom: 40,
+    marginTop: 29,
+    marginBottom: 20,
   },
-  item: {
-    marginLeft: 24,
-  },
-  itemSeparator: {
-    marginTop: 16,
-    marginBottom: 16,
-    backgroundColor: '#263047',
-    opacity: 0.1,
-    width: '90%',
-    height: 1,
-  },
-  statusTextConfirmed: {
-    color: '#63CC91',
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  statusTextFailed: {
-    color: '#FF5C5C',
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  statusTextPending: {
-    color: '#FFC05C',
-    fontSize: 18,
-    fontWeight: '500',
-  },
-
-  textSmall: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#454E62',
-  },
-  textLarge: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#263047',
-  },
-  textConversion: {},
 })
-export default TransactionDetails
+export default LogoutModal

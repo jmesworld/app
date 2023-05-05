@@ -46,18 +46,6 @@ const lcdc = client.createLCDClient({
 
 /*Wallet */
 
-const generateWallet = async (mnemonic: string) => {
-  const wallet = await client.createWallet(new Mnemonic(mnemonic))
-
-  return wallet
-}
-
-// const generateMnemonic = () => {
-//   const randomBytes = crypto.getRandomValues(new Uint8Array(32))
-//   const mnemonic = Mnemonic.generateMnemonic(randomBytes)
-
-//   return mnemonic
-// }
 const faucetRequest = async (address: string) => {
   const res = await client.providers.faucetAPI.requestCredit(address)
   console.log(res)
@@ -65,11 +53,17 @@ const faucetRequest = async (address: string) => {
 }
 
 const getCoinBal = async (address: string) => {
-  const [coins] = await lcdc.bank.balance(address)
-  const ujmesBalance =
-    parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 || 0 // 1 JMES = 1e6 uJMES
+  try {
+    const [coins] = await lcdc.bank.balance(address)
+    const ujmesBalance =
+      parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 || 0 // 1 JMES = 1e6 uJMES
 
-  return ujmesBalance
+    return ujmesBalance
+  } catch (error) {
+    // Handle the error here, such as logging it or returning a default value
+    console.error('Error getting coin balance:', error)
+    return 0
+  }
 }
 
 const sendTransaction = async (
@@ -104,37 +98,13 @@ const createUserIdentity = async (username: string, account: any) => {
   return createIdentityReq
 }
 
-// const getUserIdentity = async (identityName: string) => {
-//   try {
-//     const identity = await client.providers.identityAPI.getIdentity(identityName)
-//     return identity
-//   } catch (error) {
-//     console.log(error)
-//     return error
-//   }
-// }
 const getUserIdentity = async (identityName: string) => {
   const identity = await client.providers.identityAPI.getIdentity(
     identityName
   )
   return identity
 }
-// const restoreUserIdentity = async (mnemonic: string) => {
-//   const account = await accountFromMnemonic(mnemonic)
-//   console.log(account) // will log the account object even if the account is invalid
-//   if (account) {
-//     try {
-//       const tokenRes = await getToken(account.response)
-//       const { username } = tokenRes.identity
-//       const identity = { username, account, token: tokenRes.token }
-//       return identity
-//     } catch (error) {
-//       console.log('ERROR', error)
-//     }
-//   } else {
-//     console.log('ERROR')
-//   }
-// }
+
 const restoreUserIdentity = async (mnemonic: string) => {
   const account = await accountFromMnemonic(mnemonic)
   console.log(account) // will log the account object even if the account is invalid
@@ -176,6 +146,7 @@ const getToken = async (account?: any) => {
   console.log(tokenReq)
   return tokenReq.data
 }
+
 /*Marketplace */
 const getFeed = async (token: any) => {
   const feed = await client.providers.marketplaceAPI.getFeed({

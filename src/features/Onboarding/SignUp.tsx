@@ -5,7 +5,7 @@ import { Text, View } from '../../components/Themed/Themed'
 
 import {
   Backdrop,
-  Background4,
+  SignUpBackground,
   Input,
   Navbar,
   StyledButton,
@@ -34,47 +34,45 @@ export default function SignUpScreen({ navigation }: Props) {
   }
 
   return (
-    <Background4>
-      <Backdrop>
-        <Navbar navigation={navigation} children="Onboarding" />
-        <TextTitle> Create new account</TextTitle>
-        <Text style={styles.inputTag}>FULL NAME</Text>
-        <SafeAreaView style={styles.inputContainer}>
-          <Input
-            placeholder=""
-            onChangeText={onChangeName}
-            value={name}
-          />
-        </SafeAreaView>
-        <Text style={styles.inputTag}>USERNAME</Text>
-        <SafeAreaView style={styles.inputContainer}>
-          <Input
-            placeholder=""
-            onChangeText={onChangeUsername}
-            value={username}
-          />
-        </SafeAreaView>
-        <SafeAreaView style={styles.buttonContainer}>
-          <StyledButton
-            enabled={username.length >= 5 && name.length > 0}
-            onPress={() => {
-              handleSignUp()
-            }}
-          >
-            <Text>Sign up</Text>
-          </StyledButton>
-        </SafeAreaView>
-        <View style={styles.policyContainer}>
-          <Text style={styles.policyText}>
-            By signing up you agree to our Terms, Privacy Policy and
-            Cookies Policy
-          </Text>
-        </View>
-      </Backdrop>
+    <SignUpBackground>
+      <Navbar navigation={navigation} children="Onboarding" />
+      <TextTitle> Create new account</TextTitle>
+      <Text style={styles.inputTag}>FULL NAME</Text>
+      <SafeAreaView style={styles.inputContainer}>
+        <Input
+          placeholder=""
+          onChangeText={onChangeName}
+          value={name}
+        />
+      </SafeAreaView>
+      <Text style={styles.inputTag}>USERNAME</Text>
+      <SafeAreaView style={styles.inputContainer}>
+        <Input
+          placeholder=""
+          onChangeText={onChangeUsername}
+          value={username}
+        />
+      </SafeAreaView>
+      <SafeAreaView style={styles.buttonContainer}>
+        <StyledButton
+          enabled={username.length >= 5 && name.length > 0}
+          onPress={() => {
+            handleSignUp()
+          }}
+        >
+          <Text>Sign up</Text>
+        </StyledButton>
+      </SafeAreaView>
+      <View style={styles.policyContainer}>
+        <Text style={styles.policyText}>
+          By signing up you agree to our Terms, Privacy Policy and
+          Cookies Policy
+        </Text>
+      </View>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </Background4>
+    </SignUpBackground>
   )
 }
 
