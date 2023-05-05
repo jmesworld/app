@@ -29,7 +29,7 @@ type Props = {
 
 export default function WalletScreen({ navigation }: Props) {
   const [shouldFetch, setShouldFetch] = useState(true)
-  const [balance, setBalance] = useState(0)
+  const [balance, setBalance] = useState(null)
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
@@ -38,14 +38,15 @@ export default function WalletScreen({ navigation }: Props) {
     CURRENCIES[0]
   )
 
+  const isIOS = Platform.OS === 'ios'
+  const isWeb = Platform.OS === 'web'
+
   const account = useStoreState((state) => state.accounts[0])
+  const address = useStoreState((state) => state.accounts[0]?.address)
+
   const updateAccount = useStoreActions(
     (actions) => actions.updateAccount
   )
-  const address = useStoreState((state) => state.accounts[0].address)
-
-  const isIOS = Platform.OS === 'ios'
-  const isWeb = Platform.OS === 'web'
 
   const updateStoreState = useCallback(() => {
     updateAccount({ ...account, balance: balance })
@@ -53,11 +54,23 @@ export default function WalletScreen({ navigation }: Props) {
 
   const getBalance = useCallback(async () => {
     const fetchedBalance = await getCoinBal(address)
-    setBalance(fetchedBalance)
+    const convertBalToString = fetchedBalance.toString()
+    setBalance(convertBalToString)
+    console.log(convertBalToString)
   }, [address])
 
   useEffect(() => {
-    getBalance()
+    console.log(account)
+    try {
+      if (account.balance === 0) {
+        getBalance()
+      } else {
+        setBalance(account.balance)
+      }
+    } catch (error) {
+      console.log('error', error)
+    }
+
     const interval = setInterval(() => {
       if (shouldFetch) {
         getBalance()

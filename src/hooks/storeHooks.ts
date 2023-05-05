@@ -1,6 +1,6 @@
 import { createTypedHooks } from 'easy-peasy'
 import { WalletModel } from '../store'
-//import { WalletModel } from '../store/types'
+
 // @ts-ignore
 const typedHooks = createTypedHooks<WalletModel>()
 

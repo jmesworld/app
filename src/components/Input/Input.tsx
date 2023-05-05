@@ -1,32 +1,32 @@
-import { Platform, StyleSheet, TextInput } from 'react-native'
-import React, { memo } from 'react'
+import {
+  Platform,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+} from 'react-native'
+import React, { memo, forwardRef } from 'react'
 import { Text, View } from '../../components/Themed/Themed'
-const Input = ({
-  placeholder,
-  value,
-  onChangeText,
-  secureTextEntry,
-}: {
-  placeholder: string
-  value: string
-  onChangeText: (text: string) => void
-  secureTextEntry?: boolean
-}) => {
+
+type Props = TextInputProps & {
+  containerStyle?: any
+}
+
+const Input = forwardRef<TextInput, Props>((props, ref) => {
+  const { containerStyle, ...otherProps } = props
+
   return (
-    <View style={styles.styledContainer}>
+    <View style={[styles.container, containerStyle]}>
       <TextInput
-        style={styles.input}
-        placeholder={placeholder}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={secureTextEntry}
+        ref={ref}
+        {...otherProps}
+        style={[styles.input, otherProps.style]}
       />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
-  styledContainer: {
+  container: {
     width: '100%',
     height: '100%',
     justifyContent: 'center',

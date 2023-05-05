@@ -1,62 +1,47 @@
-import { memo, useState, useEffect } from 'react'
+import { memo, useState, useMemo } from 'react'
 import { View, Text } from '../Themed/Themed'
 import Modal from '../Modal/Modal'
 import { Pressable, StyleSheet } from 'react-native'
 import { useStoreState } from '../../hooks/storeHooks'
-import { Navigation, Transaction } from '../../types'
+import { Transaction } from '../../types'
 import { TransactionListItem } from '../Transactions/TransactionListItem'
 import { fetchTransactions } from '../../api/transactionAPI'
 import TransactionDetails from '../Modal/TransactionDetails'
+import { useQuery } from 'react-query'
 
 type Props = {
   itemPressed?: (item: Transaction) => void
 }
+
 const TransactionList = ({ itemPressed }: Props) => {
-  const address = useStoreState((state) => state.accounts[0].address)
+  const address = useStoreState((state) => state.accounts[0]?.address)
   const [activeTab, setActiveTab] = useState('All')
 
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
 
-  const [allTransactions, setAllTransactions] = useState<
-    Transaction[]
-  >([])
-  const [sentTransactions, setSentTransactions] = useState<
-    Transaction[]
-  >([])
-  const [receivedTransactions, setReceivedTransactions] = useState<
-    Transaction[]
-  >([])
+  const {
+    isLoading,
+    error,
+    data: allTransactions,
+  } = useQuery(
+    ['transactions', address],
+    () => fetchTransactions(address),
+    { enabled: !!address }
+  )
 
-  useEffect(() => {
-    const getTransactions = async () => {
-      const transactions = await fetchTransactions(address)
-      console.log('Transactions:', transactions)
+  const sentTransactions =
+    allTransactions?.filter(
+      (transaction) => transaction.tx_type === 'Sent'
+    ) || []
 
-      const sortedTransactions = transactions.sort(
-        (a, b) =>
-          new Date(b.timestamp).valueOf() -
-          new Date(a.timestamp).valueOf()
-      )
+  const receivedTransactions =
+    allTransactions?.filter(
+      (transaction) => transaction.tx_type === 'Received'
+    ) || []
 
-      setAllTransactions(sortedTransactions)
-      setSentTransactions(
-        sortedTransactions.filter(
-          (transaction) => transaction.tx_type === 'Sent'
-        )
-      )
-      setReceivedTransactions(
-        sortedTransactions.filter(
-          (transaction) => transaction.tx_type === 'Received'
-        )
-      )
-    }
-
-    getTransactions()
-  }, [address])
-
-  const getDisplayedTransactions = () => {
+  const displayedTransactions = useMemo(() => {
     switch (activeTab) {
       case 'All':
         return allTransactions
@@ -67,9 +52,12 @@ const TransactionList = ({ itemPressed }: Props) => {
       default:
         return []
     }
-  }
-
-  const displayedTransactions = getDisplayedTransactions()
+  }, [
+    activeTab,
+    allTransactions,
+    sentTransactions,
+    receivedTransactions,
+  ])
   const handleItemPress = (transaction: Transaction) => {
     setSelectedTransaction(transaction)
     setModalVisible(true) // Set the modal visible
@@ -78,6 +66,33 @@ const TransactionList = ({ itemPressed }: Props) => {
   const closeModal = () => {
     setModalVisible(false) // 4. Add a function to close the modal
   }
+
+  if (isLoading)
+    return (
+      <Text
+        style={{
+          color: '#704FF7',
+          fontSize: 20,
+          textAlign: 'center',
+          marginTop: 20,
+        }}
+      >
+        Loading...
+      </Text>
+    )
+  if (error)
+    return (
+      <Text
+        style={{
+          color: 'red',
+          fontSize: 20,
+          textAlign: 'center',
+          marginTop: 20,
+        }}
+      >
+        Error: {error}
+      </Text>
+    )
 
   return (
     <View style={styles.container}>
@@ -112,19 +127,22 @@ const TransactionList = ({ itemPressed }: Props) => {
       </View>
       <View style={styles.transactionList}>
         {displayedTransactions.map((tx, index) => {
+          const { timestamp, tx_hash, tx_type, body } = tx
+          const { to_address, from_address, amount } =
+            body.messages[0]
+          const { denom, amount: amt } = amount[0]
+
           return (
             <View key={index} style={styles.listItem}>
-              <Pressable
-                onPress={() => handleItemPress(tx)} // Call the new handler
-              >
+              <Pressable onPress={() => handleItemPress(tx)}>
                 <TransactionListItem
-                  timestamp={displayedTransactions[index].timestamp}
-                  tx_hash={displayedTransactions[index].tx_hash}
-                  tx_type={displayedTransactions[index].tx_type}
-                  to_address={tx.body.messages[0].to_address}
-                  from_address={tx.body.messages[0].from_address}
-                  denom={tx.body.messages[0].amount[0].denom}
-                  amount={tx.body.messages[0].amount[0].amount}
+                  timestamp={timestamp}
+                  tx_hash={tx_hash}
+                  tx_type={tx_type}
+                  to_address={to_address}
+                  from_address={from_address}
+                  denom={denom}
+                  amount={amt}
                 />
               </Pressable>
             </View>

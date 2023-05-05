@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto'
 import 'expo-dev-client'
 import { registerRootComponent } from 'expo'
 import { Platform, LogBox } from 'react-native'

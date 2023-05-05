@@ -38,7 +38,7 @@ export default function SendConfirmScreen({
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
-  const address = useStoreState((state) => state.accounts[0].address)
+  const address = useStoreState((state) => state.accounts[0]?.address)
 
   async function getMnemonic() {
     const mnemonicFromSecureStorage = await getDataSecurely(

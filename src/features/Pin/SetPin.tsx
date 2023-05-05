@@ -1,9 +1,13 @@
 import { Route } from '@react-navigation/native'
 import React, { memo, useEffect, useState } from 'react'
-import { SafeAreaView, StyleSheet } from 'react-native'
+import {
+  KeyboardAvoidingView,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native'
 import {
   Backdrop,
-  Background4,
+  SignUpBackground,
   Navbar,
   StyledButton,
   TextInfo,
@@ -66,31 +70,29 @@ const SetPinScreen = ({ navigation, route }: Props) => {
   }
 
   return (
-    <Background4>
-      <Backdrop>
-        <Navbar navigation={navigation} children="Confirm" />
-        <TextTitle> Choose a 4 digit pin </TextTitle>
-        <TextInfo>
-          For quick access to you wallet and security, please set a
-          pin.
-        </TextInfo>
-        <PinInput
-          pinNumbers={pinNumbers}
-          setPinNumbers={setPinNumbers}
-        />
-        <SafeAreaView style={styles.buttonContainer}>
-          <StyledButton
-            enabled={isPinComplete}
-            disabled={!isPinComplete}
-            onPress={async () => {
-              await handleNav()
-            }}
-          >
-            <Text>Next</Text>
-          </StyledButton>
-        </SafeAreaView>
-      </Backdrop>
-    </Background4>
+    <SignUpBackground>
+      <Navbar navigation={navigation} children="Confirm" />
+      <TextTitle> Choose a 4 digit pin </TextTitle>
+      <TextInfo>
+        For quick access to you wallet and security, please set a pin.
+      </TextInfo>
+      <PinInput
+        pinNumbers={pinNumbers}
+        setPinNumbers={setPinNumbers}
+      />
+
+      <SafeAreaView style={styles.buttonContainer}>
+        <StyledButton
+          enabled={isPinComplete}
+          disabled={!isPinComplete}
+          onPress={async () => {
+            await handleNav()
+          }}
+        >
+          <Text>Next</Text>
+        </StyledButton>
+      </SafeAreaView>
+    </SignUpBackground>
   )
 }
 

@@ -36,7 +36,7 @@ const isIOS = Platform.OS === 'ios'
 const isWeb = Platform.OS === 'web'
 
 export default function RequestScreen({ navigation }: Props) {
-  const address = useStoreState((state) => state.accounts[0].address)
+  const address = useStoreState((state) => state.accounts[0]?.address)
   const username = useStoreState((state) => state.user.username)
   const [payload, setPayload] = useState<IQRCodePayload>()
   const [data, setData] = useState('')

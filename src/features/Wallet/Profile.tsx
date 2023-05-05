@@ -25,21 +25,12 @@ type Props = {
 }
 
 export default function ProfileScreen({ navigation }: Props) {
-  const address = useStoreState((state) => state.accounts[0].address)
+  const address = useStoreState((state) => state.accounts[0]?.address)
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
 
   const resetStore = useStoreActions((actions) => actions.resetStore)
-
-  let [fontsLoaded] = useFonts({
-    Comfortaa_300Light,
-    Comfortaa_400Regular,
-    Comfortaa_500Medium,
-    Comfortaa_600SemiBold,
-    Comfortaa_700Bold,
-    Roboto_900Black,
-  })
 
   const handleLogout = () => {
     resetStore(true)

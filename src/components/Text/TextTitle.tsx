@@ -19,14 +19,14 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     width: '100%',
     maxWidth: 356,
-    height: 20,
+    height: 'auto',
   },
   titleText: {
     letterSpacing: 1,
     fontStyle: 'normal',
     fontWeight: '700',
     fontSize: 24,
-    lineHeight: 34,
+
     color: '#704FF7',
     textAlign: 'center',
   },

@@ -1,7 +1,6 @@
 import { Route } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
-import { useMnemonic } from '../../app/MnemonicContext'
 import {
   Platform,
   SafeAreaView,
@@ -9,17 +8,16 @@ import {
   StyleSheet,
 } from 'react-native'
 import {
-  Backdrop,
-  Background4,
-  Input,
   Navbar,
   StyledButton,
   TextInfo,
   TextTitle,
   SeedList,
+  SignUpBackground,
 } from '../../components'
 import { Text, View } from '../../components/Themed/Themed'
 import { Navigation } from '../../types'
+
 type Props = {
   navigation: Navigation
   route: Route<any>
@@ -29,7 +27,6 @@ export default function ConfirmScreen({ navigation, route }: Props) {
   const [mnemonic, setMnemonic] = useState('')
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
-  const { mnemonicContext, setMnemonicContext } = useMnemonic()
   const [mnemonicWords, setMnemonicWords] = useState<string[]>([])
 
   useEffect(() => {
@@ -71,19 +68,20 @@ export default function ConfirmScreen({ navigation, route }: Props) {
   }
 
   return (
-    <Background4>
-      <Backdrop>
-        <Navbar navigation={navigation} children="BackUp" />
-        <TextTitle> Confirm Recovery Phrase </TextTitle>
-        <TextInfo>
-          Confirm the following words from your recovery phrase
-        </TextInfo>
-
+    <SignUpBackground>
+      <Navbar navigation={navigation} children="BackUp" />
+      <TextTitle> Confirm Recovery Phrase </TextTitle>
+      <TextInfo>
+        Confirm the following words from your recovery phrase
+      </TextInfo>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         <SeedList
           mnemonicWords={mnemonicWords}
           setMnemonicWords={setMnemonicWords}
         />
-        <View style={{ paddingTop: 30 }} />
+        <View
+          style={{ paddingTop: 30, backgroundColor: 'translucent' }}
+        />
 
         <SafeAreaView style={styles.buttonContainer}>
           <StyledButton
@@ -95,76 +93,25 @@ export default function ConfirmScreen({ navigation, route }: Props) {
             <Text>Confirm</Text>
           </StyledButton>
         </SafeAreaView>
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      </Backdrop>
-    </Background4>
+      </ScrollView>
+      {/* Use a light status bar on iOS to account for the black space above the modal */}
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+    </SignUpBackground>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    justifyContent: 'center',
+  contentContainer: {
+    flexGrow: 1,
+    paddingBottom: 30,
   },
-
   buttonContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignSelf: 'center',
+
     width: '93%',
     height: 49,
     marginTop: 42,
-    marginBottom: 14,
-  },
-
-  mnemonicContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '100%',
-    height: 352,
-    marginTop: 44,
-    marginBottom: 52,
-    paddingLeft: 9,
-    paddingRight: 9,
-  },
-  seedContentContainer: {
-    display: 'flex',
-    flexGrow: 1,
-    backgroundColor: 'transparent',
-    height: 64,
-  },
-  seedWordContainer: {
-    minWidth: 108,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
-  seedWordText: {
-    color: '#0F0056',
-    fontSize: 14,
-    fontWeight: '400',
-  },
-  seedWordTextSelected: {
-    color: '#FCFCFD',
-    fontSize: 14,
-    fontWeight: '400',
-  },
-
-  seedWordNumber: {
-    color: '#704FF7',
-    alignSelf: 'center',
-  },
-  text: {
-    fontSize: 14,
-    color: '#0F0056',
-    paddingLeft: 10,
-    paddingRight: 43,
   },
 })

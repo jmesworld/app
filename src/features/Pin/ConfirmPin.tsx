@@ -3,12 +3,12 @@ import React, { memo, useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet } from 'react-native'
 import {
   Backdrop,
-  Background4,
   Navbar,
   StyledButton,
   TextInfo,
   TextTitle,
   PinInput,
+  SignUpBackground,
 } from '../../components'
 import { useMnemonic } from '../../app/MnemonicContext'
 import { Text, View } from '../../components/Themed/Themed'
@@ -71,6 +71,7 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
       setAttempts(0)
     }
   }, [remainingTime, setIsLocked])
+
   const performRegister = async () => {
     await createUserIdentity(username, account)
     const tokenRes = await getToken(account)
@@ -86,11 +87,8 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
     })
     await storeDataSecurely('mnemonic', mnemonic)
     await storeDataSecurely('token', tokenRes.token)
-
-    await addToken({
-      token: tokenRes.token,
-    })
   }
+
   const handleSubmit = async () => {
     const LOCKOUT_DURATION = 1 * 30 * 1000 // 30 seconds in milliseconds
     const MAX_ATTEMPTS = 3
@@ -123,33 +121,29 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   }
 
   return (
-    <Background4>
-      <Backdrop>
-        <Navbar navigation={navigation} children="SetPin" />
-        <TextTitle> Please confirm your pin </TextTitle>
-        <TextInfo>
-          Please retype your 4 digit pin and confirm.
-        </TextInfo>
-        <PinInput pinNumbers={pin} setPinNumbers={setPin} />
-        {attempts > 0 && !isLocked && (
-          <Text style={styles.errorText}>{errorText}</Text>
-        )}
-        {isLocked && (
-          <Text style={styles.errorText}>
-            You have been locked out for 30 seconds.
-          </Text>
-        )}
-        <SafeAreaView style={styles.buttonContainer}>
-          <StyledButton
-            enabled={isPinComplete && !isLocked} // Disable button if user is locked out
-            disabled={!isPinComplete || isLocked} // Disable button if pin is incomplete or user is locked out
-            onPress={handleSubmit}
-          >
-            <Text>Confirm</Text>
-          </StyledButton>
-        </SafeAreaView>
-      </Backdrop>
-    </Background4>
+    <SignUpBackground>
+      <Navbar navigation={navigation} children="SetPin" />
+      <TextTitle> Please confirm your pin </TextTitle>
+      <TextInfo>Please retype your 4 digit pin and confirm.</TextInfo>
+      <PinInput pinNumbers={pin} setPinNumbers={setPin} />
+      {attempts > 0 && !isLocked && (
+        <Text style={styles.errorText}>{errorText}</Text>
+      )}
+      {isLocked && (
+        <Text style={styles.errorText}>
+          You have been locked out for 30 seconds.
+        </Text>
+      )}
+      <SafeAreaView style={styles.buttonContainer}>
+        <StyledButton
+          enabled={isPinComplete && !isLocked} // Disable button if user is locked out
+          disabled={!isPinComplete || isLocked} // Disable button if pin is incomplete or user is locked out
+          onPress={handleSubmit}
+        >
+          <Text>Confirm</Text>
+        </StyledButton>
+      </SafeAreaView>
+    </SignUpBackground>
   )
 }
 

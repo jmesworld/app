@@ -1,16 +1,29 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import {
-  Platform,
+  ImageBackground,
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
+  Platform,
 } from 'react-native'
 
-const Backdrop = ({ children }) => {
-  return (
+type Props = {
+  children: React.ReactNode
+  position?: String
+}
+
+const SignUpBackground = ({ children, position }: Props) => (
+  <ImageBackground
+    source={require('../../../assets/images/onboarding.jpg')}
+    resizeMode="cover"
+    style={styles.background}
+  >
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[
+        styles.content,
+        position === 'bottom' ? styles.bottom : undefined,
+      ]}
     >
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
@@ -20,11 +33,19 @@ const Backdrop = ({ children }) => {
         {children}
       </ScrollView>
     </KeyboardAvoidingView>
-  )
-}
+  </ImageBackground>
+)
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: '100%',
+  },
   container: {
+    flex: 1,
+    width: '100%',
+  },
+  content: {
     flex: 1,
     width: '95%',
     height: '100%',
@@ -34,14 +55,19 @@ const styles = StyleSheet.create({
     marginRight: 10,
     backgroundColor: '#FCFCFD',
     borderRadius: 24,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottom: {
+    justifyContent: 'flex-end',
   },
   scrollViewContent: {
     flexGrow: 1,
-    flexShrink: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
 })
 
-export default memo(Backdrop)
+export default memo(SignUpBackground)
