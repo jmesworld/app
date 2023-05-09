@@ -55,12 +55,9 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
-  //const hasToken = useStoreState((state) => state.hasToken)
   const [hasToken, setHasToken] = useState(false)
   const [loading, setLoading] = useState(true)
   const account = useStoreState((state) => state.accounts[0])
-  // const token = await getDataSecurely('token')
-  // const hasToken = token !== null
 
   useEffect(() => {
     async function checkForToken() {
@@ -75,9 +72,6 @@ function RootNavigator() {
 
   if (hasToken && account) {
     return (
-      // <Stack.Navigator
-      //   initialRouteName={hasToken ? 'Root' : 'Onboarding'}
-      // >
       <Stack.Navigator initialRouteName="Root">
         <Stack.Screen
           name="Root"
