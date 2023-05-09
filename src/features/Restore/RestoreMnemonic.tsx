@@ -14,6 +14,7 @@ import {
   TextTitle,
   SeedList,
   Background,
+  Backdrop,
 } from '../../components'
 import { navigateToScreen, restoreUserIdentity } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
@@ -23,6 +24,7 @@ import { storeDataSecurely } from '../../store/storage'
 import { useLockout } from '../../hooks/customHooks'
 import { useContext } from 'react'
 import { AuthContext } from '../../app/AuthProvider'
+import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 type Props = {
   navigation: Navigation
   route: Route<any>
@@ -122,38 +124,43 @@ export default function RestoreMnemonicScreen({
 
   return (
     <Background>
-      <Navbar navigation={navigation} children="Restore" />
-      <TextTitle> Confirm Recovery Phrase </TextTitle>
-      <TextInfo>
-        Confirm the following words from your recovery phrase
-      </TextInfo>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <SeedList
-          mnemonicWords={mnemonicWords}
-          setMnemonicWords={setMnemonicWords}
+      <Backdrop>
+        <OnboardingNavbar
+          navigation={navigation}
+          children="Restore"
         />
+        <TextTitle> Confirm Recovery Phrase </TextTitle>
+        <TextInfo>
+          Confirm the following words from your recovery phrase
+        </TextInfo>
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <SeedList
+            mnemonicWords={mnemonicWords}
+            setMnemonicWords={setMnemonicWords}
+          />
 
-        {attempts > 0 && !isLocked && (
-          <Text style={styles.errorText}>{errorText}</Text>
-        )}
-        {isLocked && (
-          <Text style={styles.errorText}>
-            You have been locked out for 30 seconds.
-          </Text>
-        )}
-        <View style={{ paddingTop: 30, backgroundColor: 'none' }} />
+          {attempts > 0 && !isLocked && (
+            <Text style={styles.errorText}>{errorText}</Text>
+          )}
+          {isLocked && (
+            <Text style={styles.errorText}>
+              You have been locked out for 30 seconds.
+            </Text>
+          )}
+          <View style={{ paddingTop: 30, backgroundColor: 'none' }} />
 
-        <SafeAreaView style={styles.buttonContainer}>
-          <StyledButton
-            enabled={true}
-            onPress={async () => {
-              await handleAccountRestore()
-            }}
-          >
-            <Text>Confirm</Text>
-          </StyledButton>
-        </SafeAreaView>
-      </ScrollView>
+          <SafeAreaView style={styles.buttonContainer}>
+            <StyledButton
+              enabled={true}
+              onPress={async () => {
+                await handleAccountRestore()
+              }}
+            >
+              <Text>Confirm</Text>
+            </StyledButton>
+          </SafeAreaView>
+        </ScrollView>
+      </Backdrop>
     </Background>
   )
 }

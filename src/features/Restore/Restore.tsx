@@ -13,10 +13,12 @@ import {
   Background,
   StyledButton,
   TextTitle,
+  Backdrop,
 } from '../../components'
 
 import { getUserIdentity } from '../../utils'
 import { Navigation } from '../../types'
+import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 
 type Props = {
   navigation: Navigation
@@ -64,28 +66,33 @@ export default function RestoreScreen({ navigation }: Props) {
 
   return (
     <Background>
-      <Navbar navigation={navigation} children="Onboarding" />
-      <TextTitle> Restore </TextTitle>
-
-      <Text style={styles.inputTag}>USERNAME</Text>
-      <SafeAreaView style={styles.inputContainer}>
-        <Input
-          placeholder=""
-          autoFocus={true}
-          onChangeText={onChangeUsername}
-          value={username}
+      <Backdrop>
+        <OnboardingNavbar
+          navigation={navigation}
+          children="Onboarding"
         />
-      </SafeAreaView>
-      <SafeAreaView style={styles.buttonContainer}>
-        <StyledButton
-          enabled={username.length >= 5}
-          onPress={async () => {
-            await handleRestore()
-          }}
-        >
-          <Text>Restore</Text>
-        </StyledButton>
-      </SafeAreaView>
+        <TextTitle> Restore </TextTitle>
+
+        <Text style={styles.inputTag}>USERNAME</Text>
+        <SafeAreaView style={styles.inputContainer}>
+          <Input
+            placeholder=""
+            autoFocus={true}
+            onChangeText={onChangeUsername}
+            value={username}
+          />
+        </SafeAreaView>
+        <SafeAreaView style={styles.buttonContainer}>
+          <StyledButton
+            enabled={username.length >= 5}
+            onPress={async () => {
+              await handleRestore()
+            }}
+          >
+            <Text>Restore</Text>
+          </StyledButton>
+        </SafeAreaView>
+      </Backdrop>
     </Background>
   )
 }
