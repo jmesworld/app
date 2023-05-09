@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
 import {
   Platform,
@@ -15,7 +14,6 @@ import {
 
 import GeneratedQRCode from '../../components/QRCode/QRCode'
 import {
-  Background4,
   BackdropSmall,
   Navbar,
   View,
@@ -92,15 +90,6 @@ export default function RequestScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Background>
-        <View
-          style={
-            isWeb
-              ? { height: 44, backgroundColor: 'transparent' }
-              : { height: 'auto', backgroundColor: 'transparent' }
-          }
-        >
-          <StatusBar style={isIOS ? 'light' : 'auto'} />
-        </View>
         <Navbar
           title={'Request'}
           navigation={navigation}
@@ -164,8 +153,6 @@ export default function RequestScreen({ navigation }: Props) {
             </Pressable>
           </View>
         </BackdropSmall>
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Background>
     </View>
   )

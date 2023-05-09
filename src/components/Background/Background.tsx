@@ -1,32 +1,36 @@
-import { memo } from 'react'
+import React, { memo } from 'react'
 import {
   ImageBackground,
   StyleSheet,
   KeyboardAvoidingView,
-  Image,
+  ScrollView,
+  Platform,
 } from 'react-native'
-
+import { StatusBar } from 'expo-status-bar'
 import { View } from '../Themed/Themed'
+
 type Props = {
   children: React.ReactNode
   position?: String
 }
+const isIOS = Platform.OS === 'ios'
 
 const Background = ({ children, position }: Props) => (
   <ImageBackground
-    source={require('../../../assets/images/onboarding.jpg')}
+    source={require('../../../assets/images/background.jpg')}
     resizeMode="cover"
     style={styles.background}
   >
-    <KeyboardAvoidingView
-      style={[
-        styles.content,
-        position === 'bottom' ? styles.bottom : undefined,
-      ]}
-      behavior="padding"
+    <ScrollView
+      contentContainerStyle={{ ...styles.scrollViewContent }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
     >
+      <View style={{ height: 44, backgroundColor: 'transparent' }}>
+        <StatusBar style={isIOS ? 'light' : 'auto'} />
+      </View>
       {children}
-    </KeyboardAvoidingView>
+    </ScrollView>
   </ImageBackground>
 )
 
@@ -38,13 +42,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-  },
-  content: {
-    flex: 1,
-    width: '100%',
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   bottom: {
     justifyContent: 'flex-end',

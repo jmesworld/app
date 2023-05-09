@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   infoText: {
+    textAlign: 'center',
     fontSize: 14,
     color: '#0F0056',
     fontStyle: 'normal',

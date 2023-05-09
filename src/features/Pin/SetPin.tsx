@@ -7,17 +7,19 @@ import {
 } from 'react-native'
 import {
   Backdrop,
-  SignUpBackground,
+  Background,
   Navbar,
   StyledButton,
   TextInfo,
   TextTitle,
   PinInput,
+  BackdropSmall,
 } from '../../components'
 import { navigateToScreen, validatePin } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { Navigation } from '../../types'
+import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 type Props = {
   navigation: Navigation
   route: Route<any>
@@ -70,29 +72,39 @@ const SetPinScreen = ({ navigation, route }: Props) => {
   }
 
   return (
-    <SignUpBackground>
-      <Navbar navigation={navigation} children="Confirm" />
-      <TextTitle> Choose a 4 digit pin </TextTitle>
-      <TextInfo>
-        For quick access to you wallet and security, please set a pin.
-      </TextInfo>
-      <PinInput
-        pinNumbers={pinNumbers}
-        setPinNumbers={setPinNumbers}
-      />
+    <View style={styles.container}>
+      <Background>
+        <BackdropSmall>
+          <OnboardingNavbar
+            navigation={navigation}
+            children="Confirm"
+          />
+          <View style={styles.centeredContainer}>
+            <TextTitle> Choose a 4 digit pin </TextTitle>
+            <TextInfo>
+              For quick access to you wallet and security, please set
+              a pin.
+            </TextInfo>
+          </View>
+          <PinInput
+            pinNumbers={pinNumbers}
+            setPinNumbers={setPinNumbers}
+          />
 
-      <SafeAreaView style={styles.buttonContainer}>
-        <StyledButton
-          enabled={isPinComplete}
-          disabled={!isPinComplete}
-          onPress={async () => {
-            await handleNav()
-          }}
-        >
-          <Text>Next</Text>
-        </StyledButton>
-      </SafeAreaView>
-    </SignUpBackground>
+          <SafeAreaView style={styles.buttonContainer}>
+            <StyledButton
+              enabled={isPinComplete}
+              disabled={!isPinComplete}
+              onPress={async () => {
+                await handleNav()
+              }}
+            >
+              <Text>Next</Text>
+            </StyledButton>
+          </SafeAreaView>
+        </BackdropSmall>
+      </Background>
+    </View>
   )
 }
 
@@ -104,12 +116,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
-
+  centeredContainer: {
+    alignItems: 'center',
+  },
   buttonContainer: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
     width: '93%',
     height: 49,
     marginTop: 42,

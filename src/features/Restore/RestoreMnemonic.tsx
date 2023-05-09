@@ -1,5 +1,5 @@
 import { Route } from '@react-navigation/native'
-import { StatusBar } from 'expo-status-bar'
+
 import { useEffect, useState } from 'react'
 import {
   Platform,
@@ -13,7 +13,7 @@ import {
   TextInfo,
   TextTitle,
   SeedList,
-  SignUpBackground,
+  Background,
 } from '../../components'
 import { navigateToScreen, restoreUserIdentity } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
@@ -121,7 +121,7 @@ export default function RestoreMnemonicScreen({
   }
 
   return (
-    <SignUpBackground>
+    <Background>
       <Navbar navigation={navigation} children="Restore" />
       <TextTitle> Confirm Recovery Phrase </TextTitle>
       <TextInfo>
@@ -154,9 +154,7 @@ export default function RestoreMnemonicScreen({
           </StyledButton>
         </SafeAreaView>
       </ScrollView>
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </SignUpBackground>
+    </Background>
   )
 }
 

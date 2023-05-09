@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { StatusBar } from 'expo-status-bar'
+
 import {
   Platform,
   StyleSheet,
@@ -41,28 +41,6 @@ export default function SendScreen({ navigation, route }: Props) {
     }
   }, [route.params])
 
-  // const handleTxParams = async (data: string) => {
-  //   const requestedIdentity = await getUserIdentity(data)
-  //   if (requestedIdentity.statusText !== 'OK') {
-  //     //@ts-ignore
-  //     return navigation.navigate({
-  //       name: 'WalletSendConfirm',
-  //       params: {
-  //         identity: data,
-  //         amount,
-  //       },
-  //     })
-  //   } else {
-  //     //@ts-ignore
-  //     return navigation.navigate({
-  //       name: 'WalletSendConfirm',
-  //       params: {
-  //         identity: requestedIdentity.data.identity,
-  //         amount,
-  //       },
-  //     })
-  //   }
-  // }
   const handleTxParams = async (username: string) => {
     const requestedIdentity = await getUserIdentity(username)
     const recipientAddress = await requestedIdentity.data.identity
@@ -82,15 +60,6 @@ export default function SendScreen({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <Background>
-        <View
-          style={
-            isWeb
-              ? { height: 44, backgroundColor: 'transparent' }
-              : { height: 'auto', backgroundColor: 'transparent' }
-          }
-        >
-          <StatusBar style={isIOS ? 'light' : 'auto'} />
-        </View>
         <Navbar
           title={'Send to'}
           navigation={navigation}
@@ -104,6 +73,7 @@ export default function SendScreen({ navigation, route }: Props) {
               onChangeText={setData}
               value={data}
               placeholder={'Search, Public Address or ENS'}
+              placeholderTextColor="rgba(112, 79, 247, 0.5)"
             />
           </SafeAreaView>
           <Text style={styles.title}>Amount</Text>
@@ -113,6 +83,7 @@ export default function SendScreen({ navigation, route }: Props) {
               onChangeText={setAmount}
               value={amount}
               placeholder={'Amount to send'}
+              placeholderTextColor="rgba(112, 79, 247, 0.5)"
             />
           </SafeAreaView>
           <View style={styles.buttonContainer}>
@@ -124,8 +95,6 @@ export default function SendScreen({ navigation, route }: Props) {
             </NextButton>
           </View>
         </BackdropSmall>
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Background>
     </View>
   )
@@ -185,7 +154,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    placeholderTextColor: 'rgba(112, 79, 247, 0.5)',
     paddingLeft: 19,
     marginLeft: 14,
     marginRight: 14,

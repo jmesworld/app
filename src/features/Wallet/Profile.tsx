@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable } from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
 import {
@@ -6,7 +5,7 @@ import {
   useStoreState,
 } from '../../hooks/storeHooks'
 import { useEffect, useState } from 'react'
-import Background4 from '../../components/Background/Background4'
+import Background from '../../components/Background/Background'
 import {
   useFonts,
   Comfortaa_300Light,
@@ -38,7 +37,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Background4>
+      <Background>
         <Text style={styles.title}>Profile</Text>
         <View
           style={styles.separator}
@@ -56,9 +55,7 @@ export default function ProfileScreen({ navigation }: Props) {
         >
           <Text style={styles.buttonText}>Logout</Text>
         </Pressable>
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      </Background4>
+      </Background>
     </View>
   )
 }

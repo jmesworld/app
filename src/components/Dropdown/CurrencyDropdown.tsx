@@ -28,6 +28,7 @@ const CurrencyDropdown = ({ onSelect }: Props) => {
 const styles = StyleSheet.create({
   dropdown: {
     position: 'absolute',
+    top: '20%',
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#ccc',

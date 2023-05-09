@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
 import {
   Platform,
@@ -11,7 +10,7 @@ import { Text, View } from '../../components/Themed/Themed'
 import {
   Input,
   Navbar,
-  SignUpBackground,
+  Background,
   StyledButton,
   TextTitle,
 } from '../../components'
@@ -64,7 +63,7 @@ export default function RestoreScreen({ navigation }: Props) {
   }
 
   return (
-    <SignUpBackground>
+    <Background>
       <Navbar navigation={navigation} children="Onboarding" />
       <TextTitle> Restore </TextTitle>
 
@@ -87,10 +86,7 @@ export default function RestoreScreen({ navigation }: Props) {
           <Text>Restore</Text>
         </StyledButton>
       </SafeAreaView>
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </SignUpBackground>
+    </Background>
   )
 }
 

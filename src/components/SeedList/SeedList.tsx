@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
-import { View } from '../../components/Themed/Themed'
+import { View, Text } from '../../components/Themed/Themed'
 import Input from '../Input/Input'
 
 const SeedList = ({
@@ -43,6 +43,7 @@ const SeedList = ({
         {mnemonicWords.map((word, index) => (
           <View key={index} style={styles.seedContentContainer}>
             <Input
+              style={{ textAlign: 'center' }}
               ref={(instance) => {
                 inputRefs.current[index] = instance
               }}
@@ -51,6 +52,7 @@ const SeedList = ({
               value={word}
               onChangeText={(text) => handleTextChange(text, index)}
             />
+            <Text style={styles.seedWordNumber}> {index + 1} </Text>
           </View>
         ))}
       </ScrollView>
@@ -72,6 +74,10 @@ const styles = StyleSheet.create({
     paddingRight: 9,
     rowGap: 30,
     columnGap: 7,
+  },
+  seedWordNumber: {
+    color: '#704FF7',
+    alignSelf: 'center',
   },
   seedContentContainer: {
     display: 'flex',

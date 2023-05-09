@@ -1,8 +1,7 @@
 export { default as OnboardingBackground } from './Background/OnboardingBackground'
-export { default as SignUpBackground } from './Background/SignUpBackground'
+
 export { default as Background } from './Background/Background'
-export { default as Background4 } from './Background/Background4'
-export { default as Background2 } from './Background/Background2'
+
 export { default as Backdrop } from './Backdrop/Backdrop'
 export { default as BackdropSmall } from './Backdrop/BackdropSmall'
 export { default as Paragraph } from './Paragraph/Paragraph'
