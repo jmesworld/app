@@ -36,6 +36,7 @@ const SetPinScreen = ({ navigation, route }: Props) => {
   const [name, setName] = useState('')
   const [mnemonic, setMnemonic] = useState('')
   const [isPinComplete, setIsPinComplete] = useState(false)
+
   useEffect(() => {
     if (route.params) {
       setName(route.params.name)
@@ -51,7 +52,7 @@ const SetPinScreen = ({ navigation, route }: Props) => {
     if (pinNumbers.length === 4) {
       return true
     } else {
-      alert('Pin invalid')
+      alert('PIN invalid')
     }
     return false
   }
@@ -67,7 +68,7 @@ const SetPinScreen = ({ navigation, route }: Props) => {
         recoveryPhrase: mnemonic,
       })
     } else {
-      alert('Invalid pin')
+      alert('Invalid PIN')
     }
   }
 
@@ -80,10 +81,10 @@ const SetPinScreen = ({ navigation, route }: Props) => {
             children="Confirm"
           />
           <View style={styles.centeredContainer}>
-            <TextTitle> Choose a 4 digit pin </TextTitle>
+            <TextTitle> Choose a 4 digit PIN </TextTitle>
             <TextInfo>
-              For quick access to you wallet and security, please set
-              a pin.
+              For quick access to your wallet and security, please set
+              a PIN.
             </TextInfo>
           </View>
           <PinInput

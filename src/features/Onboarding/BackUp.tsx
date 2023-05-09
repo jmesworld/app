@@ -98,11 +98,11 @@ export default function BackUpScreen({ navigation, route }: Props) {
     <Background>
       <Backdrop>
         <OnboardingNavbar navigation={navigation} children="Signup" />
-        <TextTitle> Backup Recover Phrase</TextTitle>
+        <TextTitle> Backup Recovery Phrase</TextTitle>
         <TextInfo>
           Write down your recovery phrase somewhere safe. If you lose
           or damage this device, it's the only way to recover your
-          account
+          account.
         </TextInfo>
         <SeedList />
         <View style={{ paddingTop: 30 }} />

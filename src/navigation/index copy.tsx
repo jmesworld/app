@@ -56,101 +56,88 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
   //const hasToken = useStoreState((state) => state.hasToken)
-  const [hasToken, setHasToken] = useState(false)
+
   const [loading, setLoading] = useState(true)
   const account = useStoreState((state) => state.accounts[0])
-  useEffect(() => {
-    async function checkForToken() {
-      const token = await getDataSecurely('token')
-      if (token !== null) {
-        setHasToken(true)
-      }
-      setLoading(false)
-    }
+  const token = await getDataSecurely('token')
+  const hasToken = token !== null
 
-    checkForToken()
-  }, [])
-
-  if (loading) {
-    return null
-  } else if (hasToken && account) {
+  if (hasToken && account) {
     return (
-      <AuthContext.Provider value={{ hasToken, setHasToken }}>
-        <Stack.Navigator
-          initialRouteName={hasToken ? 'Root' : 'Onboarding'}
-        >
+      <Stack.Navigator
+        initialRouteName={hasToken ? 'Root' : 'Onboarding'}
+      >
+        <Stack.Screen
+          name="Root"
+          component={WalletScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="NotFound"
+          component={NotFoundScreen}
+          options={{ title: 'Oops!' }}
+        />
+        <Stack.Screen
+          name="SetPin"
+          component={SetPinScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Group screenOptions={{ presentation: 'modal' }}>
           <Stack.Screen
-            name="Root"
-            component={WalletScreen}
-            options={{ headerShown: false }}
+            name="WalletSend"
+            component={SendScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Send to user',
+            }}
           />
 
           <Stack.Screen
-            name="NotFound"
-            component={NotFoundScreen}
-            options={{ title: 'Oops!' }}
+            name="WalletSendConfirm"
+            component={SendConfirmScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Confirm sending to user',
+            }}
           />
           <Stack.Screen
-            name="SetPin"
-            component={SetPinScreen}
-            options={{ headerShown: false }}
+            name="WalletReceive"
+            component={ReceiveScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Receive',
+            }}
           />
-
-          <Stack.Group screenOptions={{ presentation: 'modal' }}>
-            <Stack.Screen
-              name="WalletSend"
-              component={SendScreen}
-              options={{
-                headerShown: false,
-                presentation: 'card',
-                title: 'Send to user',
-              }}
-            />
-
-            <Stack.Screen
-              name="WalletSendConfirm"
-              component={SendConfirmScreen}
-              options={{
-                headerShown: false,
-                presentation: 'card',
-                title: 'Confirm sending to user',
-              }}
-            />
-            <Stack.Screen
-              name="WalletReceive"
-              component={ReceiveScreen}
-              options={{
-                headerShown: false,
-                presentation: 'card',
-                title: 'Receive',
-              }}
-            />
-            <Stack.Screen
-              name="ReceiveRequest"
-              component={RequestScreen}
-              options={{
-                headerShown: false,
-                presentation: 'card',
-                title: 'Request',
-              }}
-            />
-            <Stack.Screen
-              name="TransactionHistory"
-              component={TransactionHistoryScreen}
-              options={{
-                headerShown: false,
-                presentation: 'card',
-                title: 'Transaction History',
-              }}
-            />
-            <Stack.Screen
-              name="Scan"
-              options={{ headerShown: false, title: 'Scan QR Code' }}
-              component={ScanScreen}
-            />
-          </Stack.Group>
-        </Stack.Navigator>
-      </AuthContext.Provider>
+          <Stack.Screen
+            name="ReceiveRequest"
+            component={RequestScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Request',
+            }}
+          />
+          <Stack.Screen
+            name="TransactionHistory"
+            component={TransactionHistoryScreen}
+            options={{
+              headerShown: false,
+              presentation: 'card',
+              title: 'Transaction History',
+            }}
+          />
+          <Stack.Screen
+            name="Scan"
+            options={{ headerShown: false, title: 'Scan QR Code' }}
+            component={ScanScreen}
+          />
+        </Stack.Group>
+      </Stack.Navigator>
     )
   } else {
     return (
@@ -202,7 +189,6 @@ function RootNavigator() {
           name="RestoreMnemonic"
           component={RestoreMnemonicScreen}
           options={{ headerShown: false, title: 'RestoreMnemonic' }}
-          initialParams={{ checkForToken }}
         />
       </Stack.Navigator>
     )

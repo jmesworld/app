@@ -105,7 +105,7 @@ const LoginPinScreen = ({ navigation, route }: Props) => {
       await performRegister()
       navigateToScreen(navigation, 'Root', {})
     } else if (attempts < MAX_ATTEMPTS) {
-      setErrorText('Pin does not match')
+      setErrorText('PIN does not match')
     } else {
       setErrorText(
         'Too many failed attempts. Please try again later.'
@@ -129,9 +129,9 @@ const LoginPinScreen = ({ navigation, route }: Props) => {
             children="SetPin"
           />{' '}
           <View style={styles.centeredContainer}>
-            <TextTitle> Please confirm your pin </TextTitle>
+            <TextTitle> Please confirm your PIN </TextTitle>
             <TextInfo>
-              Please retype your 4 digit pin and confirm.
+              Please retype your 4 digit PIN and confirm.
             </TextInfo>
           </View>
           <PinInput pinNumbers={pin} setPinNumbers={setPin} />
