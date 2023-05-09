@@ -69,9 +69,11 @@ export default function ConfirmScreen({ navigation, route }: Props) {
           recoveryPhrase: mnemonic,
         },
       })
-    } else {
-      alert('Invalid mnemonic')
     }
+    /**implement attempt counter here */
+    // } else {
+    //   alert('Invalid mnemonic')
+    // }
   }
 
   return (

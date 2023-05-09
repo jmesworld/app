@@ -130,9 +130,9 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
             children="SetPin"
           />
           <View style={styles.centeredContainer}>
-            <TextTitle> Please confirm your pin </TextTitle>
+            <TextTitle> Please confirm your PIN </TextTitle>
             <TextInfo>
-              Please retype your 4 digit pin and confirm.
+              Please retype your 4 digit PIN and confirm.
             </TextInfo>
           </View>
           <PinInput pinNumbers={pin} setPinNumbers={setPin} />
@@ -148,7 +148,9 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
             <StyledButton
               enabled={isPinComplete && !isLocked} // Disable button if user is locked out
               disabled={!isPinComplete || isLocked} // Disable button if pin is incomplete or user is locked out
-              onPress={handleSubmit}
+              onPress={async () => {
+                await handleSubmit
+              }}
             >
               <Text>Confirm</Text>
             </StyledButton>
