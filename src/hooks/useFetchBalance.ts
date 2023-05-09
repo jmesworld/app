@@ -3,7 +3,10 @@ import { getCoinBal } from '../utils'
 
 type FetchBalance = (address: string, shouldFetch: boolean) => number
 
-const useFetchBalance: FetchBalance = (address, shouldFetch) => {
+export const useFetchBalance: FetchBalance = (
+  address,
+  shouldFetch
+) => {
   const [balance, setBalance] = useState(0)
 
   useEffect(() => {
@@ -25,5 +28,3 @@ const useFetchBalance: FetchBalance = (address, shouldFetch) => {
 
   return balance
 }
-
-export default useFetchBalance

@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar'
 import {
   Platform,
   StyleSheet,
@@ -14,7 +13,7 @@ import { Text, View } from '../../components/Themed/Themed'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import {
   Backdrop,
-  Background4,
+  Background,
   Input,
   Navbar,
   TextTitle,
@@ -31,6 +30,7 @@ import {
   getToken,
   createUserIdentity,
 } from '../../utils'
+import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 
 type Props = {
   navigation: Navigation
@@ -95,9 +95,9 @@ export default function BackUpScreen({ navigation, route }: Props) {
   }
 
   return (
-    <Background4>
+    <Background>
       <Backdrop>
-        <Navbar navigation={navigation} children="Signup" />
+        <OnboardingNavbar navigation={navigation} children="Signup" />
         <TextTitle> Backup Recover Phrase</TextTitle>
         <TextInfo>
           Write down your recovery phrase somewhere safe. If you lose
@@ -124,9 +124,8 @@ export default function BackUpScreen({ navigation, route }: Props) {
           </StyledButton>
         </SafeAreaView>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Backdrop>
-    </Background4>
+    </Background>
   )
 }
 

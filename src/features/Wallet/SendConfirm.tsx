@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar'
 import { Platform, StyleSheet, Pressable } from 'react-native'
 import { useEffect, useState } from 'react'
 import { mnemonic, sendTransaction } from '../../utils'
@@ -96,15 +95,6 @@ export default function SendConfirmScreen({
   return (
     <View style={styles.container}>
       <Background>
-        <View
-          style={
-            isWeb
-              ? { height: 44, backgroundColor: 'transparent' }
-              : { height: 'auto', backgroundColor: 'transparent' }
-          }
-        >
-          <StatusBar style={isIOS ? 'light' : 'auto'} />
-        </View>
         <Navbar
           title={'Send Confirm'}
           navigation={navigation}
@@ -207,8 +197,6 @@ export default function SendConfirmScreen({
             </CloseButton>
           </View>
         </Modal>
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
       </Background>
     </View>
   )

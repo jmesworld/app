@@ -44,8 +44,7 @@ const ConvertDenom: React.FC<Props> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
-        ≈ {selectedCurrency.code}
-        {selectedCurrency.symbol}
+        ≈ {selectedCurrency.code} {selectedCurrency.symbol}
         {convertedValue.toFixed(2)}
       </Text>
       <Pressable style={styles.button} onPress={toggleDropdown}>

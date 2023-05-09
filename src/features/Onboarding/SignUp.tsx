@@ -1,18 +1,18 @@
-import { StatusBar } from 'expo-status-bar'
 import { useState } from 'react'
 import { Platform, SafeAreaView, StyleSheet } from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
 
 import {
   Backdrop,
-  SignUpBackground,
+  BackdropSmall,
+  Background,
   Input,
-  Navbar,
   StyledButton,
   TextTitle,
 } from '../../components'
 
 import { Navigation } from '../../types'
+import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 
 type Props = {
   navigation: Navigation
@@ -34,45 +34,48 @@ export default function SignUpScreen({ navigation }: Props) {
   }
 
   return (
-    <SignUpBackground>
-      <Navbar navigation={navigation} children="Onboarding" />
-      <TextTitle> Create new account</TextTitle>
-      <Text style={styles.inputTag}>FULL NAME</Text>
-      <SafeAreaView style={styles.inputContainer}>
-        <Input
-          placeholder=""
-          onChangeText={onChangeName}
-          value={name}
+    <Background>
+      <Backdrop>
+        <OnboardingNavbar
+          navigation={navigation}
+          children="Onboarding"
         />
-      </SafeAreaView>
-      <Text style={styles.inputTag}>USERNAME</Text>
-      <SafeAreaView style={styles.inputContainer}>
-        <Input
-          placeholder=""
-          onChangeText={onChangeUsername}
-          value={username}
-        />
-      </SafeAreaView>
-      <SafeAreaView style={styles.buttonContainer}>
-        <StyledButton
-          enabled={username.length >= 5 && name.length > 0}
-          onPress={() => {
-            handleSignUp()
-          }}
-        >
-          <Text>Sign up</Text>
-        </StyledButton>
-      </SafeAreaView>
-      <View style={styles.policyContainer}>
-        <Text style={styles.policyText}>
-          By signing up you agree to our Terms, Privacy Policy and
-          Cookies Policy
-        </Text>
-      </View>
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </SignUpBackground>
+        <TextTitle> Create new account</TextTitle>
+        <Text style={styles.inputTag}>FULL NAME</Text>
+        <SafeAreaView style={styles.inputContainer}>
+          <Input
+            placeholder=""
+            onChangeText={onChangeName}
+            value={name}
+          />
+        </SafeAreaView>
+        <Text style={styles.inputTag}>USERNAME</Text>
+        <SafeAreaView style={styles.inputContainer}>
+          <Input
+            placeholder=""
+            onChangeText={onChangeUsername}
+            value={username}
+          />
+        </SafeAreaView>
+        <SafeAreaView style={styles.buttonContainer}>
+          <StyledButton
+            enabled={username.length >= 5 && name.length > 0}
+            onPress={() => {
+              handleSignUp()
+            }}
+          >
+            <Text>Sign up</Text>
+          </StyledButton>
+        </SafeAreaView>
+        <View style={styles.policyContainer}>
+          <Text style={styles.policyText}>
+            By signing up you agree to our Terms, Privacy Policy and
+            Cookies Policy
+          </Text>
+        </View>
+      </Backdrop>
+    </Background>
   )
 }
 

@@ -45,12 +45,8 @@ const RecentTransactions = ({
           </Text>
         </Pressable>
       </View>
-      <ScrollView>
-        <TransactionList itemPressed={itemPressed} />
-      </ScrollView>
-      <View style={styles.bottomNav}>
-        <BottomNav navigation={navigation} />
-      </View>
+
+      <TransactionList itemPressed={itemPressed} />
     </BackdropSmall>
   )
 }

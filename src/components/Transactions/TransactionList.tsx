@@ -1,12 +1,11 @@
-import { memo, useState, useMemo } from 'react'
-import { View, Text } from '../Themed/Themed'
-import Modal from '../Modal/Modal'
-import { Pressable, StyleSheet } from 'react-native'
+import { memo, useState, useMemo, useCallback } from 'react'
+import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { useStoreState } from '../../hooks/storeHooks'
 import { Transaction } from '../../types'
 import { TransactionListItem } from '../Transactions/TransactionListItem'
 import { fetchTransactions } from '../../api/transactionAPI'
 import TransactionDetails from '../Modal/TransactionDetails'
+import Modal from '../Modal/Modal'
 import { useQuery } from 'react-query'
 
 type Props = {
@@ -16,6 +15,8 @@ type Props = {
 const TransactionList = ({ itemPressed }: Props) => {
   const address = useStoreState((state) => state.accounts[0]?.address)
   const [activeTab, setActiveTab] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
@@ -42,13 +43,15 @@ const TransactionList = ({ itemPressed }: Props) => {
     ) || []
 
   const displayedTransactions = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage
+    const end = start + itemsPerPage
     switch (activeTab) {
       case 'All':
-        return allTransactions
+        return allTransactions?.slice(start, end) || []
       case 'Sent':
-        return sentTransactions
+        return sentTransactions.slice(start, end)
       case 'Received':
-        return receivedTransactions
+        return receivedTransactions.slice(start, end)
       default:
         return []
     }
@@ -57,15 +60,22 @@ const TransactionList = ({ itemPressed }: Props) => {
     allTransactions,
     sentTransactions,
     receivedTransactions,
+    currentPage,
+    itemsPerPage,
   ])
-  const handleItemPress = (transaction: Transaction) => {
-    setSelectedTransaction(transaction)
-    setModalVisible(true) // Set the modal visible
-  }
 
-  const closeModal = () => {
-    setModalVisible(false) // 4. Add a function to close the modal
-  }
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage)
+  }, [])
+
+  const handleItemPress = useCallback((transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setModalVisible(true)
+  }, [])
+
+  const closeModal = useCallback(() => {
+    setModalVisible(false)
+  }, [])
 
   if (isLoading)
     return (
@@ -149,11 +159,24 @@ const TransactionList = ({ itemPressed }: Props) => {
           )
         })}
       </View>
-      {selectedTransaction && (
-        <Modal
-          isVisible={modalVisible}
-          onRequestClose={closeModal} // Close the modal when the user presses the hardware back button on Android
+      <View style={styles.pagination}>
+        <Text
+          style={styles.paginationButton}
+          onPress={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
         >
+          {'<'}
+        </Text>
+        <Text style={styles.pageNumber}>{currentPage}</Text>
+        <Text
+          style={styles.paginationButton}
+          onPress={() => handlePageChange(currentPage + 1)}
+        >
+          {'>'}
+        </Text>
+      </View>
+      {selectedTransaction && (
+        <Modal isVisible={modalVisible} onRequestClose={closeModal}>
           <TransactionDetails
             transaction={selectedTransaction}
             closeModal={closeModal}
@@ -163,7 +186,6 @@ const TransactionList = ({ itemPressed }: Props) => {
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -205,6 +227,23 @@ const styles = StyleSheet.create({
   },
   listItem: {
     backgroundColor: 'transparent',
+  },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  paginationButton: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#263047',
+    paddingHorizontal: 15,
+  },
+  pageNumber: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#263047',
   },
 })
 

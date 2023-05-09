@@ -36,7 +36,13 @@ const PinInput = ({
   return (
     <ScrollView contentContainerStyle={styles.pinContainer}>
       {pinNumbers.map((pinNumber, index) => (
-        <View key={index} style={styles.pinInputBox}>
+        <View
+          key={index}
+          style={[
+            styles.pinInputBox,
+            index !== pinNumbers.length - 1 && { marginRight: 7 },
+          ]}
+        >
           <View style={styles.styledContainer}>
             <TextInput
               keyboardType="numeric"

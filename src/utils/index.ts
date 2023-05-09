@@ -53,17 +53,15 @@ const faucetRequest = async (address: string) => {
 }
 
 const getCoinBal = async (address: string) => {
-  try {
-    const [coins] = await lcdc.bank.balance(address)
-    const ujmesBalance =
-      parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 || 0 // 1 JMES = 1e6 uJMES
-
-    return ujmesBalance
-  } catch (error) {
-    // Handle the error here, such as logging it or returning a default value
+  const [coins] = await lcdc.bank.balance(address).catch((error) => {
     console.error('Error getting coin balance:', error)
-    return 0
-  }
+    return [null]
+  })
+
+  const ujmesBalance =
+    parseFloat(coins?.get('ujmes')?.toData()?.amount) / 1e6 || 0 //optional chaining to avoid error if coins is null
+
+  return ujmesBalance
 }
 
 const sendTransaction = async (

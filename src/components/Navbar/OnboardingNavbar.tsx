@@ -17,7 +17,7 @@ type Props = {
 
 const Navbar = ({ navigation, children, title }: Props) => (
   <View style={styles.navbar}>
-    <View style={styles.toolbar}>
+    <View style={styles.backButtonContainer}>
       <Pressable
         onPress={() => navigation.navigate(children)}
         style={({ pressed }) => ({
@@ -27,16 +27,18 @@ const Navbar = ({ navigation, children, title }: Props) => (
         })}
       >
         <Image
-          source={require('../../../assets/icons/backarrow.png')}
-          style={{
-            marginTop: 2,
-            width: 10,
-            height: 16,
-          }}
+          source={require('../../../assets/icons/lilac-backarrow.png')}
+          style={{}}
         />
       </Pressable>
-      <Text style={styles.title}>{title}</Text>
     </View>
+    <View style={styles.logoContainer}>
+      <Image
+        style={{ alignSelf: 'center' }}
+        source={require('../../../assets/images/jmes-text-black.png')}
+      />
+    </View>
+    <View style={styles.emptyContainer}></View>
   </View>
 )
 
@@ -44,25 +46,24 @@ const styles = StyleSheet.create({
   navbar: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    width: '54.7%',
-    marginRight: 'auto',
-    marginLeft: 23,
-
-    marginBottom: 21,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginLeft: 10,
+    marginTop: 15,
+    marginBottom: 19,
     height: 23,
   },
-  title: {
-    marginLeft: 18,
-    lineHeight: 18,
-    fontSize: 18,
-    alignItems: 'center',
-    color: '#FFFFFF',
+  backButtonContainer: {
+    flex: 1,
+    alignSelf: 'flex-start',
   },
-  toolbar: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
+  logoContainer: {
+    flex: 2,
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
   },
 })
 
