@@ -97,7 +97,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
   return (
     <Background>
       <Backdrop>
-        <OnboardingNavbar navigation={navigation} children="Signup" />
+        <OnboardingNavbar navigation={navigation} children="SignUp" />
         <TextTitle> Backup Recovery Phrase</TextTitle>
         <TextInfo>
           Write down your recovery phrase somewhere safe. If you lose
@@ -120,7 +120,17 @@ export default function BackUpScreen({ navigation, route }: Props) {
               await handleConfirm()
             }}
           >
-            <Text>Confirm</Text>
+            <Text
+              style={{
+                textTransform: 'none',
+                fontStyle: 'normal',
+                color: '#FCFCFD',
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              Confirm
+            </Text>
           </StyledButton>
         </SafeAreaView>
         {/* Use a light status bar on iOS to account for the black space above the modal */}

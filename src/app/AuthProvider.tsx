@@ -1,9 +1,6 @@
 import React, { useState, useEffect, createContext } from 'react'
-import {
-  getDataSecurely,
-  storeDataSecurely,
-  removeDataSecurely,
-} from '../store/storage'
+import storage from '../store/storage'
+import { useStoreActions } from '../hooks/storeHooks'
 
 interface AuthContextProps {
   hasToken: boolean
@@ -29,7 +26,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const token = await getDataSecurely('token')
+        const token = await storage.getSecureItem('token')
         setHasToken(!!token)
       } catch (error) {
         console.error('Error fetching token:', error)
@@ -41,13 +38,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (token: string) => {
     // Save the token to local storage or any other preferred storage method
-    await storeDataSecurely('token', token)
+    await storage.setSecureItem('token', token)
     setHasToken(true)
   }
 
   const logout = async () => {
     // Remove the token from local storage
-    await removeDataSecurely('token')
+    await useStoreActions((actions) => actions.resetStore)
+    await storage.removeSecureItem('token')
     setHasToken(false)
   }
 

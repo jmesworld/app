@@ -21,7 +21,7 @@ import {
   validatePin,
   navigateToScreen,
 } from '../../utils'
-import { storeDataSecurely } from '../../store/storage'
+import storage from '../../store/storage'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 type Props = {
   navigation: Navigation
@@ -76,7 +76,6 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   const performRegister = async () => {
     await createUserIdentity(username, account)
     const tokenRes = await getToken(account)
-    console.log(mnemonic)
 
     await addAccount({
       index: 0,
@@ -86,26 +85,18 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
       name: tokenRes.identity.name,
       pin: pin,
     })
-    await storeDataSecurely('mnemonic', mnemonic)
-    await storeDataSecurely('token', tokenRes.token)
-  }
-
-  const handleSubmit = async () => {
-    const LOCKOUT_DURATION = 1 * 30 * 1000 // 30 seconds in milliseconds
-    const MAX_ATTEMPTS = 3
-    const isPinValid = validatePin({
-      pin,
-      pinNumbers,
-      setAttempts,
-      setIsLocked,
-      attempts,
-      setRemainingTime,
+    await storage.setSecureItem('mnemonic', mnemonic)
+    await storage.setSecureItem('token', tokenRes.token)
+    await navigateToScreen(navigation, 'Root', {
+      screen: 'Balance',
+      params: {},
     })
+  }
+  const handleError = () => {
+    const MAX_ATTEMPTS = 3
+    const LOCKOUT_DURATION = 1 * 30 * 1000 // 30 seconds in milliseconds
 
-    if (isPinValid) {
-      await performRegister()
-      navigateToScreen(navigation, 'Root', {})
-    } else if (attempts < MAX_ATTEMPTS) {
+    if (attempts < MAX_ATTEMPTS) {
       setErrorText('Pin does not match')
     } else {
       setErrorText(
@@ -118,6 +109,23 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
         setErrorText('')
         setRemainingTime(LOCKOUT_DURATION)
       }, LOCKOUT_DURATION)
+    }
+  }
+
+  const handleSubmit = async () => {
+    const isPinValid = validatePin({
+      pin,
+      pinNumbers,
+      setAttempts,
+      setIsLocked,
+      attempts,
+      setRemainingTime,
+    })
+
+    if (isPinValid) {
+      await performRegister()
+    } else {
+      handleError()
     }
   }
 
@@ -136,23 +144,23 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
             </TextInfo>
           </View>
           <PinInput pinNumbers={pin} setPinNumbers={setPin} />
-          {attempts > 0 && !isLocked && (
-            <Text style={styles.errorText}>{errorText}</Text>
-          )}
-          {isLocked && (
-            <Text style={styles.errorText}>
-              You have been locked out for 30 seconds.
-            </Text>
-          )}
+          <View style={styles.centeredContainer}>
+            {attempts > 0 && !isLocked && (
+              <Text style={styles.errorText}>{errorText}</Text>
+            )}
+            {isLocked && (
+              <Text style={styles.errorText}>
+                You have been locked out for 30 seconds.
+              </Text>
+            )}
+          </View>
           <SafeAreaView style={styles.buttonContainer}>
             <StyledButton
               enabled={isPinComplete && !isLocked} // Disable button if user is locked out
               disabled={!isPinComplete || isLocked} // Disable button if pin is incomplete or user is locked out
-              onPress={async () => {
-                await handleSubmit
-              }}
+              onPress={handleSubmit}
             >
-              <Text>Confirm</Text>
+              Confirm
             </StyledButton>
           </SafeAreaView>
         </BackdropSmall>

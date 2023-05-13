@@ -1,11 +1,17 @@
 import { useState } from 'react'
-import { Platform, SafeAreaView, StyleSheet } from 'react-native'
+import {
+  Linking,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
 
 import {
   Backdrop,
   BackdropSmall,
   Background,
+  Button,
   Input,
   StyledButton,
   TextTitle,
@@ -13,6 +19,7 @@ import {
 
 import { Navigation } from '../../types'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+import { Link } from '@react-navigation/native'
 
 type Props = {
   navigation: Navigation
@@ -60,18 +67,63 @@ export default function SignUpScreen({ navigation }: Props) {
         </SafeAreaView>
         <SafeAreaView style={styles.buttonContainer}>
           <StyledButton
-            enabled={username.length >= 5 && name.length > 0}
+            enabled={true}
             onPress={() => {
               handleSignUp()
             }}
           >
-            <Text>Sign up</Text>
+            <Text
+              style={{
+                textTransform: 'none',
+                fontStyle: 'normal',
+                color: '#FCFCFD',
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              Sign up
+            </Text>
           </StyledButton>
         </SafeAreaView>
         <View style={styles.policyContainer}>
           <Text style={styles.policyText}>
-            By signing up you agree to our Terms, Privacy Policy and
-            Cookies Policy
+            By signing up, you agree to our{' '}
+            <Text
+              style={{
+                textDecorationLine: 'underline',
+                color: '#704FF7',
+              }}
+              onPress={() =>
+                Linking.openURL('https://icons.jmes.world/terms')
+              }
+            >
+              Terms
+            </Text>
+            ,{' '}
+            <Text
+              style={{
+                textDecorationLine: 'underline',
+                color: '#704FF7',
+              }}
+              onPress={() =>
+                Linking.openURL('https://icons.jmes.world/policy')
+              }
+            >
+              Policy
+            </Text>
+            , and{' '}
+            <Text
+              style={{
+                textDecorationLine: 'underline',
+                color: '#704FF7',
+              }}
+              onPress={() =>
+                Linking.openURL('https://icons.jmes.world/cookies')
+              }
+            >
+              Cookies
+            </Text>
+            .
           </Text>
         </View>
       </Backdrop>

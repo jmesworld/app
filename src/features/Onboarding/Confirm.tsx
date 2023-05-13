@@ -60,7 +60,9 @@ export default function ConfirmScreen({ navigation, route }: Props) {
     const isValid = await validateInputWords()
     if (isValid) {
       // setMnemonicContext(mnemonic)
+      console.log(mnemonic)
       // @ts-ignore
+
       return navigation.navigate({
         name: 'SetPin',
         params: {
@@ -94,12 +96,7 @@ export default function ConfirmScreen({ navigation, route }: Props) {
             mnemonicWords={mnemonicWords}
             setMnemonicWords={setMnemonicWords}
           />
-          <View
-            style={{
-              paddingTop: 30,
-              backgroundColor: 'translucent',
-            }}
-          />
+
           <SafeAreaView style={styles.buttonContainer}>
             <StyledButton
               enabled={true}
@@ -107,7 +104,17 @@ export default function ConfirmScreen({ navigation, route }: Props) {
                 await handleConfirm()
               }}
             >
-              <Text style={styles.centeredText}>Confirm</Text>
+              <Text
+                style={{
+                  textTransform: 'none',
+                  fontStyle: 'normal',
+                  color: '#FCFCFD',
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+              >
+                Sign up
+              </Text>
             </StyledButton>
           </SafeAreaView>
         </BackdropSmall>
@@ -130,10 +137,13 @@ const styles = StyleSheet.create({
   buttonContainer: {
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     alignSelf: 'center',
     width: '93%',
     height: 49,
-    marginTop: 42,
+    marginTop: 'auto',
+    marginBottom: 14,
   },
   centeredText: {
     textAlign: 'center',

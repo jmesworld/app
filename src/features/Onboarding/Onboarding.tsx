@@ -91,4 +91,4 @@ const OnboardingScreen = ({ navigation }: Props) => (
   </OnboardingBackground>
 )
 
-export default memo(OnboardingScreen)
+export default OnboardingScreen

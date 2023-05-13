@@ -5,7 +5,6 @@ import {
   DarkTheme,
 } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import * as React from 'react'
 import { ColorSchemeName } from 'react-native'
 import { useStoreState } from '../hooks/storeHooks'
 import { RootStackParamList } from '../types'
@@ -21,7 +20,7 @@ import {
   SendConfirmScreen,
   ReceiveScreen,
 } from '../features/Wallet'
-import { AuthContext } from '../app/AuthProvider'
+
 import {
   OnboardingScreen,
   SignUpScreen,
@@ -29,13 +28,11 @@ import {
   ConfirmScreen,
 } from '../features/Onboarding'
 
+import { SetPinScreen, ConfirmPinScreen } from '../features/Pin'
 import {
   RestoreScreen,
   RestoreMnemonicScreen,
 } from '../features/Restore'
-
-import { getDataSecurely } from '../store/storage'
-import { SetPinScreen, ConfirmPinScreen } from '../features/Pin'
 
 export default function Navigation({
   colorScheme,
@@ -55,30 +52,22 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
-  const [hasToken, setHasToken] = useState(false)
-  const [loading, setLoading] = useState(true)
   const account = useStoreState((state) => state.accounts[0])
 
-  useEffect(() => {
-    async function checkForToken() {
-      const token = await getDataSecurely('token')
-      if (token !== null) {
-        setHasToken(true)
-      }
-      setLoading(false)
-    }
-    checkForToken()
-  }, [])
-
-  if (hasToken && account) {
+  console.log({ hasAccount: !!account, account })
+  if (account) {
     return (
-      <Stack.Navigator initialRouteName="Root">
+      <Stack.Navigator>
         <Stack.Screen
           name="Root"
           component={WalletScreen}
           options={{ headerShown: false }}
         />
-
+        <Stack.Screen
+          name="Balance"
+          component={WalletScreen}
+          options={{ title: 'Oops!' }}
+        />
         <Stack.Screen
           name="NotFound"
           component={NotFoundScreen}
@@ -149,6 +138,7 @@ function RootNavigator() {
     return (
       <Stack.Navigator
         style={{ backgroundColor: '#000', height: '100%' }}
+        initialRouteName="Onboarding"
       >
         <Stack.Screen
           name="Onboarding"

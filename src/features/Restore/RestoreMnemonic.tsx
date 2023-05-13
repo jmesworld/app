@@ -20,7 +20,7 @@ import { navigateToScreen, restoreUserIdentity } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { Navigation } from '../../types'
-import { storeDataSecurely } from '../../store/storage'
+import storage from '../../store/storage'
 import { useLockout } from '../../hooks/customHooks'
 import { useContext } from 'react'
 import { AuthContext } from '../../app/AuthProvider'
@@ -116,8 +116,8 @@ export default function RestoreMnemonicScreen({
 
     await Promise.all([
       createAccount(identity),
-      storeDataSecurely('mnemonic', mnemonicWords.join(' ')),
-      storeDataSecurely('token', identity.token),
+      storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
+      storage.setSecureItem('token', identity.token),
     ])
     setHasToken(true)
   }
