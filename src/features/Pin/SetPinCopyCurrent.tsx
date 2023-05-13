@@ -6,7 +6,9 @@ import {
   StyleSheet,
 } from 'react-native'
 import {
+  Backdrop,
   Background,
+  Navbar,
   StyledButton,
   TextInfo,
   TextTitle,

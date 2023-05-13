@@ -1,7 +1,7 @@
 import { Platform, StyleSheet, Pressable } from 'react-native'
 import { useEffect, useState } from 'react'
 import { mnemonic, sendTransaction } from '../../utils'
-import { getDataSecurely } from '../../store/storage'
+import storage from '../../store/storage'
 import {
   useStoreState,
   useStoreActions,
@@ -40,7 +40,7 @@ export default function SendConfirmScreen({
   const address = useStoreState((state) => state.accounts[0]?.address)
 
   async function getMnemonic() {
-    const mnemonicFromSecureStorage = await getDataSecurely(
+    const mnemonicFromSecureStorage = await storage.getSecureItem(
       'mnemonic'
     )
     setMnemonic(mnemonicFromSecureStorage)

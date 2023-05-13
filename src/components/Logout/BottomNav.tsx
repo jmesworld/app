@@ -3,7 +3,7 @@ import { View, Text } from '../Themed/Themed'
 import { Platform, Pressable, StyleSheet, Image } from 'react-native'
 import { Navigation } from '../../types'
 import CustomModal from '../Modal/Modal'
-import LogoutModal from '../Modal/LogoutModal'
+import LogoutModal from './LogoutModal'
 import StyledButton from '../Button/StyledButton'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { AuthContext } from '../../app/AuthProvider'
@@ -15,17 +15,9 @@ interface Props {
 
 const BottomNav = ({ children, navigation }: Props) => {
   const [modalVisible, setModalVisible] = useState(false)
-  const resetStore = useStoreActions((actions) => actions.resetStore)
 
   const handleCloseModal = () => {
     setModalVisible(false)
-  }
-  const auth = useContext(AuthContext)
-
-  const handleLogout = () => {
-    auth.logout()
-    resetStore(true)
-    navigation.navigate('Root')
   }
 
   return (
@@ -77,18 +69,11 @@ const BottomNav = ({ children, navigation }: Props) => {
         />
         <Text style={styles.buttonText}>Settings</Text>
       </Pressable>
-      <CustomModal
+      <LogoutModal
         isVisible={modalVisible}
         onRequestClose={handleCloseModal}
-      >
-        <LogoutModal closeModal={handleCloseModal} />
-
-        <View style={styles.buttonContainer}>
-          <StyledButton onPress={handleLogout} enabled={true}>
-            Confirm
-          </StyledButton>
-        </View>
-      </CustomModal>
+        navigation={navigation}
+      />
     </View>
   )
 }
@@ -104,6 +89,13 @@ const styles = StyleSheet.create({
     width: '92%',
     height: 70,
     marginBottom: 14,
+  },
+  text: {
+    fontWeight: '500',
+    fontSize: 24,
+    alignSelf: 'center',
+    marginTop: 29,
+    marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: 'row',

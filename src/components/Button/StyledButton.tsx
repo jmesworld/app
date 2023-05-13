@@ -1,6 +1,7 @@
 import React, { memo } from 'react'
-import { Text, View } from '../../components/Themed/Themed'
+
 import Button from './Button'
+import { Text, View } from '../Themed/Themed'
 import { StyleSheet } from 'react-native'
 
 type Props = React.ComponentProps<typeof Button> & {
@@ -16,7 +17,17 @@ const StyledButton = ({ children, enabled, ...props }: Props) => {
       ]}
       {...props}
     >
-      <Text style={styles.text}>{children}</Text>
+      <Text
+        style={{
+          textTransform: 'none',
+          fontStyle: 'normal',
+          color: '#FCFCFD',
+          fontSize: 16,
+          fontWeight: '700',
+        }}
+      >
+        {children}
+      </Text>
     </Button>
   )
 }
@@ -31,7 +42,7 @@ const styles = StyleSheet.create({
   text: {
     textTransform: 'none',
     fontStyle: 'normal',
-    color: '#FCFCFD',
+
     fontSize: 16,
     fontWeight: '700',
   },

@@ -13,15 +13,17 @@ interface Transaction {
   amount: { denom: string; amount: string }[]
 }
 
+// const LCDCURL = `http://51.38.52.37:1317`
+const LCDCURL = `http://164.92.191.45:1317`
 export const fetchTransactions = async ({ address }) => {
-  const proxyURI = 'http://localhost:8080/' // pass infront of the url to avoid CORS error in web browser like so ${proxyURI}http://51.38.52.37:1317/cosmos/'
+  const proxyURI = 'http://localhost:8080' // pass infront of the url to avoid CORS error in web browser like so ${proxyURI}http://51.38.52.37:1317/cosmos/'
 
   try {
     const sentResponse = await axios.get(
-      `http://51.38.52.37:1317/cosmos/tx/v1beta1/txs?events=message.sender='${address}'`
+      `${proxyURI}/${LCDCURL}/cosmos/tx/v1beta1/txs?events=message.sender='${address}'`
     )
     const receivedResponse = await axios.get(
-      `http://51.38.52.37:1317/cosmos/tx/v1beta1/txs?events=transfer.recipient='jmes1am0unl73eqjkk230c2cvanqln62k05ezj0kkt'`
+      `${proxyURI}/${LCDCURL}/cosmos/tx/v1beta1/txs?events=transfer.recipient='jmes1am0unl73eqjkk230c2cvanqln62k05ezj0kkt'`
     )
 
     const sentData = sentResponse.data

@@ -9,6 +9,20 @@ import { navigateToScreen } from './navigate'
 import { handleLockout } from './lockout'
 
 const SCHEMA_PREFIX = 'jmes:'
+
+/*
+const lcdcConfig = {
+  chainID: 'jmes-888',
+  URL: 'http://51.38.52.37:1888',
+  isClassic: false,
+}
+*/
+const lcdcConfig = {
+  chainID: 'jmes-testnet-1',
+  URL: 'http://164.92.191.45:1317',
+  isClassic: false,
+}
+
 const client = new Client({
   providers: {
     faucetAPI: {
@@ -21,6 +35,7 @@ const client = new Client({
         api_url: 'http://51.38.52.37:3001',
       },
     },
+    LCDC: lcdcConfig,
     // marketplaceAPI: {
     //   endpoint: {
     //     api_url: 'http://51.38.52.37:1317',
@@ -36,14 +51,10 @@ const client = new Client({
 
 const randomBytes = crypto.getRandomValues(new Uint8Array(16))
 const mnemonic = Mnemonic.generateMnemonic(randomBytes)
+
 const wallet = client.createWallet(new Mnemonic(mnemonic))
 const account = wallet.getAccount()
-const lcdc = client.createLCDClient({
-  chainID: 'jmes-888',
-  URL: 'http://51.38.52.37:1888',
-  isClassic: false,
-})
-
+const lcdc = account.getLCDClient()
 /*Wallet */
 
 const faucetRequest = async (address: string) => {
@@ -52,16 +63,35 @@ const faucetRequest = async (address: string) => {
   return res
 }
 
-const getCoinBal = async (address: string) => {
-  const [coins] = await lcdc.bank.balance(address).catch((error) => {
+const getCoinBal = async (address: string): Promise<number> => {
+  const accAddress = await account.getAddress()
+  try {
+    // Ideal way
+    console.log('getCoinBal for:', account.getAddress()) // is this only working for first render?
+    console.log('acc.getBal', await account.getBalance(accAddress))
+    const balance = (await account.getBalance()).toData()?.amount
+    console.log({ balance })
+    return parseFloat(balance) / 1e6
+
+    // Manual way
+    // const lcdc = await account.getLCDClient()
+    // const [coins] = await lcdc.bank.balance(address)
+    // const ujmesBalance =
+    // parseFloat(coins?.get('ujmes')?.toData()?.amount) / 1e6 || 0
+    // return ujmesBalance
+  } catch (error) {
+    // const [coins] = await lcdc.bank.balance(address)
+    setTimeout(async () => {
+      console.log('====')
+      const lcdc = await account.getLCDClient()
+      console.log(address)
+      console.log(await lcdc.bank.balance(address))
+      console.log(lcdc)
+    }, 5)
+    console.log(error)
     console.error('Error getting coin balance:', error)
-    return [null]
-  })
-
-  const ujmesBalance =
-    parseFloat(coins?.get('ujmes')?.toData()?.amount) / 1e6 || 0 //optional chaining to avoid error if coins is null
-
-  return ujmesBalance
+    return 0
+  }
 }
 
 const sendTransaction = async (
@@ -71,13 +101,10 @@ const sendTransaction = async (
 ) => {
   const wallet = client.createWallet(new Mnemonic(mnemonic))
   const account = wallet.getAccount()
-  const res = await account.sendTransaction(
-    {
-      recipientAddress: address,
-      recipientAmount: amount, // 1 JMES = 1e6 uJMES
-    },
-    'http://51.38.52.37:1888'
-  )
+  const res = await account.sendTransaction({
+    recipientAddress: address,
+    recipientAmount: amount, // 1 JMES = 1e6 uJMES - RecipientAmount is uJMES
+  })
 
   console.log({ res })
   return res
