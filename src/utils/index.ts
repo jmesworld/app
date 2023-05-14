@@ -10,13 +10,6 @@ import { handleLockout } from './lockout'
 
 const SCHEMA_PREFIX = 'jmes:'
 
-/*
-const lcdcConfig = {
-  chainID: 'jmes-888',
-  URL: 'http://51.38.52.37:1888',
-  isClassic: false,
-}
-*/
 const lcdcConfig = {
   chainID: 'jmes-testnet-1',
   URL: 'http://164.92.191.45:1317',
@@ -71,13 +64,16 @@ const getCoinBal = async (address: string): Promise<number> => {
     console.log('acc.getBal', await account.getBalance(accAddress))
     const balance = (await account.getBalance()).toData()?.amount
     console.log({ balance })
+    if (!balance || balance === undefined || balance === '0') {
+      faucetRequest(address)
+      console.log('faucetRequest', !!faucetRequest)
+    }
     return parseFloat(balance) / 1e6
 
     // Manual way
     // const lcdc = await account.getLCDClient()
     // const [coins] = await lcdc.bank.balance(address)
-    // const ujmesBalance =
-    // parseFloat(coins?.get('ujmes')?.toData()?.amount) / 1e6 || 0
+    // const ujmesBalance = parseFloat(coins?.get('ujmes')?.toData()?.amount) / 1e6 || 0
     // return ujmesBalance
   } catch (error) {
     // const [coins] = await lcdc.bank.balance(address)

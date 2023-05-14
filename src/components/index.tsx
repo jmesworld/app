@@ -14,7 +14,7 @@ export { default as TextInfo } from './Text/TextInfo'
 export { default as TextTitle } from './Text/TextTitle'
 export { default as SeedList } from './SeedList/SeedList'
 export { default as PinInput } from './Input/PinInput'
-export { default as BottomNav } from './Logout/BottomNav'
+export { default as BottomNav } from './Navbar/BottomNav'
 export { default as Modal } from './Modal/Modal'
 export { default as Checkbox } from './Checkbox/Checkbox'
 

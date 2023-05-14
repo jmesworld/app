@@ -23,7 +23,7 @@ const LogoutModal = ({
   const resetStore = useStoreActions((actions) => actions.resetStore)
 
   const handleLogout = async () => {
-    await auth.logout()
+    //await auth.logout() //fix this portion
     await resetStore(true)
     return navigation.navigate('Onboarding')
   }
