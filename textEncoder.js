@@ -1,4 +1,5 @@
 // some polyfills
+// not currently used, but may be useful in the future
 Object.assign(globalThis, {
     self: globalThis,
     crypto: {
