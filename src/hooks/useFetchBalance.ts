@@ -13,7 +13,7 @@ export const useFetchBalance: FetchBalance = (
     const fetchBalance = async () => {
       try {
         const fetchedBalance = await getCoinBal(address)
-        setBalance(fetchedBalance)
+        setBalance({ fetchedBalance })
       } catch (error) {
         console.error('Error fetching balance:', error)
       }

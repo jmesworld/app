@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Image } from 'react-native'
 
 import {
@@ -20,24 +20,12 @@ import { useCurrencyDropdown } from '../../hooks/useCurrencyDropdown'
 import { useTransactionModal } from '../../hooks/useTransactionModal'
 import { useInterval } from '../../hooks/useInterval'
 import { styles } from './Wallet.styles'
-import {
-  useStoreActions,
-  useStoreState,
-} from '../../hooks/storeHooks'
-import { getCoinBal } from '../../utils'
 type Props = {
   navigation: Navigation
 }
 
 export default function WalletScreen({ navigation }: Props) {
-  const [shouldFetch, setShouldFetch] = useState(true)
-  const [balance, setBalance] = useState(0)
-  const [modalVisible, setModalVisible] = useState(false)
-  const account = useStoreState((state) => state.accounts[0])
-  const updateAccount = useStoreActions(
-    (actions) => actions.updateAccount
-  )
-  const address = useStoreState((state) => state.accounts[0].address)
+  const { balance, refetchBalance } = useBalance()
   const {
     showDropdown,
     toggleDropdown,
@@ -51,30 +39,9 @@ export default function WalletScreen({ navigation }: Props) {
     setTransactionModalVisible,
   } = useTransactionModal()
 
-  const updateStoreState = () => {
-    console.log('UpdateStoreState')
-    updateAccount({ ...account, balance: balance })
-  }
-
-  const getBalance = async () => {
-    const fetchedBalance = await getCoinBal(address)
-    setBalance(fetchedBalance)
-  }
-  useEffect(() => {
-    // console.log('account', account)
-    getBalance()
-    // console.log({ getBalance })
-    // console.log({ balance })
-    const interval = setInterval(() => {
-      if (shouldFetch) {
-        getBalance()
-        updateStoreState()
-      }
-      console.log('interval')
-    }, 10 * 1000)
-
-    return () => clearInterval(interval)
-  }, [updateStoreState])
+  useInterval(() => {
+    refetchBalance()
+  }, 10 * 1000)
 
   return (
     <View style={styles.container}>
@@ -86,7 +53,7 @@ export default function WalletScreen({ navigation }: Props) {
         <BalanceContainer>
           <Text style={{ marginTop: 16, fontSize: 16 }}>Balance</Text>
           <Text style={{ marginBottom: 11, fontSize: 42 }}>
-            {balance}
+            {balance !== undefined && !isNaN(balance) ? balance : '0'}
           </Text>
 
           <ConvertDenom
