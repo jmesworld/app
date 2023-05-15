@@ -41,6 +41,7 @@
 
 //   return { balance, refetchBalance }
 // }
+
 import { useEffect } from 'react'
 import { useStoreActions, useStoreState } from './storeHooks'
 import { getCoinBal } from '../utils'
@@ -67,7 +68,6 @@ export function useBalance() {
 
     try {
       const fetchedBalance = await getCoinBal(address)
-      console.log({ fetchedBalance })
       return parseFloat(fetchedBalance.toString())
     } catch (error) {
       console.error('Error fetching balance:', error)

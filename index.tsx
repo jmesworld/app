@@ -1,5 +1,6 @@
 //import 'react-native-url-polyfill/auto'
 import 'expo-dev-client'
+import 'react-native-url-polyfill/auto'
 import { registerRootComponent } from 'expo'
 import { Platform, LogBox } from 'react-native'
 import { TextEncoder, TextDecoder } from 'text-encoding'

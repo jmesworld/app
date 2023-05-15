@@ -9,6 +9,8 @@
 
 dist/
 
+test
+
 node_modules
 
 AppStorybook
