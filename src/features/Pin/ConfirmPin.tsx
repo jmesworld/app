@@ -92,12 +92,14 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
       params: {},
     })
   }
+
+  // implement countdown and make sure button stays disabled
   const handleError = () => {
     const MAX_ATTEMPTS = 3
     const LOCKOUT_DURATION = 1 * 30 * 1000 // 30 seconds in milliseconds
 
     if (attempts < MAX_ATTEMPTS) {
-      setErrorText('Pin does not match')
+      setErrorText('PIN does not match')
     } else {
       setErrorText(
         'Too many failed attempts. Please try again later.'

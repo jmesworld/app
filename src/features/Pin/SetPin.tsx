@@ -30,6 +30,7 @@ const SetPinScreen = ({ navigation, route }: Props) => {
     '',
     '',
   ])
+
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
   const [mnemonic, setMnemonic] = useState('')

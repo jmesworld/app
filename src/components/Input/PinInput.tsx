@@ -1,73 +1,124 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { ScrollView, StyleSheet, TextInput } from 'react-native'
-import { View } from '../../components/Themed/Themed'
-
-interface Props {
-  pinNumbers: string[]
-  setPinNumbers: (pinNumbers: string[]) => void
-  placeholder?: string
-  secureTextEntry?: boolean
+import { memo, useEffect, useRef, useReducer } from 'react'
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { IconButton } from 'react-native-paper'
+import usePinInputReducer from '../../hooks/usePinInputReducer'
+const initialState = {
+  pinNumbers: Array(4).fill(''),
+  focusedIndex: 0,
+  isSecureEntry: true,
 }
 
-const PinInput = ({
-  pinNumbers,
-  setPinNumbers,
-  placeholder,
-  secureTextEntry,
-}: Props) => {
-  const [focusedIndex, setFocusedIndex] = useState(0)
-  const refs = useRef<Array<TextInput>>([
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-  ])
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_PIN_NUMBER':
+      return { ...state, pinNumbers: action.pinNumbers }
+    case 'SET_FOCUSED_INDEX':
+      return { ...state, focusedIndex: action.focusedIndex }
+    case 'SET_IS_SECURE_ENTRY':
+      return { ...state, isSecureEntry: action.isSecureEntry }
+    default:
+      throw new Error()
+  }
+}
+
+const PinInput = () => {
+  const { state, dispatch } = usePinInputReducer()
+  const { pinNumbers, focusedIndex, isSecureEntry } = state
+  const refs = useRef<(TextInput | null)[]>([])
 
   useEffect(() => {
-    refs.current[focusedIndex]?.focus()
+    if (refs.current[focusedIndex]) {
+      refs.current[focusedIndex]?.focus()
+    }
   }, [focusedIndex])
 
-  const handlePinInput = useCallback(
-    (index: number, text: string) => {
-      const newPin = [...pinNumbers]
-      newPin[index] = text
-      setPinNumbers(newPin)
+  const handlePinInput = (index: number, text: string) => {
+    if (!/^\d$/.test(text) && text !== '') {
+      return // Only allow a single digit (0-9) or empty string for deletion
+    }
 
-      if (text !== '') {
-        index < 3 ? setFocusedIndex(index + 1) : null
-      } else {
-        index > 0 ? setFocusedIndex(index - 1) : null
-      }
-    },
-    [pinNumbers, setPinNumbers]
-  )
+    const newPin = [...pinNumbers]
+    newPin[index] = text
+    dispatch({ type: 'SET_PIN_NUMBER', pinNumbers: newPin })
+
+    if (text !== '') {
+      index < 3
+        ? dispatch({
+            type: 'SET_FOCUSED_INDEX',
+            focusedIndex: index + 1,
+          })
+        : null
+    } else {
+      index > 0
+        ? dispatch({
+            type: 'SET_FOCUSED_INDEX',
+            focusedIndex: index - 1,
+          })
+        : null
+    }
+  }
+
+  const handleKeyPress = (index: number, key: string) => {
+    if (key === 'Backspace' && pinNumbers[index] === '') {
+      index >= 0
+        ? dispatch({
+            type: 'SET_FOCUSED_INDEX',
+            focusedIndex: index - 1,
+          })
+        : null
+    }
+  }
+
+  const toggleSecureEntry = () => {
+    dispatch({
+      type: 'SET_IS_SECURE_ENTRY',
+      isSecureEntry: !isSecureEntry,
+    })
+  }
 
   return (
-    <ScrollView contentContainerStyle={styles.pinContainer}>
-      {pinNumbers.map((pinNumber, index) => (
-        <View
-          key={index}
-          style={[
-            styles.pinInputBox,
-            index !== pinNumbers.length - 1 && styles.marginRight,
-          ]}
-        >
-          <View style={styles.styledContainer}>
-            <TextInput
-              keyboardType="numeric"
-              returnKeyType={'done'}
-              ref={(el) => (refs.current[index] = el)}
-              style={styles.input}
-              placeholder={placeholder}
-              value={pinNumber}
-              maxLength={1}
-              onChangeText={(text) => handlePinInput(index, text)}
-              secureTextEntry={secureTextEntry}
-            />
+    <>
+      <ScrollView contentContainerStyle={styles.pinContainer}>
+        {pinNumbers.map((pinNumber, index) => (
+          <View
+            key={index}
+            style={[
+              styles.pinInputBox,
+              index !== pinNumbers.length - 1 && styles.marginRight,
+            ]}
+          >
+            <View style={styles.styledContainer}>
+              <TextInput
+                accessibilityLabel={`Pin Input ${index + 1}`}
+                keyboardType="numeric"
+                returnKeyType={'done'}
+                ref={(input) => (refs.current[index] = input)}
+                style={styles.input}
+                placeholder={''}
+                value={pinNumber}
+                maxLength={1}
+                onChangeText={(text) => handlePinInput(index, text)}
+                onKeyPress={({ nativeEvent }) =>
+                  handleKeyPress(index, nativeEvent.key)
+                }
+                secureTextEntry={isSecureEntry}
+              />
+            </View>
           </View>
-        </View>
-      ))}
-    </ScrollView>
+        ))}
+      </ScrollView>
+      <IconButton
+        icon={isSecureEntry ? 'eye' : 'eye-off'}
+        iconColor={
+          isSecureEntry
+            ? 'rgba(112, 79, 247, 0.5)'
+            : 'rgba(112, 79, 247, 1)'
+        }
+        size={24}
+        onPress={toggleSecureEntry}
+        style={{ alignSelf: 'flex-end' }}
+      />
+    </>
   )
 }
 
@@ -79,7 +130,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 117.96,
     marginTop: 77,
-    marginBottom: 127,
     paddingLeft: 14,
     paddingRight: 14,
   },
