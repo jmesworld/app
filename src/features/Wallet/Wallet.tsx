@@ -32,7 +32,7 @@ type Props = {
 export default function WalletScreen({ navigation }: Props) {
   const [shouldFetch, setShouldFetch] = useState(true)
   const [balance, setBalance] = useState(0)
-  const [modalVisible, setModalVisible] = useState(false)
+
   const account = useStoreState((state) => state.accounts[0])
   const updateAccount = useStoreActions(
     (actions) => actions.updateAccount
@@ -44,12 +44,9 @@ export default function WalletScreen({ navigation }: Props) {
     selectedCurrency,
     handleCurrencySelection,
   } = useCurrencyDropdown()
-  const {
-    transactionModalVisible,
-    selectedTransaction,
-    setSelectedTransaction,
-    setTransactionModalVisible,
-  } = useTransactionModal()
+
+  const { setSelectedTransaction, setTransactionModalVisible } =
+    useTransactionModal()
 
   const updateStoreState = () => {
     console.log('UpdateStoreState')
@@ -84,8 +81,14 @@ export default function WalletScreen({ navigation }: Props) {
           style={styles.image}
         />
         <BalanceContainer>
-          <Text style={{ marginTop: 16, fontSize: 16 }}>Balance</Text>
-          <Text style={{ marginBottom: 11, fontSize: 42 }}>
+          <Text
+            style={{ color: 'white', marginTop: 16, fontSize: 16 }}
+          >
+            Balance
+          </Text>
+          <Text
+            style={{ color: 'white', marginBottom: 11, fontSize: 42 }}
+          >
             {balance}
           </Text>
 

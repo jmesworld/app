@@ -33,7 +33,7 @@ const SendReceive = ({ children, navigation }: Props) => {
             fontSize: 14,
             marginRight: 'auto',
             paddingRight: 30,
-
+            color: '#FFFFFF',
             alignSelf: 'center',
             textAlign: 'center',
           }}
@@ -62,6 +62,7 @@ const SendReceive = ({ children, navigation }: Props) => {
             fontSize: 14,
             marginRight: 'auto',
             paddingRight: 10,
+            color: '#FFFFFF',
             alignSelf: 'center',
             textAlign: 'center',
           }}

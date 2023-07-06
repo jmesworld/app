@@ -1,35 +1,60 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Text,
   Dimensions,
   PanResponder,
   Modal,
+  Animated,
 } from 'react-native'
 
-const windowHeight = Dimensions.get('window').height
 const windowWidth = Dimensions.get('window').width
 
 const CustomModal = ({ isVisible, onRequestClose, children }) => {
-  const [height, setHeight] = useState(windowHeight / 2)
+  const windowHeight = Dimensions.get('window').height
+  const height = useRef(new Animated.Value(windowHeight / 2)).current
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (evt, gestureState) => {
-      const newHeight = windowHeight - gestureState.moveY
+  const resetHeight = () => height.setValue(windowHeight / 2)
 
-      setHeight(newHeight)
-    },
-    onPanResponderRelease: () => {},
-  })
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderStart() {
+        resetHeight()
+      },
+      onPanResponderMove: (_, { moveY }) => {
+        const newHeight = windowHeight - moveY
+        if (newHeight <= windowHeight / 8) {
+          onRequestClose()
+          resetHeight()
+          return
+        }
+        height.setValue(newHeight)
+      },
+      onPanResponderRelease: (_, { vx, vy }) => {
+        const speed = Math.sqrt(vx ** 2 + vy ** 2)
+        if (speed > 0.2) {
+          onRequestClose()
+          resetHeight()
+        } else {
+          Animated.spring(height, {
+            toValue: windowHeight / 2,
+            useNativeDriver: false,
+          }).start()
+        }
+      },
+    })
+  ).current
 
   return (
     <Modal
       visible={isVisible}
-      onRequestClose={onRequestClose}
-      transparent={true}
+      onRequestClose={() => {
+        onRequestClose()
+        resetHeight()
+      }}
+      transparent
     >
       <View style={styles.container}>
         <View style={styles.overlay}>
@@ -38,13 +63,13 @@ const CustomModal = ({ isVisible, onRequestClose, children }) => {
             onPress={onRequestClose}
           />
         </View>
-        <View
+        <Animated.View
           style={[styles.modal, { height }]}
           {...panResponder.panHandlers}
         >
           <View style={styles.resizeBar} />
           {children}
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   )
@@ -60,14 +85,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     width: windowWidth,
-    height: windowHeight,
+    height: Dimensions.get('window').height,
   },
   modal: {
     alignSelf: 'center',
     width: windowWidth,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-
+    boxShadow: '0px 5px 15px rgba(0,0,0,0.3)',
+    position: 'absolute',
     backgroundColor: 'white',
   },
   resizeBar: {

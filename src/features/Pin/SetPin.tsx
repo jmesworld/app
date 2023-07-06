@@ -18,11 +18,13 @@ import { Text, View } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { Navigation } from '../../types'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+
 type Props = {
   navigation: Navigation
   route: Route<any>
 }
 
+//need to make sure inputfields are cleared when a user has logged out
 const SetPinScreen = ({ navigation, route }: Props) => {
   const [pinNumbers, setPinNumbers] = useState<string[]>([
     '',
@@ -30,7 +32,6 @@ const SetPinScreen = ({ navigation, route }: Props) => {
     '',
     '',
   ])
-
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
   const [mnemonic, setMnemonic] = useState('')
@@ -43,9 +44,11 @@ const SetPinScreen = ({ navigation, route }: Props) => {
       setMnemonic(route.params.recoveryPhrase)
     }
   }, [route.params])
+
   useEffect(() => {
     setIsPinComplete(pinNumbers.every((value) => value !== ''))
-  }, [pinNumbers])
+    console.log(pinNumbers)
+  }, [pinNumbers, isPinComplete])
 
   const validateInputPin = async () => {
     if (pinNumbers.length === 4) {
@@ -87,8 +90,9 @@ const SetPinScreen = ({ navigation, route }: Props) => {
             </TextInfo>
           </View>
           <PinInput
-            pinNumbers={pinNumbers}
-            setPinNumbers={setPinNumbers}
+            onChange={(newPin) => {
+              setPinNumbers(newPin)
+            }}
           />
 
           <SafeAreaView style={styles.buttonContainer}>

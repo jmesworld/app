@@ -62,7 +62,7 @@ const getCoinBal = async (address: string) => {
   const ujmesBalance =
     parseFloat(coins.get('ujmes')?.toData()?.amount) / 1e6 // 1 JMES = 1e6 uJMES
 
-  return ujmesBalance
+  return ujmesBalance || 0 // return 0 if no balance
 }
 
 /*Wallet */

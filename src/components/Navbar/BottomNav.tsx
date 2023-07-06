@@ -16,10 +16,6 @@ interface Props {
 const BottomNav = ({ children, navigation }: Props) => {
   const [modalVisible, setModalVisible] = useState(false)
 
-  const handleCloseModal = () => {
-    setModalVisible(false)
-  }
-
   return (
     <View style={styles.container}>
       <Pressable
@@ -71,7 +67,7 @@ const BottomNav = ({ children, navigation }: Props) => {
       </Pressable>
       <LogoutModal
         isVisible={modalVisible}
-        onRequestClose={handleCloseModal}
+        onRequestClose={() => setModalVisible(false)}
         navigation={navigation}
       />
     </View>
@@ -112,6 +108,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(112, 79, 247, 0.9)',
   },
   buttonText: {
+    color: 'white',
     alignSelf: 'center',
     fontSize: 10,
   },

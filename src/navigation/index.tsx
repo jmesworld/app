@@ -73,11 +73,6 @@ function RootNavigator() {
           component={NotFoundScreen}
           options={{ title: 'Oops!' }}
         />
-        <Stack.Screen
-          name="SetPin"
-          component={SetPinScreen}
-          options={{ headerShown: false }}
-        />
 
         <Stack.Group screenOptions={{ presentation: 'modal' }}>
           <Stack.Screen

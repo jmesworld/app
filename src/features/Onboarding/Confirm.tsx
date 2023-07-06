@@ -100,9 +100,10 @@ export default function ConfirmScreen({ navigation, route }: Props) {
           <SafeAreaView style={styles.buttonContainer}>
             <StyledButton
               enabled={true}
-              onPress={async () => {
-                await handleConfirm()
-              }}
+              onPress={() => handleConfirm()}
+              // onPress={async () => {
+              //   await handleConfirm()
+              // }}
             >
               <Text
                 style={{

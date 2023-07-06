@@ -1,27 +1,9 @@
-import { memo, useEffect, useRef, useReducer } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import usePinInputReducer from '../../hooks/usePinInputReducer'
-const initialState = {
-  pinNumbers: Array(4).fill(''),
-  focusedIndex: 0,
-  isSecureEntry: true,
-}
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'SET_PIN_NUMBER':
-      return { ...state, pinNumbers: action.pinNumbers }
-    case 'SET_FOCUSED_INDEX':
-      return { ...state, focusedIndex: action.focusedIndex }
-    case 'SET_IS_SECURE_ENTRY':
-      return { ...state, isSecureEntry: action.isSecureEntry }
-    default:
-      throw new Error()
-  }
-}
-
-const PinInput = () => {
+const PinInput = ({ onChange }) => {
   const { state, dispatch } = usePinInputReducer()
   const { pinNumbers, focusedIndex, isSecureEntry } = state
   const refs = useRef<(TextInput | null)[]>([])
@@ -39,6 +21,10 @@ const PinInput = () => {
 
     const newPin = [...pinNumbers]
     newPin[index] = text
+
+    // Call the onChange prop with the new pin
+    onChange(newPin)
+
     dispatch({ type: 'SET_PIN_NUMBER', pinNumbers: newPin })
 
     if (text !== '') {

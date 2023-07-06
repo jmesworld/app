@@ -1,4 +1,3 @@
-import ProfileScreen from './Profile'
 import WalletScreen from './Wallet'
 import SendScreen from './Send'
 import SendConfirmScreen from './SendConfirm'
@@ -8,7 +7,6 @@ import ScanScreen from './Scan'
 import TransactionHistoryScreen from '../TransactionHistory/TransactionHistory'
 
 export {
-  ProfileScreen,
   WalletScreen,
   SendScreen,
   SendConfirmScreen,

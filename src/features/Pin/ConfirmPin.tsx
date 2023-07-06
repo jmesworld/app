@@ -48,7 +48,9 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   const addAccount = useStoreActions((actions) => actions.addAccount)
   const addToken = useStoreActions((actions) => actions.addToken)
 
+  //handles the created pin from the previous screen
   useEffect(() => {
+    console.log(pinNumbers)
     if (route.params) {
       setName(route.params.name)
       setUsername(route.params.username)
@@ -57,10 +59,12 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
     }
   }, [route.params])
 
+  //handles the pin input from current screen
   useEffect(() => {
     setIsPinComplete(pin.every((value) => value !== ''))
   }, [pin])
 
+  //handles the countdown
   useEffect(() => {
     if (remainingTime > 0) {
       const timer = setTimeout(() => {
@@ -145,7 +149,11 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
               Please retype your 4 digit PIN and confirm.
             </TextInfo>
           </View>
-          <PinInput pinNumbers={pin} setPinNumbers={setPin} />
+          <PinInput
+            onChange={(newPin) => {
+              setPin(newPin)
+            }}
+          />
           <View style={styles.centeredContainer}>
             {attempts > 0 && !isLocked && (
               <Text style={styles.errorText}>{errorText}</Text>
@@ -159,7 +167,6 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
           <SafeAreaView style={styles.buttonContainer}>
             <StyledButton
               enabled={isPinComplete && !isLocked} // Disable button if user is locked out
-              disabled={!isPinComplete || isLocked} // Disable button if pin is incomplete or user is locked out
               onPress={handleSubmit}
             >
               Confirm

@@ -20,9 +20,12 @@ const AuthContext = createContext<AuthContextProps>({
   logout: () => Promise.resolve(),
 })
 
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+const AuthProvider = ({ children }: AuthProviderProps) => {
   const [hasToken, setHasToken] = useState<boolean>(false)
-
+  const resetStore = useStoreActions((actions) => actions.resetStore)
+  const removeAccount = useStoreActions(
+    (actions) => actions.removeAccount
+  )
   useEffect(() => {
     const checkToken = async () => {
       try {
@@ -43,10 +46,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const logout = async () => {
+    // Reset the store state
+    await removeAccount(true)
+    await resetStore(true)
+
     // Remove the token from local storage
-    await useStoreActions((actions) => actions.resetStore)
     await storage.removeSecureItem('token')
     setHasToken(false)
+
+    return
   }
 
   return (

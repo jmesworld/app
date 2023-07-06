@@ -163,6 +163,11 @@ const store = createStore<WalletModel>(
           pin: payload.pin,
         })
       }),
+      removeAccount: action((state, payload) => {
+        state.accounts = state.accounts.filter(
+          (account) => account.address !== payload.address
+        ) // remove account from accounts array
+      }),
       setSecureToken: action((state, payload) => {
         state.token = {
           token: SecureStore.setItemAsync(
