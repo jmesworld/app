@@ -7,6 +7,7 @@ import { notateWeiValue } from './notateWei'
 import { validatePin } from './validatePin'
 import { navigateToScreen } from './navigate'
 import { handleLockout } from './lockout'
+import {  PUBLIC_CHAIN_NAME ,PUBLIC_CHAIN_ID , PUBLIC_RPC_URL , PUBLIC_REST_URL} from '@env'
 // const lcdc = client.createLCDClient({
 //   chainID: 'jmes-888',
 //   URL: 'http://51.38.52.37:1888',
@@ -29,8 +30,8 @@ const MAYOREE_L1_LCDC = {
   isClassic: false,
 }
 const ALEX_L1_LCDC = {
-  chainID: 'jmes-888',
-  URL: 'http://51.38.52.37:1888',
+  chainID: PUBLIC_CHAIN_ID,
+  URL: PUBLIC_REST_URL,
   isClassic: false,
 }
 

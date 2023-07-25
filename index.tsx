@@ -20,9 +20,9 @@ if (Platform.OS !== 'web') {
 //   global.TextEncoder = TextEncoder
 // }
 
-// if (typeof global.TextDecoder === 'undefined') {
-//   global.TextDecoder = TextDecoder
-// }
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder
+}
 
 if (typeof Buffer === 'undefined') {
   global.Buffer = require('buffer').Buffer

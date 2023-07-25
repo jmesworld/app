@@ -64,7 +64,7 @@ export default function ConfirmScreen({ navigation, route }: Props) {
       // @ts-ignore
 
       return navigation.navigate({
-        name: 'SetPin',
+        name: 'SignUp',
         params: {
           username: username,
           name: name,
@@ -98,13 +98,7 @@ export default function ConfirmScreen({ navigation, route }: Props) {
           />
 
           <SafeAreaView style={styles.buttonContainer}>
-            <StyledButton
-              enabled={true}
-              onPress={() => handleConfirm()}
-              // onPress={async () => {
-              //   await handleConfirm()
-              // }}
-            >
+            <StyledButton enabled={true} onPress={handleConfirm}>
               <Text
                 style={{
                   textTransform: 'none',

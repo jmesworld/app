@@ -11,7 +11,7 @@ import {
 import storage from './storage'
 import * as SecureStore from 'expo-secure-store'
 import { useStoreState } from '../hooks/storeHooks'
-export interface IQRCodePayload {
+export interface IQRCodePayload { 
   prefix?: string
   address?: string
   username?: string

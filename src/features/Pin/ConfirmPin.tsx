@@ -159,9 +159,14 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
               <Text style={styles.errorText}>{errorText}</Text>
             )}
             {isLocked && (
-              <Text style={styles.errorText}>
-                You have been locked out for 30 seconds.
-              </Text>
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>
+                  You have been locked out for 30 seconds.
+                </Text>
+                <Text style={styles.errorText}>
+                  Remaining: {remainingTime / 1e3} seconds
+                </Text>
+              </View>
             )}
           </View>
           <SafeAreaView style={styles.buttonContainer}>
@@ -192,8 +197,13 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#FF5876',
     fontSize: 14,
+    marginBottom: 5,
+    textAlign: 'center',
+  },
+  errorContainer: {
     marginTop: 97,
     marginBottom: 17,
+    justifyContent: 'center',
   },
   buttonContainer: {
     display: 'flex',

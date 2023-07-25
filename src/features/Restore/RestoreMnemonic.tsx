@@ -1,6 +1,6 @@
 import { Route } from '@react-navigation/native'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Platform,
   SafeAreaView,
@@ -15,6 +15,7 @@ import {
   SeedList,
   Background,
   Backdrop,
+  Button,
 } from '../../components'
 import { navigateToScreen, restoreUserIdentity } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
@@ -45,17 +46,10 @@ export default function RestoreMnemonicScreen({
     setErrorText,
   } = useLockout(0)
   const { setHasToken } = useContext(AuthContext)
-  const [username, setUsername] = useState('')
   const [mnemonicWords, setMnemonicWords] = useState<string[]>(
     Array(12).fill('')
   )
   const addAccount = useStoreActions((actions) => actions.addAccount)
-
-  useEffect(() => {
-    if (route.params) {
-      setUsername(route.params.username)
-    }
-  }, [route.params])
 
   useEffect(() => {
     if (remainingTime > 0) {
@@ -122,12 +116,16 @@ export default function RestoreMnemonicScreen({
     setHasToken(true)
   }
 
+  const canConfirm = useMemo(() => {
+    return mnemonicWords.every((word) => word.length > 0)
+  }, [mnemonicWords])
+
   return (
     <Background>
       <Backdrop>
         <OnboardingNavbar
           navigation={navigation}
-          children="Restore"
+          children="Onboarding"
         />
         <TextTitle> Confirm Recovery Phrase </TextTitle>
         <TextInfo>
@@ -150,14 +148,25 @@ export default function RestoreMnemonicScreen({
           <View style={{ paddingTop: 30, backgroundColor: 'none' }} />
 
           <SafeAreaView style={styles.buttonContainer}>
-            <StyledButton
-              enabled={true}
+            <Button
+            disabled={!canConfirm}
+              mode="contained"
               onPress={async () => {
                 await handleAccountRestore()
               }}
             >
-              <Text>Confirm</Text>
-            </StyledButton>
+              <Text
+                style={{
+                  textTransform: 'none',
+                  fontStyle: 'normal',
+                  color: '#FCFCFD',
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+              >
+                Confirm
+              </Text>
+            </Button>
           </SafeAreaView>
         </ScrollView>
       </Backdrop>

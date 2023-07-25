@@ -7,13 +7,19 @@ import {
 } from 'react-native'
 import { View, Text } from '../../components/Themed/Themed'
 import Input from '../Input/Input'
+import {
+  capitalNameSchema,
+  nameSchemaForEachChar,
+} from '../../validations/name'
 
 const SeedList = ({
   mnemonicWords,
   setMnemonicWords,
+  readonly = false,
 }: {
   mnemonicWords: string[]
-  setMnemonicWords: (words: string[]) => void
+  readonly?: boolean
+  setMnemonicWords?: (words: string[]) => void
 }) => {
   const inputRefs = useRef([])
   const focusOnNextInput = (index: number) => {
@@ -43,6 +49,7 @@ const SeedList = ({
         {mnemonicWords.map((word, index) => (
           <View key={index} style={styles.seedContentContainer}>
             <Input
+              editable={!readonly}
               style={{ textAlign: 'center' }}
               ref={(instance) => {
                 inputRefs.current[index] = instance
@@ -50,7 +57,17 @@ const SeedList = ({
               autoFocus={index === mnemonicWords.length - 12}
               placeholder=""
               value={word}
-              onChangeText={(text) => handleTextChange(text, index)}
+              onChangeText={(text) => {
+                if(readonly) return
+                let value = text
+                if (capitalNameSchema.safeParse(text).success) {
+                  value = text.toLowerCase()
+                }
+                if (!nameSchemaForEachChar.safeParse(value).success && value !== '') {
+                  return
+                }
+                handleTextChange(value, index)
+              }}
             />
             <Text style={styles.seedWordNumber}> {index + 1} </Text>
           </View>

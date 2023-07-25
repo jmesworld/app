@@ -53,8 +53,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
   const account = useStoreState((state) => state.accounts[0])
-
-  console.log({ hasAccount: !!account, account })
   if (account) {
     return (
       <Stack.Navigator>
