@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "typeRoots": [
+      "./types",
       "index.d.ts"
     ],
     "types": [

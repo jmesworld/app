@@ -1,38 +1,52 @@
-import { useState } from 'react'
-import {
-  Linking,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-} from 'react-native'
+import { useMemo, useState } from 'react'
+import { Linking, SafeAreaView, StyleSheet } from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
-
 import {
   Backdrop,
-  BackdropSmall,
   Background,
   Button,
   Input,
-  StyledButton,
   TextTitle,
 } from '../../components'
 
 import { Navigation } from '../../types'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
-import { Link } from '@react-navigation/native'
+import {
+  alphaNumericSchema,
+  capitalNameSchema,
+  daoNameSchema,
+} from '../../validations/name'
+import { HelperText } from 'react-native-paper'
+import { useDebounce } from '../../hooks/useDebounce'
+import { useIdentity } from '../../hooks/useIdentity'
 
 type Props = {
   navigation: Navigation
 }
+
+type Input = {
+  value: string
+  error: string | null
+}
+
 export default function SignUpScreen({ navigation }: Props) {
-  const [username, onChangeUsername] = useState('')
-  const [name, onChangeName] = useState('')
-  const [validated, setValidated] = useState(false)
+  const [username, onChangeUsername] = useState<Input>({
+    value: '',
+    error: null,
+  })
+
+  const debouncedUsername = useDebounce({
+    value: username.value,
+    delay: 500,
+  })
+
+  // TODO: implement useIdentity
+  const identity = useIdentity(debouncedUsername)
 
   const handleSignUp = async function () {
     // @ts-ignore
     return navigation.navigate({
-      name: 'BackUp',
+      name: 'SetPin',
       params: {
         username,
         name,
@@ -40,37 +54,63 @@ export default function SignUpScreen({ navigation }: Props) {
     })
   }
 
+  const onUsernameChange = (input) => {
+    let inputValue = input
+    let error = null
+    if (
+      input !== '' &&
+      !alphaNumericSchema.safeParse(input).success
+    ) {
+      return
+    }
+
+    if (capitalNameSchema.safeParse(inputValue).success) {
+      inputValue = inputValue.toLowerCase()
+    }
+
+    const parsed = daoNameSchema('Username').safeParse(inputValue)
+    if ('error' in parsed) {
+      error = parsed.error.issues[0].message
+    }
+
+    onChangeUsername({
+      value: inputValue,
+      error,
+    })
+  }
+
+  const submitDisabled = useMemo(() => {
+    return !(!username.error && username.value !== '')
+  }, [username, name])
+
   return (
     <Background>
       <Backdrop>
         <OnboardingNavbar
           navigation={navigation}
-          children="Onboarding"
+          children="Confirm"
         />
 
         <TextTitle> Create new account</TextTitle>
-        <Text style={styles.inputTag}>FULL NAME</Text>
-        <SafeAreaView style={styles.inputContainer}>
-          <Input
-            placeholder=""
-            onChangeText={onChangeName}
-            value={name}
-          />
-        </SafeAreaView>
+
         <Text style={styles.inputTag}>USERNAME</Text>
         <SafeAreaView style={styles.inputContainer}>
           <Input
-            placeholder=""
-            onChangeText={onChangeUsername}
-            value={username}
+            error={username.error}
+            success={!!(username.error === null && username.value)}
+            onChangeText={onUsernameChange}
+            value={username.value}
           />
+          <HelperText type="error" visible={!!username.error}>
+            {username.error}
+          </HelperText>
         </SafeAreaView>
         <SafeAreaView style={styles.buttonContainer}>
-          <StyledButton
-            enabled={true}
-            onPress={() => {
-              handleSignUp()
-            }}
+          <Button
+            mode="contained"
+            rounded="full"
+            disabled={submitDisabled}
+            onPress={handleSignUp}
           >
             <Text
               style={{
@@ -83,7 +123,7 @@ export default function SignUpScreen({ navigation }: Props) {
             >
               Sign up
             </Text>
-          </StyledButton>
+          </Button>
         </SafeAreaView>
         <View style={styles.policyContainer}>
           <Text style={styles.policyText}>
@@ -170,7 +210,7 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     justifyContent: 'flex-start',
-    alignItems: 'center',
+    alignItems: 'flex-start',
 
     width: '93%',
     height: 49,
@@ -191,7 +231,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 14,
+    marginTop: 20,
     width: '93%',
 
     height: 49,

@@ -80,7 +80,7 @@ const SetPinScreen = ({ navigation, route }: Props) => {
         <BackdropSmall>
           <OnboardingNavbar
             navigation={navigation}
-            children="Confirm"
+            children="SignUp"
           />
           <View style={styles.centeredContainer}>
             <TextTitle> Choose a 4 digit PIN </TextTitle>

@@ -36,16 +36,10 @@ const ButtonContainer = ({ navigation }) => {
         }}
       >
         <Button
-          style={{
-            width: '48%',
-            height: '100%',
-            backgroundColor: '#FFF',
-            borderStyle: 'solid',
-            borderWidth: 1,
-            borderColor: '#C6B4FC',
-            borderRadius: 90,
-          }}
-          onPress={() => navigation.navigate('SignUp')}
+          mode="outlined"
+          rounded="full"
+          width={'48%'}
+          onPress={() => navigation.navigate('BackUp')}
         >
           <Text
             style={{
@@ -61,13 +55,10 @@ const ButtonContainer = ({ navigation }) => {
         </Button>
 
         <Button
-          style={{
-            width: '48%',
-            height: '100%',
-            backgroundColor: '#704FF7',
-            borderRadius: 90,
-          }}
-          onPress={() => navigation.navigate('Restore')}
+          rounded="full"
+          mode="contained"
+          width={'48%'}
+          onPress={() => navigation.navigate('RestoreMnemonic')}
         >
           <Text
             style={{

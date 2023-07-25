@@ -1,35 +1,24 @@
 import {
-  Platform,
   StyleSheet,
-  Pressable,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native'
 import { useEffect, useState } from 'react'
-
-import { useStoreActions } from '../../hooks/storeHooks'
 import { Text, View } from '../../components/Themed/Themed'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import {
   Backdrop,
   Background,
-  Input,
-  Navbar,
   TextTitle,
   TextInfo,
   StyledButton,
   Checkbox as CheckboxComponent,
+  SeedList,
 } from '../../components'
 
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
-import {
-  mnemonic,
-  account,
-  getToken,
-  createUserIdentity,
-} from '../../utils'
+import { mnemonic } from '../../utils'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 
 type Props = {
@@ -71,7 +60,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
         {checked && (
           <Ionicons
             name="ios-checkmark"
-            size={32}
+            size={30}
             color="rgba(112, 79, 247, 0.8)"
           />
         )}
@@ -79,32 +68,17 @@ export default function BackUpScreen({ navigation, route }: Props) {
     )
   }
 
-  const SeedList = () => {
-    return (
-      <ScrollView contentContainerStyle={styles.mnemonicContainer}>
-        {mnemonic.split(' ').map((word, index) => (
-          <View key={index} style={styles.seedContentContainer}>
-            <View style={styles.seedWordContainer}>
-              <Text style={styles.seedWordText}>{word}</Text>
-            </View>
-            <Text style={styles.seedWordNumber}> {index + 1} </Text>
-          </View>
-        ))}
-      </ScrollView>
-    )
-  }
-
   return (
     <Background>
       <Backdrop>
-        <OnboardingNavbar navigation={navigation} children="SignUp" />
+        <OnboardingNavbar navigation={navigation} children="Onboarding" />
         <TextTitle> Backup Recovery Phrase</TextTitle>
         <TextInfo>
           Write down your recovery phrase somewhere safe. If you lose
           or damage this device, it's the only way to recover your
           account.
         </TextInfo>
-        <SeedList />
+        <SeedList mnemonicWords={mnemonic.split(' ')} readonly />
         <View style={{ paddingTop: 30 }} />
         <SafeAreaView style={styles.checkboxContainer}>
           <Checkbox />
@@ -177,6 +151,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(112, 79, 247, 0.1)',
     border: '1px solid rgba(112, 79, 247, 0.5)',
     borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   checkedCheckbox: {
     width: 32,
