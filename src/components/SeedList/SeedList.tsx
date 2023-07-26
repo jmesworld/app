@@ -43,6 +43,10 @@ const SeedList = ({
 
   return (
     <KeyboardAvoidingView
+      style={{
+        height: 352,
+      }}
+      enabled={!readonly}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.mnemonicContainer}>
@@ -58,12 +62,15 @@ const SeedList = ({
               placeholder=""
               value={word}
               onChangeText={(text) => {
-                if(readonly) return
+                if (readonly) return
                 let value = text
                 if (capitalNameSchema.safeParse(text).success) {
                   value = text.toLowerCase()
                 }
-                if (!nameSchemaForEachChar.safeParse(value).success && value !== '') {
+                if (
+                  !nameSchemaForEachChar.safeParse(value).success &&
+                  value !== ''
+                ) {
                   return
                 }
                 handleTextChange(value, index)
@@ -86,7 +93,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 352,
     marginTop: 44,
-    marginBottom: 52,
+    marginBottom: 22,
     paddingLeft: 9,
     paddingRight: 9,
     rowGap: 30,

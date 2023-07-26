@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react'
 import { getUserIdentity } from '../utils'
+import { useIdentityContext } from '../contexts/IdentityService'
 
-export const useIdentity = (debouncedUsername) => {
+export const useIdentity = (
+  debouncedUsername,
+  disabled = false
+): {
+  loading: false
+  error: null
+  data: null
+} => {
+  const { identityService } = useIdentityContext()
   const [identity, onChangeIdentity] = useState<{
     loading
     error
@@ -22,7 +31,9 @@ export const useIdentity = (debouncedUsername) => {
         loading: true,
       }))
       try {
-        const identity = await getUserIdentity(debouncedUsername)
+        const identity = await identityService?.getIdentityByName({
+          name: debouncedUsername,
+        })
         onChangeIdentity({
           loading: false,
           error: null,
@@ -36,9 +47,8 @@ export const useIdentity = (debouncedUsername) => {
         })
       }
     }
-    fetchIdentity()
+    if (!disabled) fetchIdentity()
   }, [debouncedUsername])
-
   return {
     ...identity,
   }

@@ -24,7 +24,7 @@ import { Navigation } from '../../types'
 import storage from '../../store/storage'
 import { useLockout } from '../../hooks/customHooks'
 import { useContext } from 'react'
-import { AuthContext } from '../../app/AuthProvider'
+import { AuthContext } from '../../contexts/AuthProvider'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 type Props = {
   navigation: Navigation
@@ -127,11 +127,14 @@ export default function RestoreMnemonicScreen({
           navigation={navigation}
           children="Onboarding"
         />
-        <TextTitle> Confirm Recovery Phrase </TextTitle>
-        <TextInfo>
-          Confirm the following words from your recovery phrase
-        </TextInfo>
-        <ScrollView contentContainerStyle={styles.contentContainer}>
+        <ScrollView
+          contentContainerStyle={styles.mainContentcontnetStyle}
+          style={styles.mainContentContainer}
+        >
+          <TextTitle> Confirm Recovery Phrase </TextTitle>
+          <TextInfo>
+            Confirm the following words from your recovery phrase
+          </TextInfo>
           <SeedList
             mnemonicWords={mnemonicWords}
             setMnemonicWords={setMnemonicWords}
@@ -145,30 +148,28 @@ export default function RestoreMnemonicScreen({
               You have been locked out for 30 seconds.
             </Text>
           )}
-          <View style={{ paddingTop: 30, backgroundColor: 'none' }} />
-
-          <SafeAreaView style={styles.buttonContainer}>
-            <Button
+        </ScrollView>
+        <SafeAreaView style={styles.buttonContainer}>
+          <Button
             disabled={!canConfirm}
-              mode="contained"
-              onPress={async () => {
-                await handleAccountRestore()
+            mode="contained"
+            onPress={async () => {
+              await handleAccountRestore()
+            }}
+          >
+            <Text
+              style={{
+                textTransform: 'none',
+                fontStyle: 'normal',
+                color: '#FCFCFD',
+                fontSize: 16,
+                fontWeight: '700',
               }}
             >
-              <Text
-                style={{
-                  textTransform: 'none',
-                  fontStyle: 'normal',
-                  color: '#FCFCFD',
-                  fontSize: 16,
-                  fontWeight: '700',
-                }}
-              >
-                Confirm
-              </Text>
-            </Button>
-          </SafeAreaView>
-        </ScrollView>
+              Confirm
+            </Text>
+          </Button>
+        </SafeAreaView>
       </Backdrop>
     </Background>
   )
@@ -176,7 +177,6 @@ export default function RestoreMnemonicScreen({
 
 const styles = StyleSheet.create({
   contentContainer: {
-    flexGrow: 1,
     paddingBottom: 30,
   },
   errorText: {
@@ -184,12 +184,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
+  mainContentContainer: {
+    height: '70%',
+    width: '100%',
+  },
+
+  mainContentcontnetStyle: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
   buttonContainer: {
     display: 'flex',
     flexDirection: 'row',
     alignSelf: 'center',
     width: '93%',
     height: 49,
-    marginTop: 42,
+    marginBottom: 34,
+    marginTop: 22,
   },
 })

@@ -6,7 +6,9 @@ import CustomModal from '../Modal/Modal'
 import LogoutModal from '../Logout/LogoutModal'
 import StyledButton from '../Button/StyledButton'
 import { useStoreActions } from '../../hooks/storeHooks'
-import { AuthContext } from '../../app/AuthProvider'
+import { AuthContext } from '../../contexts/AuthProvider'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { useAppTheme } from '../../theme'
 
 interface Props {
   children?: React.ReactNode
@@ -15,39 +17,53 @@ interface Props {
 
 const BottomNav = ({ children, navigation }: Props) => {
   const [modalVisible, setModalVisible] = useState(false)
+  const route = useRoute()
+  const { colors } = useAppTheme()
 
+  const activeStyle = {
+    backgroundColor: colors.secondary,
+    borderRadius: 52,
+    height: 52,
+    width: 52,
+  }
+
+  const isRootActive = route.name === 'Root'
+  // TODO: change wallet icon to purple when active
   return (
     <View style={styles.container}>
       <Pressable
         onPress={() => {
           navigation.navigate('Root')
         }}
-        style={styles.button}
+        style={[styles.button, isRootActive && activeStyle]}
       >
         <Image
           source={require('../../../assets/icons/wallet.png')}
           style={{
-            width: 19,
-            height: 18.67,
+            width: isRootActive ? 34: 24,
+            height: isRootActive ? 34: 24,
             alignSelf: 'center',
           }}
         />
-        <Text style={styles.buttonText}>Wallet</Text>
+        {!isRootActive && (
+          <Text style={styles.buttonText}>Wallet</Text>
+        )}
       </Pressable>
       <Pressable
         onPress={() => {
           navigation.navigate('Scan')
         }}
-        style={styles.button}
+        style={[styles.button, route.name === 'Scan' && activeStyle]}
       >
         <Image
-          source={require('../../../assets/icons/scan.png')}
+          source={require('../../../assets/icons/ScanWhite.png')}
           style={{
-            width: 52,
-            height: 52,
+            width: 35,
+            height: 35,
             alignSelf: 'center',
           }}
         />
+        <Text style={styles.buttonText}>Scan</Text>
       </Pressable>
       <Pressable
         onPress={() => {
@@ -58,8 +74,8 @@ const BottomNav = ({ children, navigation }: Props) => {
         <Image
           source={require('../../../assets/icons/settings.png')}
           style={{
-            width: 18,
-            height: 19,
+            width: 24,
+            height: 24,
             alignSelf: 'center',
           }}
         />
@@ -100,11 +116,14 @@ const styles = StyleSheet.create({
 
     marginTop: 'auto',
     marginBottom: 20,
-    width: '90%',
-    height: 48,
+    width: 100,
+    height: 50,
     backgroundColor: 'transparent',
   },
   button: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'rgba(112, 79, 247, 0.9)',
   },
   buttonText: {

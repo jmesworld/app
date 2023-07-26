@@ -9,6 +9,7 @@ import {
   PinInput,
   Background,
   BackdropSmall,
+  Button,
 } from '../../components'
 import { useMnemonic } from '../../app/MnemonicContext'
 import { Text, View } from '../../components/Themed/Themed'
@@ -23,19 +24,23 @@ import {
 } from '../../utils'
 import storage from '../../store/storage'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+import { useIdentityContext } from '../../contexts/IdentityService'
+import { useMnemonicContext } from '../../contexts/MnemonicContext'
 type Props = {
   navigation: Navigation
   route: Route<any>
 }
 
 const ConfirmPinScreen = ({ navigation, route }: Props) => {
+  const { createIdentity } = useIdentityContext()
+  const { mnemonic } = useMnemonicContext()
+  const [creatingWallet, setCreatingWallet] = useState(false)
   const [pinNumbers, setPinNumbers] = useState<string[]>([
     '',
     '',
     '',
     '',
   ])
-  const [mnemonic, setMnemonic] = useState('')
   const [pin, setPin] = useState<string[]>(['', '', '', ''])
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
@@ -55,7 +60,6 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
       setName(route.params.name)
       setUsername(route.params.username)
       setPinNumbers(route.params.pinNumbers)
-      setMnemonic(route.params.recoveryPhrase)
     }
   }, [route.params])
 
@@ -78,23 +82,35 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   }, [remainingTime, setIsLocked])
 
   const performRegister = async () => {
-    await createUserIdentity(username, account)
-    const tokenRes = await getToken(account)
+    try {
+      const result = await createIdentity(mnemonic, username)
+      await addAccount({
+        index: 0,
+        title: 'default',
+        address: result.address,
+        username: result.username,
+        pin: pin,
+      })
+      await navigateToScreen(navigation, 'Root', {
+        screen: 'Balance',
+        params: {},
+      })
+    } catch (err) {
+      console.error(err)
+    }
+    // await createIdentity(mnemonic, username)
+    // const tokenRes = await getToken(account)
 
-    await addAccount({
-      index: 0,
-      title: 'default',
-      address: tokenRes.identity.address,
-      username: tokenRes.identity.username,
-      name: tokenRes.identity.name,
-      pin: pin,
-    })
-    await storage.setSecureItem('mnemonic', mnemonic)
-    await storage.setSecureItem('token', tokenRes.token)
-    await navigateToScreen(navigation, 'Root', {
-      screen: 'Balance',
-      params: {},
-    })
+    // await addAccount({
+    //   index: 0,
+    //   title: 'default',
+    //   address: tokenRes.identity.address,
+    //   username: tokenRes.identity.username,
+    //   name: tokenRes.identity.name,
+    //   pin: pin,
+    // })
+    // await storage.setSecureItem('mnemonic', mnemonic)
+    // await storage.setSecureItem('token', tokenRes.token)
   }
 
   // implement countdown and make sure button stays disabled
@@ -119,6 +135,7 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   }
 
   const handleSubmit = async () => {
+    setCreatingWallet(true)
     const isPinValid = validatePin({
       pin,
       pinNumbers,
@@ -133,6 +150,7 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
     } else {
       handleError()
     }
+    setCreatingWallet(false)
   }
 
   return (
@@ -170,12 +188,25 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
             )}
           </View>
           <SafeAreaView style={styles.buttonContainer}>
-            <StyledButton
-              enabled={isPinComplete && !isLocked} // Disable button if user is locked out
+            <Button
+              loading={creatingWallet}
+              disabled={
+                !(isPinComplete && !isLocked) || creatingWallet
+              } // Disable button if user is locked out
               onPress={handleSubmit}
             >
-              Confirm
-            </StyledButton>
+              <Text
+                style={{
+                  textTransform: 'none',
+                  fontStyle: 'normal',
+                  color: '#FCFCFD',
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+              >
+                Confirm
+              </Text>
+            </Button>
           </SafeAreaView>
         </BackdropSmall>
       </Background>
@@ -214,6 +245,6 @@ const styles = StyleSheet.create({
     width: '93%',
     height: 49,
     marginTop: 42,
-    marginBottom: 14,
+    marginBottom: 54,
   },
 })

@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { StyleSheet } from 'react-native'
 import { Button as PaperButton, useTheme } from 'react-native-paper'
-import { theme } from '../../app/theme'
+import { theme } from '../../contexts/theme'
 import { useAppTheme } from '../../theme'
 
 type ButtonProps = {
@@ -12,7 +12,7 @@ type ButtonProps = {
 type Props = ButtonProps & React.ComponentProps<typeof PaperButton>
 
 const Button = ({
-  mode,
+  mode = 'contained',
   rounded,
   disabled,
   style,
@@ -73,10 +73,10 @@ const Button = ({
     <PaperButton
       style={[
         styles.button,
-        style,
         roundedStyle,
         modeStyle,
         widthStyle,
+        style,
       ]}
       labelStyle={styles.text}
       mode={mode}

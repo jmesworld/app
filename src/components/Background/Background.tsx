@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   scrollViewContent: {
+    height: '100%',
+    width: '100%',
     flexGrow: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
