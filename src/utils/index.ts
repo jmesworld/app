@@ -7,7 +7,13 @@ import { notateWeiValue } from './notateWei'
 import { validatePin } from './validatePin'
 import { navigateToScreen } from './navigate'
 import { handleLockout } from './lockout'
-import {  PUBLIC_CHAIN_NAME ,PUBLIC_CHAIN_ID , PUBLIC_RPC_URL , PUBLIC_REST_URL} from '@env'
+import {
+  PUBLIC_CHAIN_NAME,
+  PUBLIC_CHAIN_ID,
+  PUBLIC_RPC_URL,
+  PUBLIC_REST_URL,
+  PUBLIC_IDENTITY_SERVICE_CONTRACT
+} from '@env'
 // const lcdc = client.createLCDClient({
 //   chainID: 'jmes-888',
 //   URL: 'http://51.38.52.37:1888',
@@ -29,7 +35,7 @@ const MAYOREE_L1_LCDC = {
   URL: 'http://164.92.191.45:1317',
   isClassic: false,
 }
-const ALEX_L1_LCDC = {
+const LCDCOptions = {
   chainID: PUBLIC_CHAIN_ID,
   URL: PUBLIC_REST_URL,
   isClassic: false,
@@ -39,15 +45,16 @@ const client = new Client({
   providers: {
     faucetAPI: {
       endpoint: {
-        api_url: ALEX_L1_FAUCET_API_ENDPOINT,
+      
+        api_url: PUBLIC_RPC_URL,
       },
     },
     identityAPI: {
       endpoint: {
-        api_url: ALEX_L1_IDENTITY_API_ENDPOINT,
+        api_url: PUBLIC_RPC_URL,
       },
     },
-    LCDC: ALEX_L1_LCDC,
+    LCDC: LCDCOptions,
   },
 })
 
@@ -160,7 +167,6 @@ const getToken = async (account?: any) => {
   const tokenReq = await client.providers.identityAPI.getToken(
     account
   )
-  console.log(tokenReq)
   return tokenReq.data
 }
 

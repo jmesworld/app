@@ -12,6 +12,7 @@ import {
   TextTitle,
   PinInput,
   BackdropSmall,
+  Button,
 } from '../../components'
 import { navigateToScreen, validatePin } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
@@ -47,7 +48,6 @@ const SetPinScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     setIsPinComplete(pinNumbers.every((value) => value !== ''))
-    console.log(pinNumbers)
   }, [pinNumbers, isPinComplete])
 
   const validateInputPin = async () => {
@@ -96,15 +96,25 @@ const SetPinScreen = ({ navigation, route }: Props) => {
           />
 
           <SafeAreaView style={styles.buttonContainer}>
-            <StyledButton
-              enabled={isPinComplete}
+            <Button
+              mode="contained"
               disabled={!isPinComplete}
               onPress={async () => {
                 await handleNav()
               }}
             >
-              Next
-            </StyledButton>
+              <Text
+                style={{
+                  textTransform: 'none',
+                  fontStyle: 'normal',
+                  color: '#FCFCFD',
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+              >
+                Next
+              </Text>
+            </Button>
           </SafeAreaView>
         </BackdropSmall>
       </Background>
@@ -131,7 +141,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '93%',
     height: 49,
-    marginTop: 42,
-    marginBottom: 14,
+    marginBottom: 54,
   },
 })

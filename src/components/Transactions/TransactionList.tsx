@@ -7,6 +7,7 @@ import { fetchTransactions } from '../../api/transactionAPI'
 import TransactionDetails from '../Modal/TransactionDetails'
 import Modal from '../Modal/Modal'
 import { useQuery } from 'react-query'
+import Button from '../Button/Button'
 
 type Props = {
   itemPressed?: (item: Transaction) => void
@@ -107,33 +108,22 @@ const TransactionList = ({ itemPressed }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.tabContainer}>
-        <Text
-          style={[
-            styles.tab,
-            activeTab === 'All' ? styles.activeTab : null,
-          ]}
-          onPress={() => setActiveTab('All')}
-        >
-          All
-        </Text>
-        <Text
-          style={[
-            styles.tab,
-            activeTab === 'Sent' ? styles.activeTab : null,
-          ]}
-          onPress={() => setActiveTab('Sent')}
-        >
-          Sent
-        </Text>
-        <Text
-          style={[
-            styles.tab,
-            activeTab === 'Received' ? styles.activeTab : null,
-          ]}
-          onPress={() => setActiveTab('Received')}
-        >
-          Received
-        </Text>
+        {['All', 'Sent', 'Received'].map((tab) => (
+          <View
+            style={{
+              flex: 1,
+            }}
+          >
+            <Button
+              onPress={() => setActiveTab(tab)}
+              key={tab}
+              rounded="sm"
+              mode={activeTab === tab ? 'contained' : 'outlined'}
+            >
+              <Text style={styles.tab}>{tab}</Text>
+            </Button>
+          </View>
+        ))}
       </View>
       <View style={styles.transactionList}>
         {displayedTransactions.map((tx, index) => {
@@ -192,29 +182,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   tabContainer: {
+    display: 'flex',
     backgroundColor: 'transparent',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
+    gap: 8,
+    paddingHorizontal: 10,
     alignItems: 'center',
     height: 40,
     marginTop: 19,
+    width: '100%',
   },
   tab: {
-    flex: 1,
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#704FF7',
-    borderStyle: 'solid',
-    color: '#704FF7',
-    maxWidth: '25%',
-    textAlign: 'center',
+    fontWeight: '500',
     fontSize: 14,
-    paddingTop: 12,
+    lineHeight: 19,
   },
   activeTab: {
-    flex: 1,
-    maxWidth: '30%',
+    // flex: 1,
+    // maxWidth: '30%',
     backgroundColor: '#704FF7',
     color: '#FFFFFF',
   },

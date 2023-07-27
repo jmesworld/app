@@ -29,17 +29,17 @@ const ConvertDenom: React.FC<Props> = ({
   selectedCurrency,
   setSelectedCurrency,
 }) => {
-  const { data: currencyRates, isLoading } =
-    useCurrencyRates(selectedCurrency)
+  // const { data: currencyRates, isLoading } =
+  //   useCurrencyRates(selectedCurrency)
 
-  if (isLoading) {
-    return <Text>Loading...</Text>
-  }
+  // if (isLoading) {
+  //   return <Text>Loading...</Text>
+  // }
 
-  const selectedRate =
-    currencyRates?.find((rate) => rate.code === selectedCurrency.code)
-      ?.rate || 0
-  const convertedValue = selectedRate * cryptoValue
+  // const selectedRate =
+  //   currencyRates?.find((rate) => rate.code === selectedCurrency.code)
+  //     ?.rate || 0
+  const convertedValue = .30 * cryptoValue
 
   return (
     <View style={styles.container}>

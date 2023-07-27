@@ -1,3 +1,8 @@
+global.Buffer = require('buffer').Buffer
+global.btoa = global.btoa || require('base-64').encode
+global.atob = global.atob || require('base-64').decode
+Buffer = require('buffer').Buffer
+
 //import 'react-native-url-polyfill/auto'
 import 'expo-dev-client'
 import 'react-native-url-polyfill/auto'
@@ -23,15 +28,8 @@ if (Platform.OS !== 'web') {
 if (typeof global.TextDecoder === 'undefined') {
   global.TextDecoder = TextDecoder
 }
-
-if (typeof Buffer === 'undefined') {
-  global.Buffer = require('buffer').Buffer
-}
-
-global.btoa = global.btoa || require('base-64').encode
-global.atob = global.atob || require('base-64').decode
-
 global.process = process
+
 
 //process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 

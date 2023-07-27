@@ -15,6 +15,7 @@ import {
   Background,
   Backdrop,
   BackdropSmall,
+  Button,
 } from '../../components'
 import { Text, View } from '../../components/Themed/Themed'
 import { Navigation } from '../../types'
@@ -79,13 +80,13 @@ export default function ConfirmScreen({ navigation, route }: Props) {
   }
 
   return (
-    <View style={styles.container}>
-      <Background>
-        <BackdropSmall>
-          <OnboardingNavbar
-            navigation={navigation}
-            children="BackUp"
-          />
+    <Background>
+      <Backdrop>
+        <OnboardingNavbar navigation={navigation} children="BackUp" />
+        <ScrollView
+          contentContainerStyle={styles.mainContentcontnetStyle}
+          style={styles.contentContainer}
+        >
           <View style={styles.centeredContainer}>
             <TextTitle>Confirm Recovery Phrase</TextTitle>
             <TextInfo>
@@ -96,25 +97,28 @@ export default function ConfirmScreen({ navigation, route }: Props) {
             mnemonicWords={mnemonicWords}
             setMnemonicWords={setMnemonicWords}
           />
-
-          <SafeAreaView style={styles.buttonContainer}>
-            <StyledButton enabled={true} onPress={handleConfirm}>
-              <Text
-                style={{
-                  textTransform: 'none',
-                  fontStyle: 'normal',
-                  color: '#FCFCFD',
-                  fontSize: 16,
-                  fontWeight: '700',
-                }}
-              >
-                Sign up
-              </Text>
-            </StyledButton>
-          </SafeAreaView>
-        </BackdropSmall>
-      </Background>
-    </View>
+        </ScrollView>
+        <SafeAreaView style={styles.buttonContainer}>
+          <Button
+            mode="contained"
+            disabled={false}
+            onPress={handleConfirm}
+          >
+            <Text
+              style={{
+                textTransform: 'none',
+                fontStyle: 'normal',
+                color: '#FCFCFD',
+                fontSize: 16,
+                fontWeight: '700',
+              }}
+            >
+              Sign up
+            </Text>
+          </Button>
+        </SafeAreaView>
+      </Backdrop>
+    </Background>
   )
 }
 
@@ -128,17 +132,21 @@ const styles = StyleSheet.create({
   centeredContainer: {
     alignItems: 'center',
   },
+  contentContainer: {
+    height: '70%',
+    width: '100%',
+  },
 
-  buttonContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
+  mainContentcontnetStyle: {
     alignItems: 'center',
-    alignSelf: 'center',
-    width: '93%',
+    justifyContent: 'flex-start',
+  },
+  buttonContainer: {
     height: 49,
-    marginTop: 'auto',
-    marginBottom: 14,
+    width: '93%',
+    marginHorizontal: 10,
+    marginTop: 12,
+    marginBottom: 45,
   },
   centeredText: {
     textAlign: 'center',

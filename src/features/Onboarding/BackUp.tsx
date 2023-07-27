@@ -2,6 +2,7 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native'
 import { useEffect, useState } from 'react'
 import { Text, View } from '../../components/Themed/Themed'
@@ -14,12 +15,14 @@ import {
   StyledButton,
   Checkbox as CheckboxComponent,
   SeedList,
+  Button,
 } from '../../components'
 
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
-import { mnemonic } from '../../utils'
+import { mnemonic as mnemonicPhreses } from '../../utils'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+import { useMnemonicContext } from '../../contexts/MnemonicContext'
 
 type Props = {
   navigation: Navigation
@@ -27,13 +30,13 @@ type Props = {
 }
 
 export default function BackUpScreen({ navigation, route }: Props) {
+  const { mnemonic, setMnemonic } = useMnemonicContext()
   const [username, setUsername] = useState('')
   const [name, setName] = useState('')
-  const [recoveryPhrase, setPhrase] = useState('')
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    setPhrase(mnemonic)
+    setMnemonic(mnemonicPhreses)
     if (route.params) {
       if (route.params.username) setUsername(route.params.username)
       if (route.params.name) setName(route.params.name)
@@ -47,7 +50,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
       params: {
         username,
         name,
-        recoveryPhrase,
+        recoveryPhrase: mnemonic,
       },
     })
   }
@@ -71,24 +74,33 @@ export default function BackUpScreen({ navigation, route }: Props) {
   return (
     <Background>
       <Backdrop>
-        <OnboardingNavbar navigation={navigation} children="Onboarding" />
-        <TextTitle> Backup Recovery Phrase</TextTitle>
-        <TextInfo>
-          Write down your recovery phrase somewhere safe. If you lose
-          or damage this device, it's the only way to recover your
-          account.
-        </TextInfo>
-        <SeedList mnemonicWords={mnemonic.split(' ')} readonly />
-        <View style={{ paddingTop: 30 }} />
-        <SafeAreaView style={styles.checkboxContainer}>
-          <Checkbox />
-          <Text style={styles.text}>
-            I confirm I have written down a copy of my recovery phrase
-          </Text>
-        </SafeAreaView>
+        <OnboardingNavbar
+          navigation={navigation}
+          children="Onboarding"
+        />
+        <ScrollView
+          contentContainerStyle={styles.mainContentcontnetStyle}
+          style={styles.contentContainer}
+        >
+          <TextTitle> Backup Recovery Phrase</TextTitle>
+          <TextInfo>
+            Write down your recovery phrase somewhere safe. If you
+            lose or damage this device, it's the only way to recover
+            your account.
+          </TextInfo>
+          <SeedList mnemonicWords={mnemonic.split(' ')} readonly />
+
+          <SafeAreaView style={styles.checkboxContainer}>
+            <Checkbox />
+            <Text style={styles.text}>
+              I confirm I have written down a copy of my recovery
+              phrase
+            </Text>
+          </SafeAreaView>
+        </ScrollView>
         <SafeAreaView style={styles.buttonContainer}>
-          <StyledButton
-            enabled={checked}
+          <Button
+            mode="contained"
             disabled={!checked}
             onPress={async () => {
               await handleConfirm()
@@ -105,7 +117,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
             >
               Confirm
             </Text>
-          </StyledButton>
+          </Button>
         </SafeAreaView>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
       </Backdrop>
@@ -121,14 +133,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
     width: '93%',
     height: 49,
-    marginTop: 42,
-    marginBottom: 14,
+    marginTop: 12,
+    marginBottom: 34,
   },
 
   textContainer: {
@@ -137,9 +145,16 @@ const styles = StyleSheet.create({
     height: 68,
     margin: 'auto',
   },
-  checkboxContainer: {
+  contentContainer: {
+    height: '70%',
+    width: '100%',
+  },
+
+  mainContentcontnetStyle: {
     alignItems: 'center',
-    display: 'flex',
+    justifyContent: 'flex-start',
+  },
+  checkboxContainer: {
     flexDirection: 'row',
     backgroundColor: 'transparent',
     width: '93%',

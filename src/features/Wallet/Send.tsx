@@ -6,7 +6,7 @@ import {
   Pressable,
   TextInput,
   SafeAreaView,
-  ActionSheetIOS,
+  Image,
 } from 'react-native'
 import { getUserIdentity } from '../../utils'
 import {
@@ -16,6 +16,7 @@ import {
   View,
   Text,
   StyledButton as NextButton,
+  Input,
 } from '../../components'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
@@ -66,26 +67,55 @@ export default function SendScreen({ navigation, route }: Props) {
           children={'Root'}
         />
         <BackdropSmall>
-          <Text style={styles.title}>Recipient</Text>
-          <SafeAreaView>
-            <TextInput
-              style={styles.input}
-              onChangeText={setData}
-              value={data}
-              placeholder={'Search, Public Address or ENS'}
-              placeholderTextColor="rgba(112, 79, 247, 0.5)"
-            />
-          </SafeAreaView>
-          <Text style={styles.title}>Amount</Text>
-          <SafeAreaView>
-            <TextInput
-              style={styles.input}
-              onChangeText={setAmount}
-              value={amount}
-              placeholder={'Amount to send'}
-              placeholderTextColor="rgba(112, 79, 247, 0.5)"
-            />
-          </SafeAreaView>
+          <View style={styles.mainContainer}>
+            <Text style={styles.title}>Recipient</Text>
+            <SafeAreaView
+              style={{
+                height: 60,
+                width: '100%',
+              }}
+            >
+              <Input
+                containerStyle={{
+                  borderRadius: 24,
+                }}
+                onChangeText={setData}
+                value={data}
+                placeholder={'Search, Public Address or ENS'}
+                placeholderTextColor="rgba(112, 79, 247, 0.5)"
+                imgSource={
+                  <Pressable
+                    style={{
+                      width: 40,
+                      height: 40,
+                      backgroundColor: 'transparent',
+                    }}
+                    onPress={() => {
+                      navigation.navigate('Scan')
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: 40,
+                        height: 40,
+                      }}
+                      source={require('../../../assets/icons/Scan_Black.png')}
+                    />
+                  </Pressable>
+                }
+              />
+            </SafeAreaView>
+            <Text style={styles.title}>Amount</Text>
+            <SafeAreaView>
+              <TextInput
+                style={styles.input}
+                onChangeText={setAmount}
+                value={amount}
+                placeholder={'Amount to send'}
+                placeholderTextColor="rgba(112, 79, 247, 0.5)"
+              />
+            </SafeAreaView>
+          </View>
           <View style={styles.buttonContainer}>
             <NextButton
               onPress={() => handleTxParams(data)}
@@ -106,6 +136,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     justifyContent: 'center',
+  },
+  mainContainer: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 19,
   },
   buttonText: {
     fontSize: 24,
@@ -147,22 +182,20 @@ const styles = StyleSheet.create({
   },
   title: {
     color: 'black',
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
     fontSize: 16,
     fontWeight: '500',
     marginTop: 24,
     marginBottom: 10,
   },
   input: {
-    paddingLeft: 19,
-    marginLeft: 14,
-    marginRight: 14,
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: 'rgba(112, 79, 247, 0.5)',
     borderRadius: 24,
     backgroundColor: 'rgba(112, 79, 247, 0.1)',
-    width: '90%',
+    width: '100%',
+    paddingLeft: 20,
     height: 60,
   },
   secondTitle: {

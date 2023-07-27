@@ -41,15 +41,15 @@ export default function SignUpScreen({ navigation }: Props) {
   })
 
   // TODO: implement useIdentity
-  const identity = useIdentity(debouncedUsername)
+  const identity = useIdentity(debouncedUsername, !!username.error)
 
-  const handleSignUp = async function () {
+  const handleSignUp = function () {
+  
     // @ts-ignore
-    return navigation.navigate({
+    navigation.navigate({
       name: 'SetPin',
       params: {
         username,
-        name,
       },
     })
   }
@@ -78,10 +78,33 @@ export default function SignUpScreen({ navigation }: Props) {
       error,
     })
   }
+  const nameFromIdentityServiceError = useMemo(() => {
+    if (debouncedUsername !== username.value) {
+      return null
+    }
+    if (identity.error) {
+      return identity.error.message
+    }
+    if (identity?.data?.identity?.name === debouncedUsername) {
+      return 'Username already taken'
+    }
+    return null
+  }, [debouncedUsername, identity])
 
   const submitDisabled = useMemo(() => {
-    return !(!username.error && username.value !== '')
-  }, [username, name])
+    return (
+      !!username.error ||
+      username.value === '' ||
+      !!nameFromIdentityServiceError ||
+      identity.loading ||
+      username.value !== debouncedUsername
+    )
+  }, [
+    username,
+    nameFromIdentityServiceError,
+    debouncedUsername,
+    identity,
+  ])
 
   return (
     <Background>
@@ -96,13 +119,26 @@ export default function SignUpScreen({ navigation }: Props) {
         <Text style={styles.inputTag}>USERNAME</Text>
         <SafeAreaView style={styles.inputContainer}>
           <Input
-            error={username.error}
-            success={!!(username.error === null && username.value)}
+            error={username.error || nameFromIdentityServiceError}
+            success={
+              !!(
+                username.error === null &&
+                nameFromIdentityServiceError === null &&
+                !identity.loading &&
+                username.value
+              )
+            }
             onChangeText={onUsernameChange}
             value={username.value}
           />
-          <HelperText type="error" visible={!!username.error}>
-            {username.error}
+
+          <HelperText
+            type={identity.loading ? 'info' : 'error'}
+            visible={!identity.loading}
+          >
+            {identity.loading && 'Checking username availability...'}
+            {(!identity.loading && username.error) ||
+              nameFromIdentityServiceError}
           </HelperText>
         </SafeAreaView>
         <SafeAreaView style={styles.buttonContainer}>
