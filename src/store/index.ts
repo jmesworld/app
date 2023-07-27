@@ -1,6 +1,4 @@
 import {
-  Generic,
-  generic,
   Computed,
   computed,
   createStore,
@@ -10,8 +8,7 @@ import {
 } from 'easy-peasy'
 import storage from './storage'
 import * as SecureStore from 'expo-secure-store'
-import { useStoreState } from '../hooks/storeHooks'
-export interface IQRCodePayload { 
+export interface IQRCodePayload {
   prefix?: string
   address?: string
   username?: string
@@ -51,7 +48,7 @@ export interface Account {
   address: string
   username: string
   balance: string | number
-  derivationPath: string
+  derivationPath?: string
   mnemonic: string[]
   pin: string[]
 }
@@ -60,42 +57,130 @@ export interface Identity {
   username: string
   publicKey: string
 }
-export interface WalletModel<K> {
-  wallet: Generic<K>
-  token: Generic<K>
-  identity: Generic<K>
-  accounts: Account[]
-  hasWallet: Computed<WalletModel<K>, Wallet | false>
-  hasToken: Computed<WalletModel<K>, Token | false>
-  addPasscode: Action<WalletModel<K>, K>
-  addWallet: Action<WalletModel<K>, K>
-  addUser: Action<WalletModel<K>, K>
-  addToken: Action<WalletModel<K>, K>
-  addIdentity: Action<WalletModel<K>, K>
-  updateAccount: Action<WalletModel<K>, K>
-  resetStore: Action<WalletModel<K>, K>
-  addAccount: Action<WalletModel<K>, K>
+
+export enum OnBoardingPhase {
+  'none' = 'none',
+  'welcome' = 'welcome',
+  'generateMnemonic' = 'generateMnemonic',
+  'confirmGeneratedMnemonic' = 'confirmGeneratedMnemonic',
+  'topUp' = 'topUp',
+  'pickUsername' = 'pickUsername',
+  'createPin' = 'createPin',
+  'confirmPin' = 'confirmPin',
+  'restoreMnemonic' = 'restoreMnemonic',
+}
+export interface OnBoarding {
+  onBoardingPhase: OnBoardingPhase
+  mnemonic: string[] | null
+  balance: number | null
+  accountAddress: string | null
+  username: string | null
+  pin: string | null
+}
+
+export interface WalletModel {
+  // onboarding
+  onBoarding?: OnBoarding
+  setOnboardingPhase: Action<WalletModel, OnBoardingPhase>
+  setMnemonic: Action<WalletModel, string[]>
+  setBalance: Action<WalletModel, number>
+  setAccountAddress: Action<WalletModel, string>
+  setUsername: Action<WalletModel, string>
+  setPin: Action<WalletModel, string>
+
+  wallet?: Wallet
+  token?: Token
+  app?: App
+  user?: User
+  identity?: Identity
+  accounts?: Account[]
+  hasWallet: Computed<WalletModel, boolean>
+  hasToken: Computed<WalletModel, boolean>
+  addPasscode: Action<WalletModel, App>
+  addWallet: Action<WalletModel, Wallet>
+  addUser: Action<WalletModel, User>
+  addToken: Action<WalletModel, Token>
+  addIdentity: Action<WalletModel, Identity>
+  updateAccount: Action<WalletModel, Account>
+  resetStore: Action<WalletModel, boolean>
+  addAccount: Action<WalletModel, Account>
+
+  removeAccount: Action<
+    WalletModel,
+    {
+      address: string
+    }
+  >
+  setSecureToken: Action<WalletModel, Token>
+  getSecureToken: Action<WalletModel, Token>
 }
 
 const store = createStore<WalletModel>(
   persist(
     {
-      wallet: generic({}),
-      token: generic({}),
-      identity: generic({}),
-      app: generic({}),
-      user: generic({}),
+      wallet: undefined,
+      token: undefined,
+      identity: undefined,
+      app: undefined,
+      user: undefined,
       accounts: [],
+
+      onBoarding: {
+        onBoardingPhase: OnBoardingPhase.none,
+        mnemonic: null,
+        balance: null,
+        accountAddress: null,
+        username: null,
+        pin: null,
+      },
+      setOnboardingPhase: action((state, payload) => {
+        state.onBoarding = {
+          ...state.onBoarding,
+          onBoardingPhase: payload,
+        }
+      }),
+      setMnemonic: action((state, payload) => {
+        state.onBoarding = {
+          ...state.onBoarding,
+          mnemonic: payload,
+        }
+      }),
+      setBalance: action((state, payload) => {
+        state.onBoarding = {
+          ...state.onBoarding,
+          balance: payload,
+        }
+      }),
+      setAccountAddress: action((state, payload) => {
+        state.onBoarding = {
+          ...state.onBoarding,
+          accountAddress: payload,
+        }
+      }),
+      setUsername: action((state, payload) => {
+        state.onBoarding = {
+          ...state.onBoarding,
+          username: payload,
+        }
+      }),
+      setPin: action((state, payload) => {
+        state.onBoarding = {
+          ...state.onBoarding,
+          pin: payload,
+        }
+      }),
+
       hasWallet: computed(
         //verifies wallet by checking wallet & account length in storage
         (state) =>
+          state.wallet &&
           Object.keys(state.wallet).length !== 0 &&
           state.accounts.length !== 0
       ),
       //verifies token in localstorage (need to move to secure storage and set expiration) & account length
       hasToken: computed(
         (state) =>
-          Object.keys(state.token).length !== 0 &&
+         state.token && Object.keys(state.token).length !== 0 &&
           state.accounts.length !== 0
       ),
       addPasscode: action((state, payload) => {
@@ -144,11 +229,19 @@ const store = createStore<WalletModel>(
         const forceReset = payload === true
 
         if (forceReset) {
-          state.wallet = {}
-          state.token = {}
-          state.app = {}
-          state.user = {}
+          state.wallet = undefined
+          state.token = undefined
+          state.app = undefined
+          state.user = undefined
           state.accounts = []
+          state.onBoarding = {
+            onBoardingPhase: OnBoardingPhase.none,
+            balance: undefined,
+            accountAddress: undefined,
+            username: undefined,
+            mnemonic: undefined,
+            pin: undefined,
+          }
         }
       }),
       addAccount: action((state, payload) => {
@@ -158,13 +251,13 @@ const store = createStore<WalletModel>(
           address: payload.address,
           username: payload.username,
           balance: payload.balance,
-
+          mnemonic: payload.mnemonic,
           derivationPath: 'bip44Change',
           pin: payload.pin,
         })
       }),
       removeAccount: action((state, payload) => {
-        state.accounts = state.accounts.filter(
+        state.accounts = state?.accounts.filter(
           (account) => account.address !== payload.address
         ) // remove account from accounts array
       }),

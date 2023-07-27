@@ -12,7 +12,6 @@ import {
   Background,
   TextTitle,
   TextInfo,
-  StyledButton,
   Checkbox as CheckboxComponent,
   SeedList,
   Button,
@@ -22,37 +21,43 @@ import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 import { mnemonic as mnemonicPhreses } from '../../utils'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
-import { useMnemonicContext } from '../../contexts/MnemonicContext'
+import { OnBoardingNavigate } from '../../navigation/onBoardingStack'
+import {
+  useStoreState,
+  useStoreActions,
+} from '../../hooks/storeHooks'
+import { OnBoardingPhase } from '../../store'
 
 type Props = {
-  navigation: Navigation
+  navigation: OnBoardingNavigate<'generateMnemonic'>
   route: Route<any>
 }
 
-export default function BackUpScreen({ navigation, route }: Props) {
-  const { mnemonic, setMnemonic } = useMnemonicContext()
-  const [username, setUsername] = useState('')
-  const [name, setName] = useState('')
+export default function GenerateMnemonic({
+  navigation,
+  route,
+}: Props) {
+  const mnemonic = useStoreState((state) => state.onBoarding.mnemonic)
+  const setMnemonic = useStoreActions(
+    (actions) => actions.setMnemonic
+  )
+  const setOnboardingPhase = useStoreActions(
+    (actions) => actions.setOnboardingPhase
+  )
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    setMnemonic(mnemonicPhreses)
-    if (route.params) {
-      if (route.params.username) setUsername(route.params.username)
-      if (route.params.name) setName(route.params.name)
-    }
-  }, [route.params])
+    setOnboardingPhase(OnBoardingPhase.generateMnemonic)
+  }, [])
+
+  useEffect(() => {
+    if (!mnemonicPhreses) return
+    setMnemonic(mnemonicPhreses.split(' '))
+  }, [])
 
   const handleConfirm = async () => {
     // @ts-ignore
-    return navigation.navigate({
-      name: 'Confirm',
-      params: {
-        username,
-        name,
-        recoveryPhrase: mnemonic,
-      },
-    })
+    return navigation.push('confirmGeneratedMnemonic')
   }
   const Checkbox = () => {
     return (
@@ -76,7 +81,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
       <Backdrop>
         <OnboardingNavbar
           navigation={navigation}
-          children="Onboarding"
+          children="welcome"
         />
         <ScrollView
           contentContainerStyle={styles.mainContentcontnetStyle}
@@ -88,7 +93,7 @@ export default function BackUpScreen({ navigation, route }: Props) {
             lose or damage this device, it's the only way to recover
             your account.
           </TextInfo>
-          <SeedList mnemonicWords={mnemonic.split(' ')} readonly />
+          <SeedList mnemonicWords={mnemonic ?? []} readonly />
 
           <SafeAreaView style={styles.checkboxContainer}>
             <Checkbox />

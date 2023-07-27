@@ -23,17 +23,20 @@ import {
   CosmWasmClient,
 } from '@cosmjs/cosmwasm-stargate'
 import { GasPrice } from '@cosmjs/stargate'
-import { useMnemonicContext } from './MnemonicContext'
+import { BJMES_DENOM, JMES_DENOM } from '../utils/constants'
 
 type IdentityServiceContext = {
   identityService: IdentityserviceQueryClient | null
   cosmWasmClient: CosmWasmClient | null
-  createWallet: (
-    mnemonic: string
-  ) => Promise<{ username: string; address: string }>
+  createWallet: (mnemonic: string) => Promise<{ address: string }>
   createIdentity: (
+    mnemonic: string,
     username: string
   ) => Promise<{ username: string; address: string }>
+  getBalance: (
+    address: string,
+    mnemonic: string
+  ) => Promise<number | null>
 }
 
 const emptyFn = () => {
@@ -45,6 +48,7 @@ const initialState: IdentityServiceContext = {
   cosmWasmClient: null,
   createIdentity: emptyFn,
   createWallet: emptyFn,
+  getBalance: emptyFn,
 }
 
 const IdentityContext =
@@ -56,7 +60,6 @@ type Props = {
 const IdentityServiceProvider = ({ children }: Props) => {
   const [cosmWasmClient, setCosmWasmClient] =
     useState<CosmWasmClient | null>(null)
-  const { mnemonic } = useMnemonicContext()
 
   useEffect(() => {
     async function getCosmWasmClient() {
@@ -87,7 +90,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
     [cosmWasmClient]
   )
 
-  const getSigner = useCallback(async () => {
+  const getSigner = useCallback(async (mnemonic: string) => {
     if (!mnemonic) return null
     const signer = await getOfflineSignerProto({
       mnemonic: mnemonic,
@@ -110,30 +113,47 @@ const IdentityServiceProvider = ({ children }: Props) => {
       signingClient,
       addr,
     }
-  }, [mnemonic])
+  }, [])
+
+  const getBalance = useCallback(
+    async (address: string, mnemonic: string) => {
+      if (!cosmWasmClient) return null
+      try {
+        const { signingClient } = await getSigner(mnemonic)
+        const balance = await signingClient.getBalance(
+          address,
+          JMES_DENOM
+        )
+
+        return Number(balance.amount) || 0
+      } catch (err) {
+        console.error(err)
+      }
+      return null
+    },
+    [cosmWasmClient]
+  )
 
   const createWallet = useCallback(
-    async (username) => {
-      const { addr, signingClient } = await getSigner()
+    async (mnemonic: string) => {
+      const { addr } = await getSigner(mnemonic)
       return {
         address: addr,
-        username: username,
       }
     },
     [identityQueryClient, getSigner]
   )
   const createIdentity = useCallback(
-    async (username) => {
-      const { addr, signingClient } = await getSigner()
+    async (username: string, mnemonic: string) => {
+      const { addr, signingClient } = await getSigner(mnemonic)
 
-      // const identityClient = new IdentityserviceClient(
-      //   signingClient,
-      //   addr,
-      //   PUBLIC_IDENTITY_SERVICE_CONTRACT
-      // )
+      const identityClient = new IdentityserviceClient(
+        signingClient,
+        addr,
+        PUBLIC_IDENTITY_SERVICE_CONTRACT
+      )
 
-      // await identityClient.registerUser({ name: username })
-
+      await identityClient.registerUser({ name: username })
       return {
         address: addr,
         username: username,
@@ -146,6 +166,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
     cosmWasmClient,
     createIdentity,
     createWallet,
+    getBalance,
   }
 
   return (

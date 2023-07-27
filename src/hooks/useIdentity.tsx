@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react'
 import { getUserIdentity } from '../utils'
 import { useIdentityContext } from '../contexts/IdentityService'
+import { GetIdentityByNameResponse } from '../client/Identityservice.types'
 
 export const useIdentity = (
   debouncedUsername,
   disabled = false
 ): {
-  loading: false
-  error: null
-  data: null
+  loading: boolean
+  error: null | Error
+  data: null | GetIdentityByNameResponse
 } => {
   const { identityService } = useIdentityContext()
   const [identity, onChangeIdentity] = useState<{
-    loading
-    error
-    data
+    loading: boolean
+    error: Error | null
+    data: GetIdentityByNameResponse | null
   }>({
     loading: false,
     error: null,

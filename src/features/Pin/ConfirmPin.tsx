@@ -1,5 +1,5 @@
 import { Route } from '@react-navigation/native'
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useMemo, useState } from 'react'
 import { SafeAreaView, StyleSheet } from 'react-native'
 import {
   Navbar,
@@ -11,29 +11,31 @@ import {
   BackdropSmall,
   Button,
 } from '../../components'
-import { useMnemonic } from '../../app/MnemonicContext'
 import { Text, View } from '../../components/Themed/Themed'
-import { useStoreActions } from '../../hooks/storeHooks'
-import { Navigation } from '../../types'
 import {
-  account,
-  getToken,
-  createUserIdentity,
-  validatePin,
-  navigateToScreen,
-} from '../../utils'
-import storage from '../../store/storage'
+  useStoreActions,
+  useStoreState,
+} from '../../hooks/storeHooks'
+import { validatePin, navigateToScreen } from '../../utils'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
-import { useIdentityContext } from '../../contexts/IdentityService'
-import { useMnemonicContext } from '../../contexts/MnemonicContext'
+
+import {
+  OnBoardingNavigate,
+  OnBoardingRoute,
+} from '../../navigation/onBoardingStack'
 type Props = {
-  navigation: Navigation
-  route: Route<any>
+  navigation: OnBoardingNavigate<'confirmPin'>
+  route: OnBoardingRoute<'confirmPin'>
 }
 
 const ConfirmPinScreen = ({ navigation, route }: Props) => {
-  const { createIdentity } = useIdentityContext()
-  const { mnemonic } = useMnemonicContext()
+  const mnemonic = useStoreState((state) => state.onBoarding.mnemonic)
+  const balance = useStoreState((state) => state.onBoarding.balance)
+  const username = useStoreState((state) => state.onBoarding.username)
+  const address = useStoreState(
+    (state) => state.onBoarding.accountAddress
+  )
+
   const [creatingWallet, setCreatingWallet] = useState(false)
   const [pinNumbers, setPinNumbers] = useState<string[]>([
     '',
@@ -42,30 +44,22 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
     '',
   ])
   const [pin, setPin] = useState<string[]>(['', '', '', ''])
-  const [username, setUsername] = useState('')
-  const [name, setName] = useState('')
-  const [isPinComplete, setIsPinComplete] = useState(false)
   const [attempts, setAttempts] = useState(0)
   const [isLocked, setIsLocked] = useState(false)
   const [errorText, setErrorText] = useState('')
   const [remainingTime, setRemainingTime] = useState(0)
 
   const addAccount = useStoreActions((actions) => actions.addAccount)
-  const addToken = useStoreActions((actions) => actions.addToken)
 
-  //handles the created pin from the previous screen
   useEffect(() => {
-    console.log(pinNumbers)
     if (route.params) {
-      setName(route.params.name)
-      setUsername(route.params.username)
       setPinNumbers(route.params.pinNumbers)
     }
   }, [route.params])
 
   //handles the pin input from current screen
-  useEffect(() => {
-    setIsPinComplete(pin.every((value) => value !== ''))
+  const isPinComplete = useMemo(() => {
+    return pin.every((value) => value !== '')
   }, [pin])
 
   //handles the countdown
@@ -83,12 +77,13 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
 
   const performRegister = async () => {
     try {
-      const result = await createIdentity(mnemonic, username)
       await addAccount({
         index: 0,
         title: 'default',
-        address: result.address,
-        username: result.username,
+        address: address,
+        username: username,
+        mnemonic: mnemonic,
+        balance: balance,
         pin: pin,
       })
       await navigateToScreen(navigation, 'Root', {
@@ -98,19 +93,6 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
     } catch (err) {
       console.error(err)
     }
-    // await createIdentity(mnemonic, username)
-    // const tokenRes = await getToken(account)
-
-    // await addAccount({
-    //   index: 0,
-    //   title: 'default',
-    //   address: tokenRes.identity.address,
-    //   username: tokenRes.identity.username,
-    //   name: tokenRes.identity.name,
-    //   pin: pin,
-    // })
-    // await storage.setSecureItem('mnemonic', mnemonic)
-    // await storage.setSecureItem('token', tokenRes.token)
   }
 
   // implement countdown and make sure button stays disabled
@@ -156,11 +138,11 @@ const ConfirmPinScreen = ({ navigation, route }: Props) => {
   return (
     <View style={styles.container}>
       <Background>
-        <BackdropSmall>
-          <OnboardingNavbar
+          <Navbar
             navigation={navigation}
-            children="SetPin"
-          />
+            children="createPin"
+            />
+            <BackdropSmall>
           <View style={styles.centeredContainer}>
             <TextTitle> Please confirm your PIN </TextTitle>
             <TextInfo>

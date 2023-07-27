@@ -11,8 +11,9 @@ import { Navigation } from '../../types'
 import Button from '../Button/Button'
 import { IconButton } from 'react-native-paper'
 import { useAppTheme } from '../../theme'
+import { OnBoardingPhase } from '../../store'
 type Props = {
-  children: string
+  children: keyof typeof OnBoardingPhase
   navigation: Navigation
   backButton?: boolean
   title?: string

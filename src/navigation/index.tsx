@@ -20,19 +20,7 @@ import {
   SendConfirmScreen,
   ReceiveScreen,
 } from '../features/Wallet'
-
-import {
-  OnboardingScreen,
-  SignUpScreen,
-  BackUpScreen,
-  ConfirmScreen,
-} from '../features/Onboarding'
-
-import { SetPinScreen, ConfirmPinScreen } from '../features/Pin'
-import {
-  RestoreScreen,
-  RestoreMnemonicScreen,
-} from '../features/Restore'
+import { OnBoardingStack } from './onBoardingStack'
 
 export default function Navigation({
   colorScheme,
@@ -53,133 +41,81 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
   const account = useStoreState((state) => state.accounts[0])
-  if (account) {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Root"
-          component={WalletScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Balance"
-          component={WalletScreen}
-          options={{ title: 'Oops!' }}
-        />
-        <Stack.Screen
-          name="NotFound"
-          component={NotFoundScreen}
-          options={{ title: 'Oops!' }}
-        />
+  if (!account) {
+    return <OnBoardingStack />
+  }
 
-        <Stack.Group screenOptions={{ presentation: 'modal' }}>
-          <Stack.Screen
-            name="WalletSend"
-            component={SendScreen}
-            options={{
-              headerShown: false,
-              presentation: 'card',
-              title: 'Send to user',
-            }}
-          />
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Root"
+        component={WalletScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Balance"
+        component={WalletScreen}
+        options={{ title: 'Oops!' }}
+      />
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
+        options={{ title: 'Oops!' }}
+      />
 
-          <Stack.Screen
-            name="WalletSendConfirm"
-            component={SendConfirmScreen}
-            options={{
-              headerShown: false,
-              presentation: 'card',
-              title: 'Confirm sending to user',
-            }}
-          />
-          <Stack.Screen
-            name="WalletReceive"
-            component={ReceiveScreen}
-            options={{
-              headerShown: false,
-              presentation: 'card',
-              title: 'Receive',
-            }}
-          />
-          <Stack.Screen
-            name="ReceiveRequest"
-            component={RequestScreen}
-            options={{
-              headerShown: false,
-              presentation: 'card',
-              title: 'Request',
-            }}
-          />
-          <Stack.Screen
-            name="TransactionHistory"
-            component={TransactionHistoryScreen}
-            options={{
-              headerShown: false,
-              presentation: 'card',
-              title: 'Transaction History',
-            }}
-          />
-          <Stack.Screen
-            name="Scan"
-            options={{ headerShown: false, title: 'Scan QR Code' }}
-            component={ScanScreen}
-          />
-        </Stack.Group>
-      </Stack.Navigator>
-    )
-  } else {
-    return (
-      <Stack.Navigator
-        style={{ backgroundColor: '#000', height: '100%' }}
-        initialRouteName="Onboarding"
-      >
+      <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen
-          name="Onboarding"
-          component={OnboardingScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SignUp"
-          style={{ backgroundColor: '#000', height: '100%' }}
-          component={SignUpScreen}
+          name="WalletSend"
+          component={SendScreen}
           options={{
             headerShown: false,
-            title: 'SignUp',
+            presentation: 'card',
+            title: 'Send to user',
+          }}
+        />
+
+        <Stack.Screen
+          name="WalletSendConfirm"
+          component={SendConfirmScreen}
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            title: 'Confirm sending to user',
           }}
         />
         <Stack.Screen
-          name="BackUp"
-          style={{ backgroundColor: '#000', height: '100%' }}
-          component={BackUpScreen}
-          options={{ headerShown: false, title: 'BackUp' }}
+          name="WalletReceive"
+          component={ReceiveScreen}
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            title: 'Receive',
+          }}
         />
         <Stack.Screen
-          name="Confirm"
-          component={ConfirmScreen}
-          options={{ headerShown: false, title: 'Confirm' }}
-        />
-
-        <Stack.Screen
-          name="SetPin"
-          component={SetPinScreen}
-          options={{ headerShown: false, title: 'SetPin' }}
+          name="ReceiveRequest"
+          component={RequestScreen}
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            title: 'Request',
+          }}
         />
         <Stack.Screen
-          name="ConfirmPin"
-          component={ConfirmPinScreen}
-          options={{ headerShown: false, title: 'ConfirmPin' }}
+          name="TransactionHistory"
+          component={TransactionHistoryScreen}
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            title: 'Transaction History',
+          }}
         />
         <Stack.Screen
-          name="Restore"
-          component={RestoreScreen}
-          options={{ headerShown: false, title: 'Restore' }}
+          name="Scan"
+          options={{ headerShown: false, title: 'Scan QR Code' }}
+          component={ScanScreen}
         />
-        <Stack.Screen
-          name="RestoreMnemonic"
-          component={RestoreMnemonicScreen}
-          options={{ headerShown: false, title: 'RestoreMnemonic' }}
-        />
-      </Stack.Navigator>
-    )
-  }
+      </Stack.Group>
+    </Stack.Navigator>
+  )
 }

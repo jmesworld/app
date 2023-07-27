@@ -81,7 +81,7 @@ export default function SendScreen({ navigation, route }: Props) {
                 }}
                 onChangeText={setData}
                 value={data}
-                placeholder={'Search, Public Address or ENS'}
+                placeholder={'Address or Name'}
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
                 imgSource={
                   <Pressable

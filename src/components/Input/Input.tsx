@@ -13,8 +13,11 @@ import { IconButton } from 'react-native-paper'
 type Props = TextInputProps & {
   containerStyle?: any
   error?: string | null
+  showErrorBg?: boolean
   success?: boolean
+  showSuccessBg?: boolean
   imgSource?: ReactNode
+  readonly?: boolean
 }
 
 const Input = forwardRef<TextInput, Props>((props, ref) => {
@@ -22,11 +25,27 @@ const Input = forwardRef<TextInput, Props>((props, ref) => {
   const { containerStyle, ...otherProps } = props
   const errorStyle = props.error && {
     borderColor: colors.red,
+    backgroundColor: props.showErrorBg ? colors.redBg : 'transparent',
+  }
+
+  const successStyle = props.success && {
+    borderColor: colors.greenText,
+    backgroundColor: props.showSuccessBg
+      ? colors.greenBg
+      : 'transparent',
   }
 
   return (
-    <View style={[styles.container, containerStyle, errorStyle]}>
+    <View
+      style={[
+        styles.container,
+        errorStyle,
+        successStyle,
+        containerStyle,
+      ]}
+    >
       <TextInput
+      editable={!props.readonly}
         ref={ref}
         {...otherProps}
         style={[styles.input, otherProps.style]}
@@ -53,7 +72,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: 'rgba(112, 79, 247, 0.1)',
     borderStyle: 'solid',
     borderWidth: 1,
     borderColor: 'rgba(112, 79, 247, 0.5)',
@@ -74,7 +92,6 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingTop: 16,
     paddingBottom: 16,
-
     fontSize: 14,
     fontWeight: '400',
     color: '#0F0056',

@@ -12,6 +12,7 @@ import store from './src/store'
 import { Provider } from 'react-native-paper'
 import { theme } from './src/theme'
 import { IdentityServiceProvider } from './src/contexts/IdentityService'
+import { ToastProvider } from 'react-native-paper-toast'
 
 const queryClient = new QueryClient()
 
@@ -22,26 +23,31 @@ export default function App() {
     return null
   } else {
     return (
-      <Provider theme={theme}>
+      <StoreProvider store={store}>
         <MnemonicProvider>
           <IdentityServiceProvider>
             <SafeAreaProvider>
-              <StoreProvider store={store}>
-                <QueryClientProvider client={queryClient}>
-                  <AuthProvider>
-                    <Navigation colorScheme={colorScheme} />
-                  </AuthProvider>
-                  <StatusBar
-                    style={colorScheme === 'dark' ? 'light' : 'dark'}
-                    backgroundColor="transparent"
-                    translucent={true}
-                  />
-                </QueryClientProvider>
-              </StoreProvider>
+              <Provider theme={theme}>
+                {/* // TODO: FIX TOAST PORIVIDER */}
+                <ToastProvider>
+                  <QueryClientProvider client={queryClient}>
+                    <AuthProvider>
+                      <Navigation colorScheme={colorScheme} />
+                    </AuthProvider>
+                    <StatusBar
+                      style={
+                        colorScheme === 'dark' ? 'light' : 'dark'
+                      }
+                      backgroundColor="transparent"
+                      translucent={true}
+                    />
+                  </QueryClientProvider>
+                </ToastProvider>
+              </Provider>
             </SafeAreaProvider>
           </IdentityServiceProvider>
         </MnemonicProvider>
-      </Provider>
+      </StoreProvider>
     )
   }
 }

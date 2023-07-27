@@ -2675,6 +2675,11 @@
   dependencies:
     merge-options "^3.0.4"
 
+"@react-native-clipboard/clipboard@^1.11.2":
+  version "1.11.2"
+  resolved "https://registry.yarnpkg.com/@react-native-clipboard/clipboard/-/clipboard-1.11.2.tgz#e826d0336b34e67294aaffa6878308900bc7d197"
+  integrity sha512-bHyZVW62TuleiZsXNHS1Pv16fWc0fh8O9WvBzl4h2fykqZRW9a+Pv/RGTH56E3X2PqzHP38K5go8zmCZUoIsoQ==
+
 "@react-native-community/checkbox@^0.5.15":
   version "0.5.15"
   resolved "https://registry.yarnpkg.com/@react-native-community/checkbox/-/checkbox-0.5.15.tgz#783255d0886e3eb93fe42f0cef22aeefb8b596a5"
@@ -10623,6 +10628,11 @@ react-native-gradle-plugin@^0.71.18:
   version "0.71.19"
   resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.19.tgz#3379e28341fcd189bc1f4691cefc84c1a4d7d232"
   integrity sha512-1dVk9NwhoyKHCSxcrM6vY6cxmojeATsBobDicX0ZKr7DgUF2cBQRTKsimQFvzH8XhOVXyH8p4HyDSZNIFI8OlQ==
+
+react-native-paper-toast@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/react-native-paper-toast/-/react-native-paper-toast-1.2.3.tgz#5f9ce58cf51762ef489bec7e282eb61bff375aeb"
+  integrity sha512-lX87DIjeyhBzmf6tm5/msCmqmOAA46joAVwRYeyaHEHulc1ee1jKXdsegb1PM45+LWFxGU0FzvIQT/DRFMr4SA==
 
 react-native-paper@^5.4.1:
   version "5.7.2"
