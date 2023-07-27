@@ -13,15 +13,17 @@ import {
   PinInput,
   BackdropSmall,
   Button,
+  Navbar,
 } from '../../components'
 import { navigateToScreen, validatePin } from '../../utils'
 import { Text, View } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
 import { Navigation } from '../../types'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+import { OnBoardingNavigate } from '../../navigation/onBoardingStack'
 
 type Props = {
-  navigation: Navigation
+  navigation: OnBoardingNavigate<'createPin'>
   route: Route<any>
 }
 
@@ -33,18 +35,8 @@ const SetPinScreen = ({ navigation, route }: Props) => {
     '',
     '',
   ])
-  const [username, setUsername] = useState('')
-  const [name, setName] = useState('')
-  const [mnemonic, setMnemonic] = useState('')
-  const [isPinComplete, setIsPinComplete] = useState(false)
 
-  useEffect(() => {
-    if (route.params) {
-      setName(route.params.name)
-      setUsername(route.params.username)
-      setMnemonic(route.params.recoveryPhrase)
-    }
-  }, [route.params])
+  const [isPinComplete, setIsPinComplete] = useState(false)
 
   useEffect(() => {
     setIsPinComplete(pinNumbers.every((value) => value !== ''))
@@ -63,11 +55,8 @@ const SetPinScreen = ({ navigation, route }: Props) => {
     const isValid = await validateInputPin()
     if (isValid) {
       // @ts-ignore
-      navigateToScreen(navigation, 'ConfirmPin', {
+      navigation.push('confirmPin', {
         pinNumbers,
-        username,
-        name,
-        recoveryPhrase: mnemonic,
       })
     } else {
       alert('Invalid PIN')
@@ -77,11 +66,11 @@ const SetPinScreen = ({ navigation, route }: Props) => {
   return (
     <View style={styles.container}>
       <Background>
-        <BackdropSmall>
-          <OnboardingNavbar
+          <Navbar
             navigation={navigation}
-            children="SignUp"
-          />
+            children="pickUsername"
+            />
+            <BackdropSmall>
           <View style={styles.centeredContainer}>
             <TextTitle> Choose a 4 digit PIN </TextTitle>
             <TextInfo>

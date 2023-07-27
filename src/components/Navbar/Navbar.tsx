@@ -9,6 +9,7 @@ import {
 
 import { Navigation } from '../../types'
 import { useAppTheme } from '../../theme'
+import { useStoreState } from '../../hooks/storeHooks'
 type Props = {
   children: string
   navigation: Navigation
@@ -17,6 +18,8 @@ type Props = {
 }
 
 const Navbar = ({ navigation, children, title }: Props) => {
+  const balance = useStoreState((state) => state?.accounts?.[0]?.balance)
+  const onBoardingBalance = useStoreState( (state) => state.onBoarding.balance)
   const { colors } = useAppTheme()
 
   return (
@@ -54,7 +57,7 @@ const Navbar = ({ navigation, children, title }: Props) => {
               height: 13,
             }}
           />
-          <Text style={styles.walletText}> 0.0</Text>
+          <Text style={styles.walletText}> {balance || onBoardingBalance } </Text>
         </View>
       </View>
     </View>

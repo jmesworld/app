@@ -1,88 +1,120 @@
 import { Route } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
-  Platform,
+  Alert,
   SafeAreaView,
   ScrollView,
   StyleSheet,
 } from 'react-native'
 import {
-  Navbar,
-  StyledButton,
   TextInfo,
   TextTitle,
   SeedList,
   Background,
   Backdrop,
-  BackdropSmall,
   Button,
 } from '../../components'
 import { Text, View } from '../../components/Themed/Themed'
-import { Navigation } from '../../types'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+import {
+  useStoreActions,
+  useStoreState,
+} from '../../hooks/storeHooks'
+import { OnBoardingNavigate } from '../../navigation/onBoardingStack'
+import { useIdentityContext } from '../../contexts/IdentityService'
+import { OnBoardingPhase } from '../../store'
 
 type Props = {
-  navigation: Navigation
+  navigation: OnBoardingNavigate<'confirmGeneratedMnemonic'>
   route: Route<any>
 }
 
-export default function ConfirmScreen({ navigation, route }: Props) {
-  const [mnemonic, setMnemonic] = useState('')
-  const [username, setUsername] = useState('')
-  const [name, setName] = useState('')
+export default function ConfirmMnemonic({
+  navigation,
+  route,
+}: Props) {
+  const { createWallet } = useIdentityContext()
+  const mnemonic = useStoreState((state) => state.onBoarding.mnemonic)
+  const [creatingAccount, setCreatingAccount] = useState(false)
+  const address = useStoreState(
+    (state) => state.onBoarding.accountAddress
+  )
+  const setAddress = useStoreActions(
+    (actions) => actions.setAccountAddress
+  )
+  const setOnboardingPhase = useStoreActions(
+    (actions) => actions.setOnboardingPhase
+  )
+  const setBalance = useStoreActions(
+    (actions) => actions.setBalance
+  )
   const [mnemonicWords, setMnemonicWords] = useState<string[]>([])
 
   useEffect(() => {
-    if (route.params && route.params.recoveryPhrase) {
-      const words = route.params.recoveryPhrase.split(' ')
-      setMnemonicWords(Array.from({ length: words.length }, () => ''))
-      setMnemonic(route.params.recoveryPhrase)
-      setName(route.params.name)
-      setUsername(route.params.username)
-
-      // Auto-populate mnemonic during development
-      if (__DEV__) {
-        setMnemonicWords(words)
-      }
+    if (!mnemonic) {
+      navigation.replace('generateMnemonic')
+      return
     }
-  }, [route.params])
+
+    setOnboardingPhase(OnBoardingPhase.confirmGeneratedMnemonic)
+
+    // TODO: remove this when ready
+    if (__DEV__) {
+      setMnemonicWords(mnemonic)
+    }
+  }, [address, mnemonic])
 
   const validateInputWords = async () => {
-    if (mnemonicWords.join(' ') === mnemonic) {
-      // compare the input words to the mnemonic phrase
+    if (mnemonicWords.join('') === mnemonic.join('')) {
       return true
-    } else {
-      alert('Mnemonic does not match')
     }
     return false
   }
 
   const handleConfirm = async () => {
-    const isValid = await validateInputWords()
-    if (isValid) {
-      // setMnemonicContext(mnemonic)
-      console.log(mnemonic)
-      // @ts-ignore
-
-      return navigation.navigate({
-        name: 'SignUp',
-        params: {
-          username: username,
-          name: name,
-          recoveryPhrase: mnemonic,
-        },
-      })
+    const isValid = validateInputWords()
+    if (!isValid) {
+      Alert.alert('Mnemonic does not match')
     }
-    /**implement attempt counter here */
-    // } else {
-    //   alert('Invalid mnemonic')
-    // }
+    setCreatingAccount(true)
+    try {
+      const res = await createWallet(mnemonicWords.join(' '))
+      setAddress(res.address)
+      setBalance(0)
+      navigation.push('topUp')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setCreatingAccount(false)
+    }
   }
+
+  const setMnemonicWord = (word: string, index: number) => {
+    const newMnemonicWords = [...mnemonicWords]
+    newMnemonicWords[index] = word
+    setMnemonicWords(newMnemonicWords)
+  }
+
+  const errors = useMemo(() => {
+    if (mnemonicWords.join('') === '') {
+      return []
+    }
+    const errors = []
+    mnemonicWords.forEach((word, index) => {
+      if (word !== mnemonic[index]) {
+        errors.push(index)
+      }
+    })
+    return errors
+  }, [mnemonicWords])
 
   return (
     <Background>
       <Backdrop>
-        <OnboardingNavbar navigation={navigation} children="BackUp" />
+        <OnboardingNavbar
+          navigation={navigation}
+          children="generateMnemonic"
+        />
         <ScrollView
           contentContainerStyle={styles.mainContentcontnetStyle}
           style={styles.contentContainer}
@@ -95,13 +127,19 @@ export default function ConfirmScreen({ navigation, route }: Props) {
           </View>
           <SeedList
             mnemonicWords={mnemonicWords}
-            setMnemonicWords={setMnemonicWords}
+            setMnemonicWords={setMnemonicWord}
+            errors={errors}
           />
         </ScrollView>
         <SafeAreaView style={styles.buttonContainer}>
           <Button
+            loading={creatingAccount}
             mode="contained"
-            disabled={false}
+            disabled={
+              errors.length > 0 ||
+              mnemonicWords.join('') === '' ||
+              creatingAccount
+            }
             onPress={handleConfirm}
           >
             <Text

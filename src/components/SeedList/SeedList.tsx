@@ -15,11 +15,13 @@ import {
 const SeedList = ({
   mnemonicWords,
   setMnemonicWords,
+  errors,
   readonly = false,
 }: {
   mnemonicWords: string[]
   readonly?: boolean
-  setMnemonicWords?: (words: string[]) => void
+  setMnemonicWords?: (word: string, index) => void
+  errors?: number[]
 }) => {
   const inputRefs = useRef([])
   const focusOnNextInput = (index: number) => {
@@ -30,9 +32,7 @@ const SeedList = ({
 
   const handleTextChange = useCallback(
     (text, index) => {
-      const newMnemonicWords = [...mnemonicWords]
-      newMnemonicWords[index] = text
-      setMnemonicWords(newMnemonicWords)
+      setMnemonicWords(text, index)
 
       if (text.includes(' ')) {
         focusOnNextInput(index)
@@ -58,6 +58,12 @@ const SeedList = ({
               ref={(instance) => {
                 inputRefs.current[index] = instance
               }}
+              showErrorBg={!readonly}
+              error={
+                !readonly && errors?.includes(index)
+                  ? 'Invalid word'
+                  : null
+              }
               autoFocus={index === mnemonicWords.length - 12}
               placeholder=""
               value={word}

@@ -26,9 +26,13 @@ import { useLockout } from '../../hooks/customHooks'
 import { useContext } from 'react'
 import { AuthContext } from '../../contexts/AuthProvider'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
+import {
+  OnBoardingNavigate,
+  OnBoardingRoute,
+} from '../../navigation/onBoardingStack'
 type Props = {
-  navigation: Navigation
-  route: Route<any>
+  navigation: OnBoardingNavigate<'confirmGeneratedMnemonic'>
+  route: OnBoardingRoute<'confirmGeneratedMnemonic'>
 }
 
 export default function RestoreMnemonicScreen({
@@ -120,12 +124,18 @@ export default function RestoreMnemonicScreen({
     return mnemonicWords.every((word) => word.length > 0)
   }, [mnemonicWords])
 
+  const setMnemonicWord = (word: string, index: number) => {
+    const newMnemonicWords = [...mnemonicWords]
+    newMnemonicWords[index] = word
+    setMnemonicWords(newMnemonicWords)
+  }
+
   return (
     <Background>
       <Backdrop>
         <OnboardingNavbar
           navigation={navigation}
-          children="Onboarding"
+          children="welcome"
         />
         <ScrollView
           contentContainerStyle={styles.mainContentcontnetStyle}
@@ -137,7 +147,7 @@ export default function RestoreMnemonicScreen({
           </TextInfo>
           <SeedList
             mnemonicWords={mnemonicWords}
-            setMnemonicWords={setMnemonicWords}
+            setMnemonicWords={setMnemonicWord}
           />
 
           {attempts > 0 && !isLocked && (

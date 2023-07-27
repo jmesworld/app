@@ -1,14 +1,24 @@
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
 import { OnboardingBackground, Button } from '../../components'
 import { Navigation } from '../../types'
 import { View, Text, SafeAreaView, StyleSheet } from 'react-native'
 import { normalize } from 'path'
 import 'react-native-get-random-values'
+import { OnBoardingNavigate } from '../../navigation/onBoardingStack'
+import { useStoreActions } from '../../hooks/storeHooks'
+import { OnBoardingPhase } from '../../store'
 
 type Props = {
-  navigation: Navigation
+  navigation: OnBoardingNavigate<'welcome'>
 }
-const ButtonContainer = ({ navigation }) => {
+const ButtonContainer = ({ navigation }: Props) => {
+  const setOnboardingPhase = useStoreActions(
+    (actions) => actions.setOnboardingPhase
+  )
+
+  useEffect(() => {
+    setOnboardingPhase(OnBoardingPhase.welcome)
+  }, [])
   return (
     <SafeAreaView
       style={{
@@ -39,7 +49,7 @@ const ButtonContainer = ({ navigation }) => {
           mode="outlined"
           rounded="full"
           width={'48%'}
-          onPress={() => navigation.navigate('BackUp')}
+          onPress={() => navigation.push('generateMnemonic')}
         >
           <Text
             style={{
@@ -58,7 +68,7 @@ const ButtonContainer = ({ navigation }) => {
           rounded="full"
           mode="contained"
           width={'48%'}
-          onPress={() => navigation.navigate('RestoreMnemonic')}
+          onPress={() => navigation.push('restoreMnemonic')}
         >
           <Text
             style={{
@@ -76,10 +86,10 @@ const ButtonContainer = ({ navigation }) => {
     </SafeAreaView>
   )
 }
-const OnboardingScreen = ({ navigation }: Props) => (
+const WelcomeScreen = ({ navigation }: Props) => (
   <OnboardingBackground position="bottom">
     <ButtonContainer navigation={navigation} />
   </OnboardingBackground>
 )
 
-export default OnboardingScreen
+export default WelcomeScreen

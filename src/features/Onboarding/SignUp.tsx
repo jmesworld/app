@@ -3,9 +3,11 @@ import { Linking, SafeAreaView, StyleSheet } from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
 import {
   Backdrop,
+  BackdropSmall,
   Background,
   Button,
   Input,
+  Navbar,
   TextTitle,
 } from '../../components'
 
@@ -19,9 +21,15 @@ import {
 import { HelperText } from 'react-native-paper'
 import { useDebounce } from '../../hooks/useDebounce'
 import { useIdentity } from '../../hooks/useIdentity'
+import { OnBoardingNavigate } from '../../navigation/onBoardingStack'
+import { useIdentityContext } from '../../contexts/IdentityService'
+import {
+  useStoreActions,
+  useStoreState,
+} from '../../hooks/storeHooks'
 
 type Props = {
-  navigation: Navigation
+  navigation: OnBoardingNavigate<'pickUsername'>
 }
 
 type Input = {
@@ -29,7 +37,13 @@ type Input = {
   error: string | null
 }
 
-export default function SignUpScreen({ navigation }: Props) {
+export default function PickUsernameScreen({ navigation }: Props) {
+  const { createIdentity } = useIdentityContext()
+  const mnemonic = useStoreState((state) => state.onBoarding.mnemonic)
+  const setUsername = useStoreActions(
+    (actions) => actions.setUsername
+  )
+  const [creatingIdentity, setCreatingIdentity] = useState(false)
   const [username, onChangeUsername] = useState<Input>({
     value: '',
     error: null,
@@ -40,18 +54,18 @@ export default function SignUpScreen({ navigation }: Props) {
     delay: 500,
   })
 
-  // TODO: implement useIdentity
   const identity = useIdentity(debouncedUsername, !!username.error)
-
-  const handleSignUp = function () {
-  
-    // @ts-ignore
-    navigation.navigate({
-      name: 'SetPin',
-      params: {
-        username,
-      },
-    })
+  const handleSignUp = async function () {
+    setCreatingIdentity(true)
+    try {
+      await createIdentity(username.value, mnemonic.join(' '))
+      setUsername(username.value)
+      navigation.push('createPin')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setCreatingIdentity(false)
+    }
   }
 
   const onUsernameChange = (input) => {
@@ -107,107 +121,113 @@ export default function SignUpScreen({ navigation }: Props) {
   ])
 
   return (
-    <Background>
-      <Backdrop>
-        <OnboardingNavbar
-          navigation={navigation}
-          children="Confirm"
-        />
+    <View style={styles.container}>
+      <Background>
+        <Navbar  navigation={navigation} children="topUp" />
+        <BackdropSmall>
+          <TextTitle> Create new account</TextTitle>
 
-        <TextTitle> Create new account</TextTitle>
+          <Text style={styles.inputTag}>USERNAME</Text>
+          <SafeAreaView style={styles.inputContainer}>
+            <Input
+              error={username.error || nameFromIdentityServiceError}
+              success={
+                !!(
+                  username.error === null &&
+                  nameFromIdentityServiceError === null &&
+                  !identity.loading &&
+                  username.value
+                )
+              }
+              onChangeText={onUsernameChange}
+              value={username.value}
+            />
 
-        <Text style={styles.inputTag}>USERNAME</Text>
-        <SafeAreaView style={styles.inputContainer}>
-          <Input
-            error={username.error || nameFromIdentityServiceError}
-            success={
-              !!(
-                username.error === null &&
-                nameFromIdentityServiceError === null &&
-                !identity.loading &&
-                username.value
-              )
-            }
-            onChangeText={onUsernameChange}
-            value={username.value}
-          />
-
-          <HelperText
-            type={identity.loading ? 'info' : 'error'}
-            visible={!identity.loading}
-          >
-            {identity.loading && 'Checking username availability...'}
-            {(!identity.loading && username.error) ||
-              nameFromIdentityServiceError}
-          </HelperText>
-        </SafeAreaView>
-        <SafeAreaView style={styles.buttonContainer}>
-          <Button
-            mode="contained"
-            rounded="full"
-            disabled={submitDisabled}
-            onPress={handleSignUp}
-          >
-            <Text
-              style={{
-                textTransform: 'none',
-                fontStyle: 'normal',
-                color: '#FCFCFD',
-                fontSize: 16,
-                fontWeight: '700',
-              }}
+            <HelperText
+              type={identity.loading ? 'info' : 'error'}
+              visible={!identity.loading}
             >
-              Sign up
-            </Text>
-          </Button>
-        </SafeAreaView>
-        <View style={styles.policyContainer}>
-          <Text style={styles.policyText}>
-            By signing up, you agree to our{' '}
-            <Text
-              style={{
-                textDecorationLine: 'underline',
-                color: '#704FF7',
-              }}
-              onPress={() =>
-                Linking.openURL('https://icons.jmes.world/terms')
-              }
+              {identity.loading &&
+                'Checking username availability...'}
+              {(!identity.loading && username.error) ||
+                nameFromIdentityServiceError}
+            </HelperText>
+          </SafeAreaView>
+          <SafeAreaView style={styles.buttonContainer}>
+            <Button
+              mode="contained"
+              loading={creatingIdentity}
+              rounded="full"
+              disabled={submitDisabled || creatingIdentity}
+              onPress={handleSignUp}
             >
-              Terms
+              <Text
+                style={{
+                  textTransform: 'none',
+                  fontStyle: 'normal',
+                  color: '#FCFCFD',
+                  fontSize: 16,
+                  fontWeight: '700',
+                }}
+              >
+                Sign up
+              </Text>
+            </Button>
+          </SafeAreaView>
+          <View style={styles.policyContainer}>
+            <Text style={styles.policyText}>
+              By signing up, you agree to our{' '}
+              <Text
+                style={{
+                  textDecorationLine: 'underline',
+                  color: '#704FF7',
+                }}
+                onPress={() =>
+                  Linking.openURL('https://icons.jmes.world/terms')
+                }
+              >
+                Terms
+              </Text>
+              ,{' '}
+              <Text
+                style={{
+                  textDecorationLine: 'underline',
+                  color: '#704FF7',
+                }}
+                onPress={() =>
+                  Linking.openURL('https://icons.jmes.world/policy')
+                }
+              >
+                Policy
+              </Text>
+              , and{' '}
+              <Text
+                style={{
+                  textDecorationLine: 'underline',
+                  color: '#704FF7',
+                }}
+                onPress={() =>
+                  Linking.openURL('https://icons.jmes.world/cookies')
+                }
+              >
+                Cookies
+              </Text>
+              .
             </Text>
-            ,{' '}
-            <Text
-              style={{
-                textDecorationLine: 'underline',
-                color: '#704FF7',
-              }}
-              onPress={() =>
-                Linking.openURL('https://icons.jmes.world/policy')
-              }
-            >
-              Policy
-            </Text>
-            , and{' '}
-            <Text
-              style={{
-                textDecorationLine: 'underline',
-                color: '#704FF7',
-              }}
-              onPress={() =>
-                Linking.openURL('https://icons.jmes.world/cookies')
-              }
-            >
-              Cookies
-            </Text>
-            .
-          </Text>
-        </View>
-      </Backdrop>
-    </Background>
+          </View>
+        </BackdropSmall>
+      </Background>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
   contentContainer: {
     display: 'flex',
     flex: 1,
@@ -247,7 +267,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-
     width: '93%',
     height: 49,
     marginBottom: 22,

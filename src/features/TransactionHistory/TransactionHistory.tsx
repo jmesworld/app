@@ -33,7 +33,7 @@ export default function TransactionHistoryScreen({
             setModalVisible(true)
           }}
           navigation={navigation}
-          title="Recent Transactions"
+          title="Transactions"
           textLink="See all"
         />
       </Background>

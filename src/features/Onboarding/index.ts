@@ -1,6 +1,13 @@
-import BackUpScreen from './BackUp'
-import ConfirmScreen from './Confirm'
-import OnboardingScreen from './Onboarding'
-import SignUpScreen from './SignUp'
+import GenerateMnemonic from './BackUp'
+import ConfirmMnemonic from './Confirm'
+import WelcomeScreen from './Onboarding'
+import PickUsernameScreen from './SignUp'
+import TopUpScreen from './TopUpScreen'
 
-export { BackUpScreen, ConfirmScreen, OnboardingScreen, SignUpScreen }
+export {
+  GenerateMnemonic,
+  ConfirmMnemonic,
+  WelcomeScreen,
+  PickUsernameScreen,
+  TopUpScreen,
+}
