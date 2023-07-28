@@ -7,16 +7,14 @@ import {
   Image,
 } from 'react-native'
 import StyledButton from '../Button/StyledButton'
+import { useAppTheme } from '../../theme'
 
 type Props = {
   transactionStatus: string | null
-  closeModal: () => void
 }
 
-const SendTxStatusModal = ({
-  transactionStatus,
-  closeModal,
-}: Props) => {
+const SendTxStatusModal = ({ transactionStatus }: Props) => {
+  const { colors } = useAppTheme()
   if (!transactionStatus) {
     return null
   }
@@ -36,6 +34,7 @@ const SendTxStatusModal = ({
           <Text style={styles.statusTextComplete}>
             Transaction {transactionStatus}!
           </Text>
+          <Text style={[styles.desc, {color: colors.darkGray}]}>See details is history</Text>
         </View>
       ) : transactionStatus === 'Failed' ? (
         <Text style={styles.statusTextFailed}>
@@ -62,12 +61,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     alignSelf: 'center',
     marginTop: 29,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   statusTextConfirmed: {
     color: '#63CC91',
     fontSize: 18,
     fontWeight: '500',
+  },
+  desc: {
+    fontSize: 16,
+    alignSelf: 'center',
   },
   statusTextFailed: {
     color: '#FF5C5C',

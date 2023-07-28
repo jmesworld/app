@@ -8,6 +8,7 @@ export const theme = {
   colors: {
     ...DefaultTheme.colors,
     black: '#000000',
+    darkGray: '#454E62',
     bgInput: '#f4f4f7',
     red: '#FF5876',
     redBg: '#fcdae0',

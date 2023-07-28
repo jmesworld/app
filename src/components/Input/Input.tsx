@@ -45,7 +45,11 @@ const Input = forwardRef<TextInput, Props>((props, ref) => {
       ]}
     >
       <TextInput
-      editable={!props.readonly}
+        autoComplete="off"
+        autoCorrect={false}
+        autoCapitalize="none"
+        spellCheck={false}
+        editable={!props.readonly}
         ref={ref}
         {...otherProps}
         style={[styles.input, otherProps.style]}

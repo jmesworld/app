@@ -73,6 +73,7 @@ const SeedList = ({
                 if (capitalNameSchema.safeParse(text).success) {
                   value = text.toLowerCase()
                 }
+                
                 if (
                   !nameSchemaForEachChar.safeParse(value).success &&
                   value !== ''

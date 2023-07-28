@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   Platform,
@@ -7,6 +7,7 @@ import {
   TextInput,
   SafeAreaView,
   Image,
+  Text,
 } from 'react-native'
 import { getUserIdentity } from '../../utils'
 import {
@@ -14,49 +15,146 @@ import {
   BackdropSmall,
   Navbar,
   View,
-  Text,
   StyledButton as NextButton,
   Input,
 } from '../../components'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
+import ScanIcon from '../../assets/ScanBlack.svg'
+import { useIdentityContext } from '../../contexts/IdentityService'
+import { useIdentity } from '../../hooks/useIdentity'
+import { useDebounce } from '../../hooks/useDebounce'
+import { useAppTheme } from '../../theme'
+import { numberSchema } from '../../validations/number'
+import { useStoreState } from '../../hooks/storeHooks'
 
 type Props = {
   navigation: Navigation
   route: Route<any>
 }
-const isIOS = Platform.OS === 'ios'
-const isWeb = Platform.OS === 'web'
 
 export default function SendScreen({ navigation, route }: Props) {
-  const [data, setData] = useState('')
-  const [identity, setIdentity] = useState<any>()
-  const [amount, setAmount] = useState('')
+  const { colors } = useAppTheme()
+  const account = useStoreState((state) => state.accounts)
+  const [nameOrAddress, setNameOrAddress] = useState('')
+  const [amount, setAmount] = useState({
+    value: '',
+    error: null,
+  })
 
-  useEffect(() => {
-    if (route.params) {
-      if (route.params.payload.amount)
-        setAmount(route.params.payload.amount)
-      if (route.params.payload.username)
-        setIdentity(route.params.payload.username)
-    }
-  }, [route.params])
+  const debouncedNameOrAddress = useDebounce({
+    value: nameOrAddress,
+    delay: 500,
+  })
+
+  const identity = useIdentity(
+    debouncedNameOrAddress,
+    !nameOrAddress,
+    nameOrAddress.length > 20
+  )
 
   const handleTxParams = async (username: string) => {
-    const requestedIdentity = await getUserIdentity(username)
-    const recipientAddress = await requestedIdentity.data.identity
-      .address
+ 
 
     // @ts-ignore
     return navigation.navigate({
       name: 'WalletSendConfirm',
       params: {
         username,
-        amount,
-        recipientAddress,
+        amount: amount.value,
+        recipientAddress: identity.data?.identity?.owner,
       },
     })
   }
+
+  const canProceed = useMemo(() => {
+    if (!amount || amount.value === '' || amount.error) {
+      return false
+    }
+    if (identity.loading || identity.error) {
+      return false
+    }
+    if (nameOrAddress && identity.data?.identity?.owner) {
+      return true
+    }
+    return false
+  }, [identity, amount, nameOrAddress])
+
+  const searchResult = useMemo(():
+    | 'loading'
+    | 'notFound'
+    | string => {
+    if (identity.loading) {
+      return 'loading' as const
+    }
+    if (identity.error) {
+      return identity.error.message
+    }
+    if (identity.data) {
+      const name = identity.data?.identity?.name
+      const address = identity.data?.identity?.owner
+
+      if (!address) {
+        return 'notFound'
+      }
+      if (!name) {
+        return address
+      }
+      if (debouncedNameOrAddress === address) {
+        return address
+      }
+      if (debouncedNameOrAddress !== name) {
+        return 'loading'
+      }
+      return address
+    }
+    return 'notFound'
+  }, [identity, debouncedNameOrAddress])
+
+  useEffect(() => {
+    if (
+      !identity.data?.identity?.owner ||
+      debouncedNameOrAddress.length <= 20
+    ) {
+      return
+    }
+    const addr = identity.data?.identity?.owner
+    const name = identity.data?.identity?.name
+    if (addr !== debouncedNameOrAddress) {
+      return
+    }
+    if (!name) {
+      return
+    }
+    setNameOrAddress(name)
+  }, [identity])
+
+  const onAmountChange = (value: string) => {
+    if (!numberSchema.safeParse(value).success && value !== '') {
+      return
+    }
+    const balance = account[0]?.balance
+    if (!balance) {
+      return
+    }
+    const balanceNumber = Number(balance || 0)
+
+    setAmount({
+      value,
+      error:
+        balanceNumber < Number(value) ? 'Insufficient balance' : null,
+    })
+  }
+
+  const getSearchResultMessage = useMemo(() => {
+    if (searchResult === 'loading') {
+      return 'Loading...'
+    }
+    if (searchResult === 'notFound') {
+      return 'Not found'
+    }
+    return searchResult
+  }, [searchResult])
 
   return (
     <View style={styles.container}>
@@ -79,47 +177,84 @@ export default function SendScreen({ navigation, route }: Props) {
                 containerStyle={{
                   borderRadius: 24,
                 }}
-                onChangeText={setData}
-                value={data}
+                onChangeText={setNameOrAddress}
+                value={nameOrAddress}
                 placeholder={'Address or Name'}
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
                 imgSource={
                   <Pressable
-                    style={{
-                      width: 40,
-                      height: 40,
-                      backgroundColor: 'transparent',
-                    }}
                     onPress={() => {
                       navigation.navigate('Scan')
                     }}
                   >
-                    <Image
+                    <ScanIcon
                       style={{
                         width: 40,
                         height: 40,
                       }}
-                      source={require('../../../assets/icons/Scan_Black.png')}
                     />
                   </Pressable>
                 }
               />
             </SafeAreaView>
-            <Text style={styles.title}>Amount</Text>
+
+            <Text
+              selectionColor={colors.primary}
+              style={[
+                styles.searchResult,
+                {
+                  color:
+                    searchResult === 'notFound'
+                      ? colors.red
+                      : colors.darkGray,
+                 },
+              ]}
+              selectable
+              ellipsizeMode="middle"
+              numberOfLines={1}
+            >
+              {nameOrAddress && getSearchResultMessage}
+            </Text>
+
+            <Text
+              style={[
+                styles.title,
+                {
+                  marginTop: 10,
+                },
+              ]}
+            >
+              Amount
+            </Text>
             <SafeAreaView>
               <TextInput
+                keyboardType="numeric"
                 style={styles.input}
-                onChangeText={setAmount}
-                value={amount}
+                onChangeText={onAmountChange}
+                value={amount.value}
                 placeholder={'Amount to send'}
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
               />
             </SafeAreaView>
+            <Text
+              selectionColor={colors.primary}
+              style={[
+                styles.searchResult,
+                {
+                  color: colors.red,
+                },
+              ]}
+              selectable
+              ellipsizeMode="middle"
+              numberOfLines={1}
+            >
+              {amount.error}
+            </Text>
           </View>
           <View style={styles.buttonContainer}>
             <NextButton
-              onPress={() => handleTxParams(data)}
-              enabled={true}
+              onPress={() => handleTxParams(nameOrAddress)}
+              enabled={canProceed}
             >
               Next
             </NextButton>
@@ -140,7 +275,8 @@ const styles = StyleSheet.create({
   mainContainer: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingHorizontal: 19,
+    paddingHorizontal: 10,
+    width: '100%',
   },
   buttonText: {
     fontSize: 24,
@@ -160,7 +296,12 @@ const styles = StyleSheet.create({
 
     backgroundColor: 'transparent',
   },
-
+  searchResult: {
+    marginTop: 10,
+    marginBottom: 5,
+    height: 20,
+    alignSelf: 'center'
+  },
   iconImageView: {
     flexDirection: 'row',
   },
@@ -180,6 +321,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontFamily: 'Roboto_900Black',
   },
+
   title: {
     color: 'black',
     alignSelf: 'flex-start',
