@@ -36,6 +36,8 @@ import { FAUCET_URL } from '@env'
 import { useQuery } from 'react-query'
 import { useIdentityContext } from '../../contexts/IdentityService'
 import { useClipboardTimeout } from '../../hooks/useClipboardTimeout'
+import CopyIcon from '../../assets/copy.svg'
+import CheckIcon from '../../assets/check.svg'
 
 type Props = {
   navigation: OnBoardingNavigate<'generateMnemonic'>
@@ -67,7 +69,7 @@ const TopUpScreen = ({ navigation }: Props) => {
   useEffect(() => {
     if (data === undefined || isFetching || isLoading) return
     if (data > 0) {
-      setAccountBalance(data/1e6)
+      setAccountBalance(data / 1e6)
       navigation.replace('pickUsername')
     }
   }, [data])
@@ -86,9 +88,6 @@ const TopUpScreen = ({ navigation }: Props) => {
     setOnboardingPhase(OnBoardingPhase.topUp)
   }, [])
 
-  const source = copied
-    ? require('../../../assets/icons/Check.png')
-    : require('../../../assets/icons/Copy.png')
 
   return (
     <View style={styles.container}>
@@ -145,7 +144,14 @@ const TopUpScreen = ({ navigation }: Props) => {
                       copyToClipboard(address, 2000)
                     }}
                   >
-                    <Image source={source} />
+                    {copied ? <CheckIcon 
+                    width={20}
+                    height={20}
+                    color={colors.green}
+                    /> : <CopyIcon
+                    height={20}
+                    width={20}
+                    />}
                   </Pressable>
                 }
               />

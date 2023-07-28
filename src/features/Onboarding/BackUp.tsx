@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'transparent',
     width: '93%',
+    marginTop: 20,
     height: 40,
   },
   uncheckedCheckbox: {

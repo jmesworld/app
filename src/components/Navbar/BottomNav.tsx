@@ -1,14 +1,14 @@
-import { memo, useState, useContext } from 'react'
+import { memo, useState } from 'react'
 import { View, Text } from '../Themed/Themed'
-import { Platform, Pressable, StyleSheet, Image } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import { Navigation } from '../../types'
-import CustomModal from '../Modal/Modal'
 import LogoutModal from '../Logout/LogoutModal'
-import StyledButton from '../Button/StyledButton'
-import { useStoreActions } from '../../hooks/storeHooks'
-import { AuthContext } from '../../contexts/AuthProvider'
-import { useNavigation, useRoute } from '@react-navigation/native'
+import { useRoute } from '@react-navigation/native'
 import { useAppTheme } from '../../theme'
+import WalletIcon from '../../assets/wallet.svg'
+import WalletPurpleIcon from '../../assets/WalletPurple.svg'
+import ScanIcon from '../../assets/scan.svg'
+import SettingIcon from '../../assets/settings.svg'
 
 interface Props {
   children?: React.ReactNode
@@ -33,30 +33,11 @@ const BottomNav = ({ children, navigation }: Props) => {
     <View style={styles.container}>
       <Pressable
         onPress={() => {
-          navigation.navigate('Root')
-        }}
-        style={[styles.button, isRootActive && activeStyle]}
-      >
-        <Image
-          source={require('../../../assets/icons/wallet.png')}
-          style={{
-            width: isRootActive ? 34: 24,
-            height: isRootActive ? 34: 24,
-            alignSelf: 'center',
-          }}
-        />
-        {!isRootActive && (
-          <Text style={styles.buttonText}>Wallet</Text>
-        )}
-      </Pressable>
-      <Pressable
-        onPress={() => {
           navigation.navigate('Scan')
         }}
         style={[styles.button, route.name === 'Scan' && activeStyle]}
       >
-        <Image
-          source={require('../../../assets/icons/ScanWhite.png')}
+        <ScanIcon
           style={{
             width: 35,
             height: 35,
@@ -67,12 +48,42 @@ const BottomNav = ({ children, navigation }: Props) => {
       </Pressable>
       <Pressable
         onPress={() => {
+          navigation.navigate('Root')
+        }}
+        style={[styles.button, isRootActive && activeStyle]}
+      >
+        {isRootActive && (
+          <WalletPurpleIcon
+            style={{
+              width: 34,
+              height: 34,
+              alignSelf: 'center',
+            }}
+          />
+        )}
+
+        {!isRootActive && (
+          <WalletIcon
+            color={isRootActive ? colors.primary : 'white'}
+            style={{
+              width: 24,
+              height: 24,
+              alignSelf: 'center',
+            }}
+          />
+        )}
+        {!isRootActive && (
+          <Text style={styles.buttonText}>Wallet</Text>
+        )}
+      </Pressable>
+
+      <Pressable
+        onPress={() => {
           setModalVisible(true)
         }}
         style={styles.button}
       >
-        <Image
-          source={require('../../../assets/icons/settings.png')}
+        <SettingIcon
           style={{
             width: 24,
             height: 24,

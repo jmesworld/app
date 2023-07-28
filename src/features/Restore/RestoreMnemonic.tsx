@@ -30,6 +30,8 @@ import {
   OnBoardingNavigate,
   OnBoardingRoute,
 } from '../../navigation/onBoardingStack'
+import { useIdentityContext } from '../../contexts/IdentityService'
+import { OnBoardingPhase } from '../../store'
 type Props = {
   navigation: OnBoardingNavigate<'confirmGeneratedMnemonic'>
   route: OnBoardingRoute<'confirmGeneratedMnemonic'>
@@ -53,7 +55,22 @@ export default function RestoreMnemonicScreen({
   const [mnemonicWords, setMnemonicWords] = useState<string[]>(
     Array(12).fill('')
   )
-  const addAccount = useStoreActions((actions) => actions.addAccount)
+  const [loadingAccount, setLoadingAccount] = useState(false)
+  const { getAccount } = useIdentityContext()
+
+  const setMnemonic = useStoreActions(
+    (actions) => actions.setMnemonic
+  )
+  const setBalance = useStoreActions((actions) => actions.setBalance)
+  const setOnboardingPhase = useStoreActions(
+    (actions) => actions.setOnboardingPhase
+  )
+  const setAccountAddress = useStoreActions(
+    (actions) => actions.setAccountAddress
+  )
+  const setUsername = useStoreActions(
+    (actions) => actions.setUsername
+  )
 
   useEffect(() => {
     if (remainingTime > 0) {
@@ -95,29 +112,43 @@ export default function RestoreMnemonicScreen({
     return identity
   }
 
-  const createAccount = async (identity) => {
-    await addAccount({
-      index: 0,
-      title: 'default',
-      address: identity.account.address,
-      username: identity.username,
-    })
-  }
-
   const handleAccountRestore = async () => {
-    const identity = await restoreIdentity()
+    try {
+      setLoadingAccount(true)
+      const { balance, token, address, username } = await getAccount(
+        mnemonicWords.join(' ')
+      )
 
-    if (!identity) {
-      handleLockout()
-      return
+      if (!address) {
+        handleLockout()
+        return
+      }
+
+      setMnemonic(mnemonicWords)
+      setAccountAddress(address)
+      if (balance === undefined) {
+        setOnboardingPhase(OnBoardingPhase.topUp)
+        navigation.push('topUp')
+      }
+      if (username === undefined) {
+        setOnboardingPhase(OnBoardingPhase.pickUsername)
+        navigation.push('pickUsername')
+      }
+      setBalance(balance)
+
+      setUsername(username)
+      setOnboardingPhase(OnBoardingPhase.createPin)
+      navigation.push('createPin')
+
+      await Promise.all([
+        storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
+        storage.setSecureItem('token', token),
+      ])
+      setHasToken(true)
+    } catch (err) {
+      console.error(err)
     }
-
-    await Promise.all([
-      createAccount(identity),
-      storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
-      storage.setSecureItem('token', identity.token),
-    ])
-    setHasToken(true)
+    setLoadingAccount(false)
   }
 
   const canConfirm = useMemo(() => {
@@ -161,7 +192,8 @@ export default function RestoreMnemonicScreen({
         </ScrollView>
         <SafeAreaView style={styles.buttonContainer}>
           <Button
-            disabled={!canConfirm}
+            loading={loadingAccount}
+            disabled={!canConfirm || isLocked || loadingAccount}
             mode="contained"
             onPress={async () => {
               await handleAccountRestore()
