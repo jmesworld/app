@@ -36,7 +36,15 @@ type IdentityServiceContext = {
   getBalance: (
     address: string,
     mnemonic: string
-  ) => Promise<number | null>
+  ) => Promise<number | null>,
+  getAccount: (
+    mnemonic: string
+  ) => Promise<{
+    address: string
+    token: string
+    balance: number
+    username: string
+  } | null>
 }
 
 const emptyFn = () => {
@@ -49,6 +57,7 @@ const initialState: IdentityServiceContext = {
   createIdentity: emptyFn,
   createWallet: emptyFn,
   getBalance: emptyFn,
+  getAccount: emptyFn,
 }
 
 const IdentityContext =
@@ -115,6 +124,40 @@ const IdentityServiceProvider = ({ children }: Props) => {
     }
   }, [])
 
+  const getAccount = useCallback(
+    async (mnemonic: string) => {
+      if (!cosmWasmClient) return null
+      try {
+        const { addr, signingClient } = await getSigner(mnemonic)
+        const account = await signingClient.getAccount(addr)
+        const balance = await signingClient.getBalance(
+          addr,
+          JMES_DENOM
+        )
+        const identityClient = new IdentityserviceClient(
+          signingClient,
+          addr,
+          PUBLIC_IDENTITY_SERVICE_CONTRACT
+        )
+        const identity = await identityClient.getIdentityByOwner({
+          owner: addr,
+        })
+
+        const token = account.pubkey?.value
+        return {
+          address: addr,
+          token: token,
+          balance: (Number(balance.amount) || 0) / 1e6,
+          username: identity?.identity?.name,
+        }
+      } catch (err) {
+        console.error(err)
+      }
+      return null
+    },
+    [cosmWasmClient]
+  )
+
   const getBalance = useCallback(
     async (address: string, mnemonic: string) => {
       if (!cosmWasmClient) return null
@@ -167,6 +210,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
     createIdentity,
     createWallet,
     getBalance,
+    getAccount,
   }
 
   return (

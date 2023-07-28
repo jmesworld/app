@@ -10,6 +10,8 @@ import {
 import { Navigation } from '../../types'
 import { useAppTheme } from '../../theme'
 import { useStoreState } from '../../hooks/storeHooks'
+import JmesIcon from '../../assets/jmes.svg'
+
 type Props = {
   children: string
   navigation: Navigation
@@ -18,8 +20,12 @@ type Props = {
 }
 
 const Navbar = ({ navigation, children, title }: Props) => {
-  const balance = useStoreState((state) => state?.accounts?.[0]?.balance)
-  const onBoardingBalance = useStoreState( (state) => state.onBoarding.balance)
+  const balance = useStoreState(
+    (state) => state?.accounts?.[0]?.balance
+  )
+  const onBoardingBalance = useStoreState(
+    (state) => state.onBoarding.balance
+  )
   const { colors } = useAppTheme()
 
   return (
@@ -48,16 +54,19 @@ const Navbar = ({ navigation, children, title }: Props) => {
         <View
           style={[styles.wallet, { backgroundColor: colors.primary }]}
         >
-          <Image
-            source={require('../../../assets/icons/JMES_Icon.png')}
+          <JmesIcon
+            width={10}
+            height={13}
             style={{
               marginTop: 2,
               marginRight: 3,
-              width: 10,
-              height: 13,
             }}
           />
-          <Text style={styles.walletText}> {balance || onBoardingBalance } </Text>
+
+          <Text style={styles.walletText}>
+            {' '}
+            {balance || onBoardingBalance}{' '}
+          </Text>
         </View>
       </View>
     </View>
