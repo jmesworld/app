@@ -23,9 +23,9 @@ import {
   CosmWasmClient,
 } from '@cosmjs/cosmwasm-stargate'
 import { DeliverTxResponse, GasPrice } from '@cosmjs/stargate'
-import { BJMES_DENOM, JMES_DENOM } from '../utils/constants'
+import { JMES_DENOM } from '../utils/constants'
 import { coin } from '@cosmjs/amino'
-import { TxSearchResult } from 'jmes/build/Client/providers/LCDClient/lcd/api'
+import type { TxSearchResult } from 'jmes/build/Client/providers/LCDClient/lcd/api'
 
 type IdentityServiceContext = {
   identityService: IdentityserviceQueryClient | null
