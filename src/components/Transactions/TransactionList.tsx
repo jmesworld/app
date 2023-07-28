@@ -8,12 +8,14 @@ import TransactionDetails from '../Modal/TransactionDetails'
 import Modal from '../Modal/Modal'
 import { useQuery } from 'react-query'
 import Button from '../Button/Button'
+import { useIdentityContext } from '../../contexts/IdentityService'
 
 type Props = {
   itemPressed?: (item: Transaction) => void
 }
 
 const TransactionList = ({ itemPressed }: Props) => {
+  const { searchTxs } = useIdentityContext()
   const address = useStoreState((state) => state.accounts[0]?.address)
   const [activeTab, setActiveTab] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
@@ -29,18 +31,18 @@ const TransactionList = ({ itemPressed }: Props) => {
     data: allTransactions,
   } = useQuery(
     ['transactions', address],
-    () => fetchTransactions(address),
+    () => searchTxs(address),
     { enabled: !!address }
   )
 
   const sentTransactions =
-    allTransactions?.filter(
-      (transaction) => transaction.tx_type === 'Sent'
+    allTransactions.txs?.filter(
+      (transaction) =>  false
     ) || []
 
   const receivedTransactions =
-    allTransactions?.filter(
-      (transaction) => transaction.tx_type === 'Received'
+    allTransactions.txs?.filter(
+      (transaction) =>  false
     ) || []
 
   const displayedTransactions = useMemo(() => {
@@ -48,7 +50,7 @@ const TransactionList = ({ itemPressed }: Props) => {
     const end = start + itemsPerPage
     switch (activeTab) {
       case 'All':
-        return allTransactions?.slice(start, end) || []
+        return allTransactions?.txs?.slice(start, end) || []
       case 'Sent':
         return sentTransactions.slice(start, end)
       case 'Received':
@@ -101,7 +103,7 @@ const TransactionList = ({ itemPressed }: Props) => {
           marginTop: 20,
         }}
       >
-        Error: {error}
+        Error
       </Text>
     )
 
@@ -127,10 +129,11 @@ const TransactionList = ({ itemPressed }: Props) => {
       </View>
       <View style={styles.transactionList}>
         {displayedTransactions.map((tx, index) => {
-          const { timestamp, tx_hash, tx_type, body } = tx
-          const { to_address, from_address, amount } =
-            body.messages[0]
-          const { denom, amount: amt } = amount[0]
+          // TODO: fix this
+          const { timestamp, txhash: tx_hash, code: tx_type, logs: body,  } = tx
+          // const { to_address, from_address, amount } =
+          //   body.messages[0]
+          // const { denom, amount: amt } = amount[0]
 
           return (
             <View key={index} style={styles.listItem}>
@@ -138,11 +141,11 @@ const TransactionList = ({ itemPressed }: Props) => {
                 <TransactionListItem
                   timestamp={timestamp}
                   tx_hash={tx_hash}
-                  tx_type={tx_type}
-                  to_address={to_address}
-                  from_address={from_address}
-                  denom={denom}
-                  amount={amt}
+                  tx_type={tx_type as any}
+                  to_address={'hi'}
+                  from_address={'ho'}
+                  denom={'denom'}
+                  amount={33}
                 />
               </Pressable>
             </View>

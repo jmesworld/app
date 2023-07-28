@@ -25,6 +25,7 @@ import {
 import { DeliverTxResponse, GasPrice } from '@cosmjs/stargate'
 import { BJMES_DENOM, JMES_DENOM } from '../utils/constants'
 import { coin } from '@cosmjs/amino'
+import { TxSearchResult } from 'jmes/build/Client/providers/LCDClient/lcd/api'
 
 type IdentityServiceContext = {
   identityService: IdentityserviceQueryClient | null
@@ -49,6 +50,7 @@ type IdentityServiceContext = {
     recipient: string,
     amount: number
   ) => Promise<DeliverTxResponse>
+  searchTxs: (address: string) => Promise<TxSearchResult>
 }
 
 const emptyFn = () => {
@@ -63,6 +65,7 @@ const initialState: IdentityServiceContext = {
   getBalance: emptyFn,
   getAccount: emptyFn,
   sendTransaction: emptyFn,
+  searchTxs: emptyFn,
 }
 
 const IdentityContext =
@@ -89,8 +92,8 @@ const IdentityServiceProvider = ({ children }: Props) => {
     getCosmWasmClient()
   }, [])
 
-  const client = useMemo(async () => {
-    return (await getClient()) as any
+  const client = useMemo(() => {
+    return getClient()
   }, [getClient])
   const identityQueryClient = useMemo(
     () =>
@@ -100,6 +103,25 @@ const IdentityServiceProvider = ({ children }: Props) => {
             PUBLIC_IDENTITY_SERVICE_CONTRACT
           )
         : null,
+    [cosmWasmClient]
+  )
+
+  const searchTxs = useCallback(
+    async (address: string) => {
+      const result = await client.providers.LCDC.tx.search({
+        events: [
+          {
+            key: 'message.sender',
+            value: address,
+          },
+          {
+            key: 'message.recipient',
+            value: address,
+          },
+        ],
+      })
+      return result
+    },
     [cosmWasmClient]
   )
 
@@ -235,6 +257,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
     getBalance,
     getAccount,
     sendTransaction,
+    searchTxs,
   }
 
   return (
