@@ -19,7 +19,9 @@ export const daoNameSchema = (field) =>
       message: `${field} must only contain lowercase letters and numbers`,
     })
 
-export const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/)
+export const nameSchemaForEachChar = z
+  .string()
+  .regex(/^[a-zA-Z0-9\s]+$/)
 export const capitalNameSchema = z.string().regex(/[A-Z]/)
 export const alphaNumericSchema = z.string().regex(/^[a-zA-Z0-9]+$/)
 export const specialCharSchema = z

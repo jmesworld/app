@@ -10,13 +10,9 @@ import StyledButton from '../Button/StyledButton'
 
 type Props = {
   transactionStatus: string | null
-  closeModal: () => void
 }
 
-const SendTxStatusModal = ({
-  transactionStatus,
-  closeModal,
-}: Props) => {
+const SendTxStatusModal = ({ transactionStatus }: Props) => {
   if (!transactionStatus) {
     return null
   }

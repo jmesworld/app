@@ -1,11 +1,7 @@
-import { Platform, StyleSheet, Pressable } from 'react-native'
-import { useEffect, useState } from 'react'
-import { mnemonic, sendTransaction } from '../../utils'
+import { StyleSheet } from 'react-native'
+import { useCallback, useEffect, useState } from 'react'
 import storage from '../../store/storage'
-import {
-  useStoreState,
-  useStoreActions,
-} from '../../hooks/storeHooks'
+import { useStoreState } from '../../hooks/storeHooks'
 import {
   Background,
   BackdropSmall,
@@ -14,26 +10,34 @@ import {
   Text,
   Modal,
   StyledButton as CloseButton,
+  Button,
 } from '../../components'
 import { isIOS, isWeb } from '../../utils/platformDetect'
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 import SendTxStatusModal from '../../components/Modal/SendTxStatusModal'
+import { useAppTheme } from '../../theme'
+import { Avatar, Divider } from 'react-native-paper'
+import { useIdentityContext } from '../../contexts/IdentityService'
 type Props = {
   navigation: Navigation
   route: Route<any>
 }
 
+type TransactionStatus = 'Pending' | 'Success' | 'Failed' | null
 export default function SendConfirmScreen({
   navigation,
   route,
 }: Props) {
+  const { colors } = useAppTheme()
+  const { sendTransaction } = useIdentityContext()
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
   const [mnemonic, setMnemonic] = useState<any>()
   const [modalVisible, setModalVisible] = useState(false)
-  const [transactionStatus, setTransactionStatus] = useState(null)
+  const [transactionStatus, setTransactionStatus] =
+    useState<TransactionStatus>(null)
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
@@ -48,8 +52,6 @@ export default function SendConfirmScreen({
   }
 
   useEffect(() => {
-    console.log('params', route.params)
-    console.log('match', route.match)
     getMnemonic()
     if (route.params) {
       if (route.params.recipientAddress)
@@ -66,30 +68,37 @@ export default function SendConfirmScreen({
     setTransactionStatus('Pending')
     try {
       const response = await sendTransaction(
+        mnemonic,
         recipientAddress,
-        recipientAmount,
-        mnemonic
+        recipientAmount
       )
-      if (response.txhash) {
+
+      if (response.transactionHash) {
         setTransactionStatus('Success')
-      } else {
-        setTransactionStatus('Failed')
+        return
       }
+      setTransactionStatus('Failed')
     } catch (error) {
       console.error('Error sending transaction:', error)
       setTransactionStatus('Failed')
     }
   }
-
+  // TODO: trnsaction status issue
   const handleCloseModal = () => {
+    console.log('transactionStatus', transactionStatus)
+    if (transactionStatus === 'Pending') {
+      return
+    }
     setModalVisible(false)
     if (transactionStatus === 'Success') {
-      return navigation.navigate('Root')
-    } else if (transactionStatus === 'Failed') {
-      return navigation.navigate('WalletSend')
-    } else {
-      return navigation.navigate('Root')
+      navigation.navigate('Root')
+      return
     }
+    if (transactionStatus === 'Failed') {
+      navigation.navigate('WalletSend')
+      return
+    }
+    return navigation.navigate('WalletSend')
   }
 
   return (
@@ -102,18 +111,59 @@ export default function SendConfirmScreen({
         />
         <BackdropSmall>
           <Text style={styles.title}>Sender account</Text>
-          <View style={styles.userContainer}>
-            <Text style={styles.username}>{username}</Text>
-            <Text style={styles.address}>{address}</Text>
+          <View style={styles.userItemContainer}>
+            <Avatar.Text
+              style={{
+                backgroundColor: colors.primary,
+              }}
+              size={40}
+              label={username?.[0]?.toUpperCase()}
+            />
+            <View style={styles.userContainer}>
+              <Text style={styles.username}>{username}</Text>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="middle"
+                style={styles.address}
+              >
+                {address}
+              </Text>
+            </View>
           </View>
+          <Divider
+            style={{
+              width: '90%',
+            }}
+          />
           <View style={styles.separator} />
-          <Text style={styles.title}>Recipient account</Text>
-          <View style={styles.userContainer}>
-            <Text style={styles.username}>{recipientUsername}</Text>
-            <Text style={styles.address}>{recipientAddress}</Text>
+          <Text style={styles.title}>Receiver account</Text>
+          <View style={styles.userItemContainer}>
+            <Avatar.Text
+              size={40}
+              style={{
+                backgroundColor: colors.green,
+              }}
+              label={recipientUsername?.[0]?.toUpperCase()}
+            />
+            <View style={styles.userContainer}>
+              <Text style={styles.username}>{recipientUsername}</Text>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="middle"
+                style={styles.address}
+              >
+                {recipientAddress}
+              </Text>
+            </View>
           </View>
           <View
-            style={{ marginTop: 30, backgroundColor: 'transparent' }}
+            style={{
+              marginTop: 30,
+              width: '95%',
+              padding: 14,
+              borderRadius: 24,
+              backgroundColor: colors.bgInput,
+            }}
           >
             <View style={styles.detailsItemContainer}>
               <Text style={styles.detailsTitle}>Amount</Text>
@@ -125,6 +175,7 @@ export default function SendConfirmScreen({
               <Text style={styles.detailsTitle}>Network Fee</Text>
               <Text style={styles.detailsTitle}>0.6948 JMES</Text>
             </View>
+            <Divider />
             <View style={styles.separator} />
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
@@ -146,7 +197,9 @@ export default function SendConfirmScreen({
           </View>
 
           <View style={styles.buttonContainer}>
-            <Pressable
+            <Button
+              rounded="full"
+              mode="outlined"
               style={styles.cancelButton}
               onPress={async () => {
                 navigation.navigate('Root')
@@ -162,12 +215,12 @@ export default function SendConfirmScreen({
               >
                 Cancel
               </Text>
-            </Pressable>
-            <Pressable
+            </Button>
+            <Button
+              mode="contained"
+              rounded="full"
               style={styles.sendButton}
-              onPress={async () => {
-                await handleSend()
-              }}
+              onPress={handleSend}
             >
               <Text
                 style={{
@@ -179,20 +232,24 @@ export default function SendConfirmScreen({
               >
                 Send
               </Text>
-            </Pressable>
+            </Button>
           </View>
         </BackdropSmall>
         <Modal
           isVisible={modalVisible}
-          onRequestClose={handleCloseModal}
+          // TODO: fix the on Request close issue
+          onRequestClose={() => {}}
         >
-          <SendTxStatusModal
-            closeModal={handleCloseModal}
-            transactionStatus={transactionStatus}
-          />
+          <SendTxStatusModal transactionStatus={transactionStatus} />
 
           <View style={styles.buttonContainer}>
-            <CloseButton onPress={handleCloseModal} enabled={true}>
+            <CloseButton
+              onPress={handleCloseModal}
+              enabled={
+                transactionStatus === 'Failed' ||
+                transactionStatus === 'Success'
+              }
+            >
               Close
             </CloseButton>
           </View>
@@ -218,8 +275,17 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: 12,
+    width: 100,
     fontWeight: '400',
     color: '#454E62',
+  },
+
+  userItemContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '90%',
+    marginBottom: 20,
   },
   userContainer: {
     backgroundColor: 'transparent',
@@ -227,10 +293,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
 
     alignSelf: 'center',
-    width: '90%',
-    marginLeft: 80,
+    marginLeft: 10,
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 10,
   },
 
   detailsItemContainer: {
@@ -266,7 +331,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
 
     marginTop: 'auto',
-    marginBottom: 20,
+    marginBottom: 40,
     width: '90%',
     height: 48,
     backgroundColor: 'transparent',
@@ -276,21 +341,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 90,
-    border: '1px solid #5136C2',
+
     fontSize: 16,
-    height: 48,
+
     width: '48%',
   },
   sendButton: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#704FF7',
-    borderRadius: 90,
     fontSize: 16,
-    height: 48,
     width: '48%',
   },
   title: {

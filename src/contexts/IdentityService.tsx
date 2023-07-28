@@ -22,8 +22,9 @@ import {
   SigningCosmWasmClient,
   CosmWasmClient,
 } from '@cosmjs/cosmwasm-stargate'
-import { GasPrice } from '@cosmjs/stargate'
+import { DeliverTxResponse, GasPrice } from '@cosmjs/stargate'
 import { BJMES_DENOM, JMES_DENOM } from '../utils/constants'
+import { coin } from '@cosmjs/amino'
 
 type IdentityServiceContext = {
   identityService: IdentityserviceQueryClient | null
@@ -36,15 +37,18 @@ type IdentityServiceContext = {
   getBalance: (
     address: string,
     mnemonic: string
-  ) => Promise<number | null>,
-  getAccount: (
-    mnemonic: string
-  ) => Promise<{
+  ) => Promise<number | null>
+  getAccount: (mnemonic: string) => Promise<{
     address: string
     token: string
     balance: number
     username: string
   } | null>
+  sendTransaction: (
+    mnemonic: string,
+    recipient: string,
+    amount: number
+  ) => Promise<DeliverTxResponse>
 }
 
 const emptyFn = () => {
@@ -58,6 +62,7 @@ const initialState: IdentityServiceContext = {
   createWallet: emptyFn,
   getBalance: emptyFn,
   getAccount: emptyFn,
+  sendTransaction: emptyFn,
 }
 
 const IdentityContext =
@@ -87,7 +92,6 @@ const IdentityServiceProvider = ({ children }: Props) => {
   const client = useMemo(async () => {
     return (await getClient()) as any
   }, [getClient])
-
   const identityQueryClient = useMemo(
     () =>
       cosmWasmClient
@@ -116,6 +120,10 @@ const IdentityServiceProvider = ({ children }: Props) => {
         { gasPrice: GasPrice.fromString('0.3ujmes') }
       )
 
+    if (!signingClient || !signer) {
+      throw new Error('Invalid mnemonic')
+    }
+
     const addr = (await signer.getAccounts())[0].address
     return {
       signer,
@@ -124,37 +132,52 @@ const IdentityServiceProvider = ({ children }: Props) => {
     }
   }, [])
 
+  const sendTransaction = useCallback(
+    async (mnemonic: string, recipient: string, amount: number) => {
+      if (!cosmWasmClient) return null
+
+      const { addr, signingClient } = await getSigner(mnemonic)
+      const conBalance = coin(amount, JMES_DENOM)
+      return signingClient.sendTokens(
+        addr,
+        recipient,
+        [conBalance],
+        'auto'
+      )
+    },
+    [cosmWasmClient]
+  )
+
   const getAccount = useCallback(
     async (mnemonic: string) => {
       if (!cosmWasmClient) return null
-      try {
-        const { addr, signingClient } = await getSigner(mnemonic)
-        const account = await signingClient.getAccount(addr)
-        const balance = await signingClient.getBalance(
-          addr,
-          JMES_DENOM
-        )
-        const identityClient = new IdentityserviceClient(
-          signingClient,
-          addr,
-          PUBLIC_IDENTITY_SERVICE_CONTRACT
-        )
-        const identity = await identityClient.getIdentityByOwner({
-          owner: addr,
-        })
 
-        const token = account.pubkey?.value
-        return {
-          address: addr,
-          token: token,
-          balance: (Number(balance.amount) || 0) / 1e6,
-          username: identity?.identity?.name,
-        }
-      } catch (err) {
-        console.error(err)
+      const { addr, signingClient } = await getSigner(mnemonic)
+      if (!addr || !signingClient) {
+        throw new Error('Invalid mnemonic')
+      }
+
+      const account = await signingClient.getAccount(addr)
+      const balance = await signingClient.getBalance(addr, JMES_DENOM)
+      const identityClient = new IdentityserviceClient(
+        signingClient,
+        addr,
+        PUBLIC_IDENTITY_SERVICE_CONTRACT
+      )
+      const identity = await identityClient.getIdentityByOwner({
+        owner: addr,
+      })
+
+      const token = account.pubkey?.value
+      return {
+        address: addr,
+        token: token,
+        balance: (Number(balance.amount) || 0) / 1e6,
+        username: identity?.identity?.name,
       }
       return null
     },
+
     [cosmWasmClient]
   )
 
@@ -211,6 +234,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
     createWallet,
     getBalance,
     getAccount,
+    sendTransaction,
   }
 
   return (

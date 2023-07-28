@@ -5,7 +5,8 @@ import { GetIdentityByNameResponse } from '../client/Identityservice.types'
 
 export const useIdentity = (
   debouncedUsername,
-  disabled = false
+  disabled = false,
+  isAddress = false
 ): {
   loading: boolean
   error: null | Error
@@ -29,10 +30,24 @@ export const useIdentity = (
     async function fetchIdentity() {
       onChangeIdentity((p) => ({
         ...p,
+        error: null,
+        data: null,
         loading: true,
       }))
       try {
-        const identity = await identityService?.getIdentityByName({
+        let identity = null
+        if (isAddress) {
+          identity = await identityService.getIdentityByOwner({
+            owner: debouncedUsername,
+          })
+          onChangeIdentity({
+            loading: false,
+            error: null,
+            data: identity,
+          })
+          return
+        }
+        identity = await identityService?.getIdentityByName({
           name: debouncedUsername,
         })
         onChangeIdentity({

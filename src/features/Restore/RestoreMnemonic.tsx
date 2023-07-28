@@ -90,7 +90,6 @@ export default function RestoreMnemonicScreen({
     if (attempts < MAX_ATTEMPTS) {
       setErrorText('Invalid mnemonic ')
       setAttempts(attempts + 1)
-      console.log('attempts', attempts)
     } else {
       setErrorText(
         'Too many failed attempts. Please try again later.'
@@ -102,14 +101,6 @@ export default function RestoreMnemonicScreen({
       }, LOCKOUT_DURATION)
       setRemainingTime(LOCKOUT_DURATION)
     }
-  }
-
-  const restoreIdentity = async () => {
-    const identity = await restoreUserIdentity(
-      mnemonicWords.join(' ')
-    )
-
-    return identity
   }
 
   const handleAccountRestore = async () => {
@@ -146,6 +137,7 @@ export default function RestoreMnemonicScreen({
       ])
       setHasToken(true)
     } catch (err) {
+      setErrorText('Invalid mnemonic')
       console.error(err)
     }
     setLoadingAccount(false)
@@ -157,10 +149,17 @@ export default function RestoreMnemonicScreen({
 
   const setMnemonicWord = (word: string, index: number) => {
     const newMnemonicWords = [...mnemonicWords]
+    if (word.includes(' ')) {
+      const splitWord = word.split(' ')
+      for (let i = index; i < 12; i++) {
+        newMnemonicWords[i] = splitWord[i].trim()
+      }
+      setMnemonicWords(newMnemonicWords)
+      return
+    }
     newMnemonicWords[index] = word
     setMnemonicWords(newMnemonicWords)
   }
-
   return (
     <Background>
       <Backdrop>
@@ -195,9 +194,7 @@ export default function RestoreMnemonicScreen({
             loading={loadingAccount}
             disabled={!canConfirm || isLocked || loadingAccount}
             mode="contained"
-            onPress={async () => {
-              await handleAccountRestore()
-            }}
+            onPress={handleAccountRestore}
           >
             <Text
               style={{
