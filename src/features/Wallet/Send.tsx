@@ -206,7 +206,7 @@ export default function SendScreen({ navigation, route }: Props) {
                   color:
                     searchResult === 'notFound'
                       ? colors.red
-                      : colors.black,
+                      : colors.darkGray,
                  },
               ]}
               selectable
