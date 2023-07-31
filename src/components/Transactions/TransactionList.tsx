@@ -3,12 +3,12 @@ import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native'
 import { useStoreState } from '../../hooks/storeHooks'
 import { Transaction } from '../../types'
 import { TransactionListItem } from '../Transactions/TransactionListItem'
-import { fetchTransactions } from '../../api/transactionAPI'
 import TransactionDetails from '../Modal/TransactionDetails'
 import Modal from '../Modal/Modal'
 import { useQuery } from 'react-query'
 import Button from '../Button/Button'
 import { useIdentityContext } from '../../contexts/IdentityService'
+import { JMES_DENOM } from '../../utils/constants'
 
 type Props = {
   itemPressed?: (item: Transaction) => void
@@ -24,7 +24,7 @@ const TransactionList = ({ itemPressed }: Props) => {
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
-
+ 
   const {
     isLoading,
     error,
@@ -48,8 +48,8 @@ const TransactionList = ({ itemPressed }: Props) => {
       (transaction) =>
         transaction.logs[0].events
           .find((event) => event.type === 'transfer')
-          .attributes.find((attr) => attr.key === 'recipient')
-          .value === address
+          .attributes.find((attr) => attr.key === 'sender')
+          .value !== address
     ) || []
 
   const displayedTransactions = useMemo(() => {
@@ -158,12 +158,9 @@ const TransactionList = ({ itemPressed }: Props) => {
             (attr) => attr.key === 'amount'
           )
 
-          // const { to_address, from_address, amount } =
-          //   body.messages[0]
-          // const { denom, amount: amt } = amount[0]
-
+      
           return (
-            <View key={index} style={styles.listItem}>
+            <View key={tx.txhash} style={styles.listItem}>
               <Pressable onPress={() => handleItemPress(tx)}>
                 <TransactionListItem
                   timestamp={timestamp}
@@ -171,7 +168,7 @@ const TransactionList = ({ itemPressed }: Props) => {
                   tx_type={ sender.value === address ? 'Sent' : 'Received' }
                   to_address={sender.value}
                   from_address={recipient.value}
-                  denom={'denom'}
+                  denom={JMES_DENOM}
                   amount={parseFloat(amount?.value)/1e6}
                 />
               </Pressable>

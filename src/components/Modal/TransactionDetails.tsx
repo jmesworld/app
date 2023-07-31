@@ -1,8 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { Transaction } from '../../types'
-import { formatDate } from '../../utils/formatDate'
-import { TxInfo } from 'jmes/build/Client/providers/LCDClient/core'
+ import { formatDate } from '../../utils/formatDate'
+import type { TxInfo } from 'jmes/build/Client/providers/LCDClient/core'
 type Props = {
   transaction: TxInfo | null
   closeModal: () => void
