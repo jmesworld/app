@@ -128,8 +128,7 @@ const TopUpScreen = ({ navigation }: Props) => {
                 )}`}
                 readonly
                 placeholder={'Address or Name'}
-                placeholderTextColor="rgba(112, 79, 247, 0.5)"
-                imgSource={
+                 imgSource={
                   <Pressable
                     style={{
                       display: 'flex',
@@ -140,8 +139,7 @@ const TopUpScreen = ({ navigation }: Props) => {
                       backgroundColor: 'transparent',
                     }}
                     onPress={() => {
-                      // copy to clipboard on press
-                      copyToClipboard(address, 2000)
+                       copyToClipboard(address, 2000)
                     }}
                   >
                     {copied ? <CheckIcon 

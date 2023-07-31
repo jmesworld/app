@@ -4,10 +4,10 @@ import {
   DefaultTheme,
   DarkTheme,
 } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { ColorSchemeName } from 'react-native'
+import { NativeStackScreenProps, createNativeStackNavigator } from '@react-navigation/native-stack'
+import { ColorSchemeName, Modal } from 'react-native'
 import { useStoreState } from '../hooks/storeHooks'
-import { RootStackParamList } from '../types'
+import { RootStackParamList, ModalParamList } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
 import NotFoundScreen from '../components/NotFound/NotFound'
 import { useState, useEffect } from 'react'
@@ -21,6 +21,7 @@ import {
   ReceiveScreen,
 } from '../features/Wallet'
 import { OnBoardingStack } from './onBoardingStack'
+import ActiveRequest from '../features/Wallet/ActiveRequest'
 
 export default function Navigation({
   colorScheme,
@@ -38,6 +39,10 @@ export default function Navigation({
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
+export type ModalNavigation<T extends keyof ModalParamList> = NativeStackScreenProps<ModalParamList, T>
+ 
+export type ModalNavigate<T> = ModalNavigation<T>['navigation']
+export type ModalRoute<T> = ModalNavigation<T>['route']
 
 function RootNavigator() {
   const account = useStoreState((state) => state.accounts[0])
@@ -99,6 +104,15 @@ function RootNavigator() {
             headerShown: false,
             presentation: 'card',
             title: 'Request',
+          }}
+        />
+        <Stack.Screen
+          name="ActiveRequest"
+          component={ActiveRequest}
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            title: 'Active Request',
           }}
         />
         <Stack.Screen

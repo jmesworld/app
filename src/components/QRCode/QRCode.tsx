@@ -7,13 +7,17 @@ import { IQRCodePayload } from '../../store'
 
 type Props = {
   payload: IQRCodePayload
+  size?: number
 }
 
-export default function GeneratedQRCode({ payload }: Props) {
+export default function GeneratedQRCode({
+  payload,
+  size = 168,
+}: Props) {
   return (
     <View style={styles.container}>
       <QRCode
-        size={168}
+        size={size}
         color="#5136C2"
         value={JSON.stringify(payload)}
       />

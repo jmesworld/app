@@ -18,9 +18,22 @@ declare global {
 
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined
-  Modal: undefined
+  Modal: NavigatorScreenParams<ModalParamList> | undefined
   NotFound: undefined
 }
+
+export type ModalParamList = {
+  WalletSend: undefined
+  WalletSendConfirm: undefined
+  WalletReceive: undefined
+  ReceiveRequest: undefined
+  ActiveRequest: {
+    amount: string
+  }
+  TransactionHistory: undefined
+  Scan: undefined
+}
+
 
 export type RootStackScreenProps<
   Screen extends keyof RootStackParamList
