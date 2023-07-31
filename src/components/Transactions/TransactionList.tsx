@@ -1,5 +1,5 @@
 import { memo, useState, useMemo, useCallback } from 'react'
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native'
 import { useStoreState } from '../../hooks/storeHooks'
 import { Transaction } from '../../types'
 import { TransactionListItem } from '../Transactions/TransactionListItem'
@@ -14,12 +14,12 @@ type Props = {
   itemPressed?: (item: Transaction) => void
 }
 
+const itemsPerPage = 10
 const TransactionList = ({ itemPressed }: Props) => {
   const { searchTxs } = useIdentityContext()
   const address = useStoreState((state) => state.accounts[0]?.address)
   const [activeTab, setActiveTab] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
 
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
@@ -29,20 +29,27 @@ const TransactionList = ({ itemPressed }: Props) => {
     isLoading,
     error,
     data: allTransactions,
-  } = useQuery(
-    ['transactions', address],
-    () => searchTxs(address),
-    { enabled: !!address }
-  )
+  } = useQuery(['transactions', address], () => searchTxs(address), {
+    enabled: !!address,
+    refetchInterval: 1000,
+  })
 
   const sentTransactions =
-    allTransactions.txs?.filter(
-      (transaction) =>  false
+    allTransactions?.txs?.filter(
+      (transaction) =>
+        transaction.logs[0].events
+          .find((event) => event.type === 'transfer')
+          .attributes.find((attr) => attr.key === 'sender').value ===
+        address
     ) || []
 
   const receivedTransactions =
-    allTransactions.txs?.filter(
-      (transaction) =>  false
+    allTransactions?.txs?.filter(
+      (transaction) =>
+        transaction.logs[0].events
+          .find((event) => event.type === 'transfer')
+          .attributes.find((attr) => attr.key === 'recipient')
+          .value === address
     ) || []
 
   const displayedTransactions = useMemo(() => {
@@ -50,11 +57,11 @@ const TransactionList = ({ itemPressed }: Props) => {
     const end = start + itemsPerPage
     switch (activeTab) {
       case 'All':
-        return allTransactions?.txs?.slice(start, end) || []
+        return allTransactions?.txs?.slice(start, end).sort((a,b) => b.timestamp - a.timestamp) || []
       case 'Sent':
-        return sentTransactions.slice(start, end)
+        return sentTransactions?.slice(start, end)
       case 'Received':
-        return receivedTransactions.slice(start, end)
+        return receivedTransactions?.slice(start, end)
       default:
         return []
     }
@@ -127,10 +134,30 @@ const TransactionList = ({ itemPressed }: Props) => {
           </View>
         ))}
       </View>
-      <View style={styles.transactionList}>
+      <ScrollView style={styles.transactionList}>
         {displayedTransactions.map((tx, index) => {
           // TODO: fix this
-          const { timestamp, txhash: tx_hash, code: tx_type, logs: body,  } = tx
+          const {
+            timestamp,
+            txhash: tx_hash,
+            code: tx_type,
+            logs: body,
+            tx: txBody,
+          } = tx
+          const attributes = body[0].events.find(
+            (event) => event.type === 'transfer'
+          ).attributes
+
+          const recipient = attributes.find(
+            (attr) => attr.key === 'recipient'
+          )
+          const sender = attributes.find(
+            (attr) => attr.key === 'sender'
+          )
+          const amount = attributes.find(
+            (attr) => attr.key === 'amount'
+          )
+
           // const { to_address, from_address, amount } =
           //   body.messages[0]
           // const { denom, amount: amt } = amount[0]
@@ -141,17 +168,17 @@ const TransactionList = ({ itemPressed }: Props) => {
                 <TransactionListItem
                   timestamp={timestamp}
                   tx_hash={tx_hash}
-                  tx_type={tx_type as any}
-                  to_address={'hi'}
-                  from_address={'ho'}
+                  tx_type={ sender.value === address ? 'Sent' : 'Received' }
+                  to_address={sender.value}
+                  from_address={recipient.value}
                   denom={'denom'}
-                  amount={33}
+                  amount={parseFloat(amount?.value)/1e6}
                 />
               </Pressable>
             </View>
           )
         })}
-      </View>
+      </ScrollView>
       <View style={styles.pagination}>
         <Text
           style={styles.paginationButton}
@@ -210,9 +237,10 @@ const styles = StyleSheet.create({
   transactionList: {
     marginTop: 16,
     marginBottom: 52,
-    marginLeft: 35.5,
-    marginRight: 21,
+    marginLeft: 20,
+    marginRight: 20,
     backgroundColor: 'transparent',
+ 
   },
   listItem: {
     backgroundColor: 'transparent',

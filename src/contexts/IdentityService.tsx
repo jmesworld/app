@@ -109,17 +109,18 @@ const IdentityServiceProvider = ({ children }: Props) => {
   const searchTxs = useCallback(
     async (address: string) => {
       const result = await client.providers.LCDC.tx.search({
-        events: [
+         events: [
           {
             key: 'message.sender',
             value: address,
           },
           {
-            key: 'message.recipient',
+            key: 'transfer.recipient',
             value: address,
           },
         ],
       })
+
       return result
     },
     [cosmWasmClient]

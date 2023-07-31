@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Transaction } from '../types'
 import { PUBLIC_REST_URL } from '@env'
-const API_BASE_URL = 'http://51.38.52.37:1317/cosmos/tx/v1beta1/txs'
+const API_BASE_URL = `${PUBLIC_REST_URL}/cosmos/tx/v1beta1/txs`
 
 async function fetchTransactionsByEvent(
   event: string
@@ -33,10 +33,6 @@ export async function fetchTransactions(
       ...sentTransactions,
       ...receivedTransactions,
     ]
-
-    console.log('allTransactions', allTransactions)
-    console.log('receivedTransactions', receivedTransactions)
-    console.log('sentTransactions', sentTransactions)
 
     return allTransactions
   } catch (error) {

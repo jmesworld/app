@@ -2,8 +2,9 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Transaction } from '../../types'
 import { formatDate } from '../../utils/formatDate'
+import { TxInfo } from 'jmes/build/Client/providers/LCDClient/core'
 type Props = {
-  transaction: Transaction | null
+  transaction: TxInfo | null
   closeModal: () => void
 }
 
@@ -11,7 +12,16 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
   if (!transaction) {
     return null
   }
+  const senderAddress = transaction.logs[0].events
+    .find((event) => event.type === 'transfer')
+    .attributes.find((attr) => attr.key === 'recipient').value
 
+  const receiverAddress = transaction.logs[0].events
+    .find((event) => event.type === 'transfer')
+    .attributes.find((attr) => attr.key === 'recipient').value
+  const amount = transaction.logs[0].events
+    .find((event) => event.type === 'transfer')
+    .attributes.find((attr) => attr.key === 'amount').value
   return (
     <View>
       <Text style={styles.title}>Transaction Details</Text>
@@ -44,23 +54,17 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>From</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].from_address}
-        </Text>
+        <Text style={styles.textLarge}>{senderAddress}</Text>
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>To</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].to_address}
-        </Text>
+        <Text style={styles.textLarge}>{receiverAddress}</Text>
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>Total Amount</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].amount[0].amount} JMES
-        </Text>
+        <Text style={styles.textLarge}>{amount}</Text>
         <View style={styles.itemSeparator} />
       </View>
     </View>
@@ -108,7 +112,7 @@ const styles = StyleSheet.create({
     color: '#454E62',
   },
   textLarge: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '500',
     color: '#263047',
   },
