@@ -5,6 +5,7 @@ import { Navigation, Transaction } from '../../types'
 
 import { RecentTransactions } from '../Wallet/components'
 import { useState } from 'react'
+import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
 type Props = {
   navigation: Navigation
   address: string
@@ -21,7 +22,7 @@ export default function TransactionHistoryScreen({
   const [modalVisible, setModalVisible] = useState(false)
   return (
     <View style={styles.container}>
-      <Background>
+      <BackgroundWithNoScrollView>
         <Navbar
           title={'Transaction History'}
           navigation={navigation}
@@ -36,7 +37,7 @@ export default function TransactionHistoryScreen({
           title="Transactions"
           textLink="See all"
         />
-      </Background>
+      </BackgroundWithNoScrollView>
     </View>
   )
 }

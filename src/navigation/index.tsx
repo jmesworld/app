@@ -10,8 +10,7 @@ import { useStoreState } from '../hooks/storeHooks'
 import { RootStackParamList, ModalParamList } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
 import NotFoundScreen from '../components/NotFound/NotFound'
-import { useState, useEffect } from 'react'
-import {
+ import {
   WalletScreen,
   SendScreen,
   RequestScreen,

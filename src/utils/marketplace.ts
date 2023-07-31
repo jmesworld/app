@@ -2,7 +2,6 @@ export const getFeed = async (token: any, client: any) => {
   const feed = await client.providers.marketplaceAPI.getFeed({
     token,
   })
-  console.log(feed)
 
   return feed
 }
@@ -17,8 +16,7 @@ export const postItemVote = async (
     { identifier: '82f182ddbef3d7b80bafc06ee9e4a664', direction: 1 },
     { token }
   )
-  console.log(vote)
-
+ 
   return vote
 }
 

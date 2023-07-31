@@ -51,10 +51,7 @@ export const fetchTransactions = async ({ address }) => {
       ...sentTransactions,
       ...receivedTransactions,
     ]
-    console.log('allTransactions', allTransactions)
-    console.log('receivedTransactions', receivedTransactions)
-    console.log('sentTransactions', sentTransactions)
-
+ 
     return allTransactions
   } catch (error) {
     console.error('Error fetching transactions:', error)

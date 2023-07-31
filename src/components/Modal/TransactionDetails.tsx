@@ -2,19 +2,47 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Transaction } from '../../types'
 import { formatDate } from '../../utils/formatDate'
+import { UserAvatar } from '../userAvatar'
+import { useIdentity } from '../../hooks/useIdentity'
+import { useAppTheme } from '../../theme'
+import JmesIcon from '../../assets/jmesBlack.svg'
+import Button from '../Button/Button'
+import {
+  convertToUSD,
+  formatBalance,
+} from '../../utils/balanceFormat'
+
 type Props = {
   transaction: Transaction | null
   closeModal: () => void
 }
 
 const TransactionDetails = ({ transaction, closeModal }: Props) => {
+  const { timestamp, tx_hash, body } = transaction
+  const {
+    to_address: toAddress,
+    from_address: fromAddress,
+    amount,
+  } = body.messages[0]
+  if (!amount?.[0]) {
+    return null
+  }
+  const { amount: amt } = amount[0]
+
+  const fromIdentity = useIdentity(fromAddress, false, true)
+  const toIdentity = useIdentity(toAddress, false, true)
+  const { colors } = useAppTheme()
   if (!transaction) {
     return null
   }
 
+  const isSent = transaction.tx_type === 'Sent'
+
   return (
     <View>
-      <Text style={styles.title}>Transaction Details</Text>
+      <Text style={styles.title}>
+        {isSent ? 'Sent' : 'Received'} JMES
+      </Text>
       <View style={styles.item}>
         <Text style={styles.textSmall}>Status</Text>
         <View>
@@ -37,31 +65,61 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>Date</Text>
-        <Text style={styles.textLarge}>
-          {formatDate(transaction.timestamp)}
-        </Text>
+        <Text style={styles.textLarge}>{formatDate(timestamp)}</Text>
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>From</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].from_address}
-        </Text>
+        <UserAvatar
+          address={fromAddress}
+          name={fromIdentity?.data?.identity?.name}
+          color={colors.green}
+        />
+
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>To</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].to_address}
-        </Text>
+        <UserAvatar
+          color={colors.primary}
+          address={toAddress}
+          name={toIdentity?.data?.identity?.name}
+        />
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>Total Amount</Text>
-        <Text style={styles.textLarge}>
-          {transaction.body.messages[0].amount[0].amount} JMES
-        </Text>
+        <View style={styles.amountContainer}>
+          <View style={styles.amount}>
+            <JmesIcon width={12} height={12} />
+            <Text style={styles.textAmount}>
+              {formatBalance(amt)}
+            </Text>
+          </View>
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.textAmount,
+              {
+                color: colors.darkGray,
+              },
+            ]}
+          >
+            USD {convertToUSD(amt)}
+          </Text>
+        </View>
         <View style={styles.itemSeparator} />
+        <View style={styles.buttonContainer}>
+          <Button
+            mode="contained"
+            width="full"
+            onPress={() => {
+              // TODO: add action
+            }}
+          >
+            <Text>View on Main net</Text>
+          </Button>
+        </View>
       </View>
     </View>
   )
@@ -76,14 +134,27 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   item: {
-    marginLeft: 24,
+    paddingHorizontal: 24,
+    width: '100%',
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    flexWrap: 'wrap',
+  },
+  amount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   itemSeparator: {
     marginTop: 16,
     marginBottom: 16,
     backgroundColor: '#263047',
     opacity: 0.1,
-    width: '90%',
+    width: '100%',
     height: 1,
   },
   statusTextConfirmed: {
@@ -106,6 +177,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
     color: '#454E62',
+    marginBottom: 5,
+  },
+  textAmount: {
+    fontSize: 16,
+    overflow: 'hidden',
+    fontWeight: '500',
+    verticalAlign: 'middle',
+  },
+  buttonContainer: {
+    width: '100%',
+    height: 48,
   },
   textLarge: {
     fontSize: 18,

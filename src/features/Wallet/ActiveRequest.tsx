@@ -126,7 +126,9 @@ const ActiveRequest = ({ navigation, route }: Props) => {
             <ActivityIndicator size="large" color={colors.primary} />
           )}
           <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={async () => {}}>
+            <Button mode="outlined" onPress={async () => {
+              navigation.navigate('Root')
+            }}>
               <Text
                 style={{
                   fontWeight: '500',
