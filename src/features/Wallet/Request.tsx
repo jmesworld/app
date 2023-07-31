@@ -1,156 +1,84 @@
-import { useEffect, useState } from 'react'
-import {
-  Platform,
-  StyleSheet,
-  Pressable,
-  TextInput,
-  SafeAreaView,
-} from 'react-native'
-
-import {
-  useStoreState,
-  useStoreActions,
-} from '../../hooks/storeHooks'
-
-import GeneratedQRCode from '../../components/QRCode/QRCode'
+import { useMemo, useState } from 'react'
+import { StyleSheet, TextInput, SafeAreaView } from 'react-native'
 import {
   BackdropSmall,
   Navbar,
   View,
   Text,
-  StyledButton as NextButton,
   Background,
+  Button,
 } from '../../components'
-
 import { Navigation } from '../../types'
-import { IQRCodePayload } from '../../store'
-import { SCHEMA_PREFIX, notateWeiValue } from '../../utils'
+import { numberSchema } from '../../validations/number'
+import { ModalNavigate } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
+  navigation: ModalNavigate<'ActiveRequest'>
 }
 
-const isIOS = Platform.OS === 'ios'
-const isWeb = Platform.OS === 'web'
-
 export default function RequestScreen({ navigation }: Props) {
-  const address = useStoreState((state) => state.accounts[0]?.address)
-  const username = useStoreState((state) => state.user.username)
-  const [payload, setPayload] = useState<IQRCodePayload>()
   const [data, setData] = useState('')
-  const [isValidInput, setIsValidInput] = useState(true)
 
-  const parsePayload = async () => {
-    // Currently resembles a request amount transaction
-    const parsedAmount = parseFloat(data)
-
-    // Check if parsedAmount is a valid number before converting to wei
-    if (!isNaN(parsedAmount)) {
-      const notatedAmount = await notateWeiValue(parsedAmount)
-      const url = `${SCHEMA_PREFIX}${address}?value=${notatedAmount}`
-      const payloadData = {
-        url: url,
-        address: address,
-        username: username,
-        amount: notatedAmount,
-      }
-
-      setPayload(payloadData)
-    } else {
-      setPayload(undefined)
-    }
-  }
-
-  const handleGenerateQR = async () => {
-    //implement case switch to determine type of transaction being made (request,transfer, etc)
-    if (data) {
-      await parsePayload()
-    } else {
-      alert('Please enter a valid Amount')
-    }
-  }
   const handleTextInputChange = async (value: string) => {
-    setData(value)
-
-    // Check if input contains only numbers and a single decimal point
-    const isNumber = /^-?\d*(\.\d+)?$/.test(value)
+    const isNumber = numberSchema.safeParse(value).success
 
     if (isNumber) {
-      setIsValidInput(true)
-      if (value) {
-        await parsePayload()
-      } else {
-        setPayload(undefined)
-      }
-    } else {
-      setIsValidInput(false)
+      setData(value)
     }
   }
+
+  const isValidInput = useMemo(() => {
+    return data.length > 0
+  }, [data])
 
   return (
     <View style={styles.container}>
       <Background>
         <Navbar
-          title={'Request'}
+          title={'Request Amount'}
           navigation={navigation}
           children={'WalletReceive'}
         />
         <BackdropSmall>
-          <Text style={styles.title}>Amount</Text>
-          <SafeAreaView>
+          <Text style={styles.title}>Amount of JMES</Text>
+          <SafeAreaView style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="JMES"
+              placeholder="Enter amount"
               onChangeText={handleTextInputChange}
               keyboardType="numeric"
               value={data}
             />
-            {!isValidInput && (
-              <Text style={{ color: 'red', textAlign: 'center' }}>
-                Only numbers are allowed
-              </Text>
-            )}
+
             <Text style={styles.conversionText}>
-              {payload ? `≈ ${payload.amount}` : null}
+              {data && isValidInput
+                ? `≈ ${(Number(data) * 0.3).toFixed(3)}`
+                : null}
             </Text>
-            {payload ? <GeneratedQRCode payload={payload} /> : null}
           </SafeAreaView>
 
           <View style={styles.buttonContainer}>
-            <Pressable
-              style={styles.cancelButton}
+            <Button
+              rounded="full"
+              mode="contained"
+              disabled={!isValidInput}
               onPress={async () => {
-                navigation.navigate('Root')
-              }}
-            >
-              <Text
-                style={{
-                  color: '#23262F',
-                  fontSize: 16,
-                  fontWeight: '500',
-                  lineHeight: 16,
-                }}
-              >
-                Cancel
-              </Text>
-            </Pressable>
-            <Pressable
-              style={styles.sendButton}
-              onPress={async () => {
-                navigation.navigate('Root')
+                navigation.navigate('ActiveRequest', {
+                  amount: data,
+                })
               }}
             >
               <Text
                 style={{
                   color: '#FFFFFF',
                   fontSize: 16,
+
                   fontWeight: '500',
-                  lineHeight: 16,
                 }}
               >
-                Done
+                Next
               </Text>
-            </Pressable>
+            </Button>
           </View>
         </BackdropSmall>
       </Background>
@@ -169,11 +97,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#704FF7',
-    borderRadius: 90,
-    fontSize: 16,
-    height: 48,
-    width: '48%',
+  },
+  inputContainer: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cancelButton: {
     flexDirection: 'row',
@@ -195,11 +124,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignSelf: 'center',
-
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 'auto',
-    marginBottom: 20,
+    marginBottom: 30,
     width: '90%',
     height: 48,
     backgroundColor: 'transparent',
@@ -234,7 +162,7 @@ const styles = StyleSheet.create({
   },
   input: {
     placeholderTextColor: 'rgba(112, 79, 247, 0.5)',
-    fontSize: 38,
+    fontSize: 18,
     textAlign: 'center',
     color: '#704FF7',
     paddingLeft: 19,

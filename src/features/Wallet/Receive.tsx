@@ -1,14 +1,5 @@
-import React, { useEffect, useState } from 'react'
-
-import {
-  Platform,
-  StyleSheet,
-  Pressable,
-  TextInput,
-  SafeAreaView,
-  ActionSheetIOS,
-} from 'react-native'
-import { getUserIdentity } from '../../utils'
+import React from 'react'
+import { StyleSheet, Pressable, SafeAreaView } from 'react-native'
 import {
   Background,
   BackdropSmall,
@@ -16,21 +7,24 @@ import {
   View,
   Text,
   StyledButton as NextButton,
+  Input,
 } from '../../components'
 import { Navigation } from '../../types'
-import { Route } from '@react-navigation/native'
 import { useStoreState } from '../../hooks/storeHooks'
 import QRCode from 'react-native-qrcode-svg' // Import QRCode component
+import { useClipboardTimeout } from '../../hooks/useClipboardTimeout'
+import CopyIcon from '../../assets/copy.svg'
+import CheckIcon from '../../assets/check.svg'
+import { useAppTheme } from '../../theme'
 
 type Props = {
   navigation: Navigation
 }
 
-const isIOS = Platform.OS === 'ios'
-const isWeb = Platform.OS === 'web'
-
 export default function ReceiveScreen({ navigation }: Props) {
   const address = useStoreState((state) => state.accounts[0]?.address)
+  const [copied, copyToClipboard] = useClipboardTimeout()
+  const { colors } = useAppTheme()
 
   return (
     <View style={styles.container}>
@@ -41,77 +35,69 @@ export default function ReceiveScreen({ navigation }: Props) {
           children={'Root'}
         />
         <BackdropSmall>
-          <Text style={styles.title}>Share Account</Text>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 20,
-              backgroundColor: 'transparent',
-            }}
-          >
+          <View style={styles.qrContainer}>
             <QRCode value={address} size={168} color="#5136C2" />
           </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 32,
-              backgroundColor: 'transparent',
-            }}
-          >
-            <Text
-              style={{
-                color: '#454E62',
-                fontSize: 15,
-                fontWeight: '400',
-              }}
-            >
-              {address}
-            </Text>
-          </View>
-          <View
-            style={{
-              marginTop: 55,
-              backgroundColor: 'transparent',
-            }}
-          >
-            <Text style={styles.title}>or</Text>
-          </View>
 
-          <View
+          <Text style={styles.textInfo}>Your JMES address</Text>
+          <SafeAreaView
             style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 70,
-              backgroundColor: 'transparent',
+              marginTop: 15,
+              paddingHorizontal: 10,
+              height: 60,
+              width: '100%',
             }}
           >
-            <Pressable
-              style={styles.requestButton}
-              onPress={async () => {
-                navigation.navigate('ReceiveRequest')
+            <Input
+              containerStyle={{
+                marginTop: 4,
+                borderRadius: 16,
+                backgroundColor: colors.bgInput,
+                borderWidth: 0,
               }}
-            >
-              <Text
-                style={{
-                  color: '#23262F',
-                  fontSize: 16,
-                  fontWeight: '500',
-                  lineHeight: 16,
-                }}
-              >
-                Request
-              </Text>
-            </Pressable>
-          </View>
+              value={`${address.substring(
+                0,
+                15
+              )}...${address.substring(
+                address.length - 15,
+                address.length
+              )}`}
+              readonly
+              placeholder={'Address or Name'}
+               imgSource={
+                <Pressable
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 40,
+                    height: 40,
+                    backgroundColor: 'transparent',
+                  }}
+                  onPress={() => {
+                    copyToClipboard(address, 2000)
+                  }}
+                >
+                  {copied ? (
+                    <CheckIcon
+                      width={20}
+                      height={20}
+                      color={colors.green}
+                    />
+                  ) : (
+                    <CopyIcon height={20} width={20} />
+                  )}
+                </Pressable>
+              }
+            />
+          </SafeAreaView>
 
           <View style={styles.buttonContainer}>
             <NextButton
-              onPress={() => navigation.navigate('Root')}
-              enabled={true}
+              onPress={() => navigation.navigate('ReceiveRequest')}
+              enabled
             >
-              Done
+              Add Amount
             </NextButton>
           </View>
         </BackdropSmall>
@@ -126,24 +112,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
-
-  requestButton: {
-    flexDirection: 'row',
+  qrContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 90,
-    border: '1px solid #5136C2',
-    fontSize: 16,
-    height: 48,
-    width: '48%',
+    marginTop: 40,
+    backgroundColor: 'transparent',
   },
-  buttonText: {
-    fontSize: 24,
-    textTransform: 'uppercase',
-    fontFamily: 'Roboto_900Black',
-    color: '#000000',
+  textInfo: {
+    fontSize: 18,
+    marginTop: 45,
   },
+
   buttonContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
@@ -157,9 +136,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 
-  iconImageView: {
-    flexDirection: 'row',
-  },
   button: {
     left: 0,
     right: 0,
@@ -175,85 +151,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textTransform: 'uppercase',
     fontFamily: 'Roboto_900Black',
-  },
-  title: {
-    color: 'black',
-    alignSelf: 'center',
-    fontSize: 16,
-    fontWeight: '500',
-    marginTop: 24,
-    marginBottom: 10,
-  },
-  input: {
-    placeholderTextColor: 'rgba(112, 79, 247, 0.5)',
-    paddingLeft: 19,
-    marginLeft: 14,
-    marginRight: 14,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'rgba(112, 79, 247, 0.5)',
-    borderRadius: 24,
-    backgroundColor: 'rgba(112, 79, 247, 0.1)',
-    width: '90%',
-    height: 60,
-  },
-  secondTitle: {
-    fontSize: 36,
-    fontFamily: 'Comfortaa_300Light',
-    paddingTop: 40,
-  },
-  balanceJMES: {
-    fontWeight: 'bold',
-    flex: 0,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: 'center',
-    fontFamily: 'Roboto_900Black',
-    textTransform: 'uppercase',
-  },
-  balanceEUR: {
-    fontWeight: 'bold',
-    flex: 0,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: 'center',
-    fontFamily: 'Roboto_900Black',
-    textTransform: 'uppercase',
-  },
-  buttonImage: {
-    padding: 10,
-  },
-  iconImage: {
-    width: 30,
-    height: 30,
-    margin: 10,
-  },
-  section: {
-    fontWeight: 'bold',
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: 'flex-start',
-    fontFamily: 'Roboto_900Black',
-    textTransform: 'uppercase',
-  },
-  noAssetText: {
-    fontWeight: 'bold',
-    flex: 1,
-    fontSize: 24,
-    lineHeight: 28,
-    paddingTop: 15,
-    alignSelf: 'center',
-    fontFamily: 'Roboto_900Black',
-    textTransform: 'uppercase',
-  },
-
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
 })

@@ -16,7 +16,7 @@ const Button = ({
   rounded,
   disabled,
   style,
-  width,
+  width = 'full',
   children,
   ...props
 }: Props) => {
@@ -49,9 +49,12 @@ const Button = ({
     ...(typeof width === 'number' && {
       width: width,
     }),
-    ...(typeof width === 'string' && {
-      width: width,
-    }),
+    ...(typeof width === 'string' &&
+      width !== 'full' &&
+      width !== 'md' &&
+      width !== 'sm' && {
+        width: width,
+      }),
   }
 
   const roundedStyle = rounded && {
@@ -71,6 +74,7 @@ const Button = ({
 
   return (
     <PaperButton
+      {...props}
       style={[
         styles.button,
         roundedStyle,
@@ -80,7 +84,6 @@ const Button = ({
       ]}
       labelStyle={styles.text}
       mode={mode}
-      {...props}
       onPress={(e) => {
         if (props.onPress && !disabled) {
           props.onPress(e)
@@ -97,6 +100,7 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     marginVertical: 10,
+    
   },
   text: {
     fontWeight: 'bold',
