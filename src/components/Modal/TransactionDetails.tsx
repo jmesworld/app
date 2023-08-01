@@ -10,6 +10,7 @@ import Button from '../Button/Button'
 import {
   convertToUSD,
   formatBalance,
+  formatUSDFromJMES,
 } from '../../utils/balanceFormat'
 
 type Props = {
@@ -107,7 +108,7 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
               },
             ]}
           >
-            USD {convertToUSD(amt)}
+         {formatUSDFromJMES(amt)}
           </Text>
         </View>
         <View style={styles.itemSeparator} />

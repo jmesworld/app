@@ -59,7 +59,9 @@ const TransactionList = ({
     const end = showFilter ? start + itemsPerPage : 5
     switch (activeTab) {
       case 'All':
-        return allTransactions?.slice(start, end)
+        return allTransactions
+          ?.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
+          .slice(start, end)
       case 'Sent':
         return sentTransactions.slice(start, end)
       case 'Received':
@@ -87,14 +89,18 @@ const TransactionList = ({
     })
     return category
   }, [displayedTransactions, showFilter])
+
   const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage)
   }, [])
 
-  const handleItemPress = useCallback((txHash: string) => {
-     const tx = allTransactions.find((tx) => tx.tx_hash === txHash)
-    setSelectedTransaction(tx)
-  }, [allTransactions])
+  const handleItemPress = useCallback(
+    (txHash: string) => {
+      const tx = allTransactions.find((tx) => tx.tx_hash === txHash)
+      setSelectedTransaction(tx)
+    },
+    [allTransactions]
+  )
 
   const closeModal = useCallback(() => {
     setSelectedTransaction(null)
@@ -164,7 +170,7 @@ const TransactionList = ({
         )}
         style={styles.transactionList}
         sections={categorizedTransactions}
-        keyExtractor={(item) => item.tx_hash}
+        keyExtractor={(item, index) => `${item.tx_hash}-${index}`}
         renderItem={({ item, index }) => {
           const { timestamp, tx_hash, tx_type, body } = item
           const { to_address, from_address, amount } =

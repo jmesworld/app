@@ -22,6 +22,7 @@ import {
 } from '../../hooks/storeHooks'
 import { getCoinBal } from '../../utils'
 import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
+import { formatBalance } from '../../utils/balanceFormat'
 
 type Props = {
   navigation: Navigation
@@ -83,7 +84,7 @@ export default function WalletScreen({ navigation }: Props) {
           <Text
             style={{ color: 'white', marginBottom: 11, fontSize: 42 }}
           >
-            {balance}
+            {formatBalance(balance, false)}
           </Text>
 
           <ConvertDenom

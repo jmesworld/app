@@ -25,7 +25,7 @@ export const TransactionReceived = ({
     <View style={styles.container}>
       <View style={styles.mainContainer}> 
       <CheckIcon width={62} height={62} />
-      <Text style={styles.title}> Transaction Completed</Text>
+      <Text style={styles.title}> Transaction Completed!</Text>
       <View>
         <Text
           numberOfLines={3}
@@ -36,7 +36,7 @@ export const TransactionReceived = ({
             },
           ]}
         >
-          You received {amount} JMES from {name} See details is history
+          You received {amount} JMES from {name}. {'\n'}See details is history
         </Text>
       </View>
       </View>

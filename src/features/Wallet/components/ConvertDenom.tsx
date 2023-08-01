@@ -1,14 +1,6 @@
 // ConvertDenom.tsx
 import React, { useState } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Image,
-} from 'react-native'
-
-import { useCurrencyRates } from '../../../hooks/useCurrencyRates'
+import { View, Text, StyleSheet } from 'react-native'
 
 interface Props {
   cryptoValue: number
@@ -29,33 +21,13 @@ const ConvertDenom: React.FC<Props> = ({
   selectedCurrency,
   setSelectedCurrency,
 }) => {
-  // const { data: currencyRates, isLoading } =
-  //   useCurrencyRates(selectedCurrency)
-
-  // if (isLoading) {
-  //   return <Text>Loading...</Text>
-  // }
-
-  // const selectedRate =
-  //   currencyRates?.find((rate) => rate.code === selectedCurrency.code)
-  //     ?.rate || 0
-  const convertedValue = .30 * cryptoValue
+  const convertedValue = 0.3 * cryptoValue
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
-        ≈ {selectedCurrency.code} {selectedCurrency.symbol}
-        {convertedValue.toFixed(2)}
+        ≈ {convertedValue.toFixed(2)} {selectedCurrency.code}
       </Text>
-      <Pressable style={styles.button} onPress={toggleDropdown}>
-        <Image
-          source={require('../../../../assets/icons/arrow-down.png')}
-          style={{
-            width: 16,
-            height: 16,
-          }}
-        />
-      </Pressable>
     </View>
   )
 }

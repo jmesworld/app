@@ -27,6 +27,7 @@ import { useDebounce } from '../../hooks/useDebounce'
 import { useAppTheme } from '../../theme'
 import { numberSchema } from '../../validations/number'
 import { useStoreState } from '../../hooks/storeHooks'
+import { formatUSDFromJMES } from '../../utils/balanceFormat'
 
 type Props = {
   navigation: Navigation
@@ -54,8 +55,6 @@ export default function SendScreen({ navigation, route }: Props) {
   )
 
   const handleTxParams = async (username: string) => {
- 
-
     // @ts-ignore
     return navigation.navigate({
       name: 'WalletSendConfirm',
@@ -74,9 +73,18 @@ export default function SendScreen({ navigation, route }: Props) {
     if (identity.loading || identity.error) {
       return false
     }
-    if (nameOrAddress && identity.data?.identity?.owner) {
+
+    if (nameOrAddress !== debouncedNameOrAddress) {
+      return false
+    }
+
+    if (identity.data?.identity?.owner === nameOrAddress) {
       return true
     }
+    if (identity.data?.identity?.name === nameOrAddress) {
+      return true
+    }
+
     return false
   }, [identity, amount, nameOrAddress])
 
@@ -85,6 +93,9 @@ export default function SendScreen({ navigation, route }: Props) {
     | 'notFound'
     | string => {
     if (identity.loading) {
+      return 'loading' as const
+    }
+    if (debouncedNameOrAddress !== nameOrAddress) {
       return 'loading' as const
     }
     if (identity.error) {
@@ -97,16 +108,19 @@ export default function SendScreen({ navigation, route }: Props) {
       if (!address) {
         return 'notFound'
       }
-      if (!name) {
+      if (!name && debouncedNameOrAddress === address) {
         return address
       }
       if (debouncedNameOrAddress === address) {
         return address
       }
+      if (debouncedNameOrAddress === name) {
+        return address
+      }
       if (debouncedNameOrAddress !== name) {
         return 'loading'
       }
-      return address
+      return ''
     }
     return 'notFound'
   }, [identity, debouncedNameOrAddress])
@@ -207,7 +221,7 @@ export default function SendScreen({ navigation, route }: Props) {
                     searchResult === 'notFound'
                       ? colors.red
                       : colors.darkGray,
-                 },
+                },
               ]}
               selectable
               ellipsizeMode="middle"
@@ -250,6 +264,20 @@ export default function SendScreen({ navigation, route }: Props) {
             >
               {amount.error}
             </Text>
+           {amount.value && (<Text
+              selectionColor={colors.primary}
+              style={[
+                styles.searchResult,
+                {
+                  color: colors.darkGray,
+                },
+              ]}
+              selectable
+              ellipsizeMode="middle"
+              numberOfLines={1}
+            >
+              {formatUSDFromJMES(amount.value, false)}
+            </Text>)}
           </View>
           <View style={styles.buttonContainer}>
             <NextButton
@@ -300,7 +328,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
     height: 20,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   iconImageView: {
     flexDirection: 'row',

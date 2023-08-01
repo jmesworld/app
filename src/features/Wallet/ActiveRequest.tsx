@@ -18,6 +18,7 @@ import { useQuery } from 'react-query'
 import { getUserReceivedTransactions } from '../../api/transactionAPI'
 import { TransactionReceived } from '../../components/Modal/TransactionReceived'
 import Modal from '../../components/Modal/Modal'
+import { formatUSDFromJMES } from '../../utils/balanceFormat'
 
 type routeParams = {
   amount: string
@@ -107,9 +108,7 @@ const ActiveRequest = ({ navigation, route }: Props) => {
               {amount}
             </Text>
             <Text style={styles.conversionText}>
-              {amount
-                ? `≈ ${(Number(amount) * 0.3).toFixed(3)}`
-                : null}
+              {amount && formatUSDFromJMES(amount, false)}
             </Text>
             <View style={styles.qrContainer}>
               <GeneratedQRCode

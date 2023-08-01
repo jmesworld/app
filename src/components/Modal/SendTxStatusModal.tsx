@@ -32,17 +32,17 @@ const SendTxStatusModal = ({ transactionStatus }: Props) => {
             source={require('../../../assets/icons/tx-complete.png')}
           />
           <Text style={styles.statusTextComplete}>
-            Transaction {transactionStatus}!
+            Transaction Successful!
           </Text>
           <Text style={[styles.desc, {color: colors.darkGray}]}>See details is history</Text>
         </View>
       ) : transactionStatus === 'Failed' ? (
         <Text style={styles.statusTextFailed}>
-          Transaction {transactionStatus}
+          Transaction Failed
         </Text>
       ) : (
         <Text style={styles.statusTextPending}>
-          Transaction {transactionStatus}
+          Transaction {transactionStatus}!
         </Text>
       )}
       {transactionStatus === 'Pending' && (
