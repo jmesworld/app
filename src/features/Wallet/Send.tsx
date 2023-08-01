@@ -44,11 +44,15 @@ export default function SendScreen({ navigation, route }: Props) {
   })
 
   useEffect(() => {
-    if(!route.params?.address) {
+    if (!route.params?.address && !route.params?.amount) {
       return
     }
-   setNameOrAddress(route.params?.address)
-
+    if (route.params?.amount) {
+      setAmount({ value: route.params?.amount, error: null })
+    }
+    if (route.params?.address) {
+      setNameOrAddress(route.params?.address)
+    }
   }, [amount])
 
   const debouncedNameOrAddress = useDebounce({
@@ -272,20 +276,22 @@ export default function SendScreen({ navigation, route }: Props) {
             >
               {amount.error}
             </Text>
-           {amount.value && (<Text
-              selectionColor={colors.primary}
-              style={[
-                styles.searchResult,
-                {
-                  color: colors.darkGray,
-                },
-              ]}
-              selectable
-              ellipsizeMode="middle"
-              numberOfLines={1}
-            >
-              {formatUSDFromJMES(amount.value, false)}
-            </Text>)}
+            {amount.value && (
+              <Text
+                selectionColor={colors.primary}
+                style={[
+                  styles.searchResult,
+                  {
+                    color: colors.darkGray,
+                  },
+                ]}
+                selectable
+                ellipsizeMode="middle"
+                numberOfLines={1}
+              >
+                {formatUSDFromJMES(amount.value, false)}
+              </Text>
+            )}
           </View>
           <View style={styles.buttonContainer}>
             <NextButton

@@ -16,6 +16,7 @@ import { useClipboardTimeout } from '../../hooks/useClipboardTimeout'
 import CopyIcon from '../../assets/copy.svg'
 import CheckIcon from '../../assets/check.svg'
 import { useAppTheme } from '../../theme'
+import GeneratedQRCode from '../../components/QRCode/QRCode'
 
 type Props = {
   navigation: Navigation
@@ -36,7 +37,12 @@ export default function ReceiveScreen({ navigation }: Props) {
         />
         <BackdropSmall>
           <View style={styles.qrContainer}>
-            <QRCode value={address} size={168} color="#5136C2" />
+            <GeneratedQRCode
+              payload={{
+                address: address,
+              }}
+              size={168}
+            />
           </View>
 
           <Text style={styles.textInfo}>Your JMES address</Text>
@@ -64,7 +70,7 @@ export default function ReceiveScreen({ navigation }: Props) {
               )}`}
               readonly
               placeholder={'Address or Name'}
-               imgSource={
+              imgSource={
                 <Pressable
                   style={{
                     display: 'flex',

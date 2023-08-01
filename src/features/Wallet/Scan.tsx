@@ -29,7 +29,7 @@ export default function ScanScreen({ navigation }: Props) {
       return navigation.navigate({
         name: "WalletSend",
         params: {
-          payload,
+          ...payload,
         },
       });
     } else {
