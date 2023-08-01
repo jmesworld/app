@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { Transaction } from '../../types'
+import { Navigation, Transaction } from '../../types'
 import { formatDate } from '../../utils/formatDate'
 import { UserAvatar } from '../userAvatar'
 import { useIdentity } from '../../hooks/useIdentity'
@@ -10,7 +10,9 @@ import Button from '../Button/Button'
 import {
   convertToUSD,
   formatBalance,
+  formatUSDFromJMES,
 } from '../../utils/balanceFormat'
+import { useNavigation } from '@react-navigation/native'
 
 type Props = {
   transaction: Transaction | null
@@ -28,7 +30,7 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
     return null
   }
   const { amount: amt } = amount[0]
-
+  const navigation = useNavigation()
   // const fromIdentity = useIdentity(fromAddress, !transaction, true)
   // const toIdentity = useIdentity(toAddress, !transaction, true)
   const { colors } = useAppTheme()
@@ -107,19 +109,39 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
               },
             ]}
           >
-            USD {convertToUSD(amt)}
+            {formatUSDFromJMES(amt)}
           </Text>
         </View>
-        <View style={styles.itemSeparator} />
         <View style={styles.buttonContainer}>
           <Button
-            mode="contained"
-            width="full"
+            mode="outlined"
+            rounded="full"
+            width="48%"
             onPress={() => {
-              // TODO: add action
+              navigation.navigate('WalletSend', {
+                address: isSent ? toAddress : fromAddress,
+              })
+              closeModal()
             }}
           >
-            <Text>View on Main net</Text>
+            <Text
+              style={{
+                color: colors.black,
+              }}
+            >
+              Send
+            </Text>
+          </Button>
+          <Button
+            rounded="full"
+            mode="contained"
+            width="48%"
+            onPress={() => {
+              // TODO: add action
+              closeModal()
+            }}
+          >
+            <Text> Close </Text>
           </Button>
         </View>
       </View>
@@ -189,7 +211,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
+    gap: 10,
     height: 48,
+    marginTop: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   textLarge: {
     fontSize: 18,

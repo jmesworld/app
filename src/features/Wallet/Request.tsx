@@ -11,6 +11,7 @@ import {
 import { Navigation } from '../../types'
 import { numberSchema } from '../../validations/number'
 import { ModalNavigate } from '../../navigation'
+import { convertToUSD, formatUSDFromJMES } from '../../utils/balanceFormat'
 
 type Props = {
   navigation: ModalNavigate<'ActiveRequest'>
@@ -22,7 +23,7 @@ export default function RequestScreen({ navigation }: Props) {
   const handleTextInputChange = async (value: string) => {
     const isNumber = numberSchema.safeParse(value).success
 
-    if (isNumber) {
+    if (isNumber || value === '') {
       setData(value)
     }
   }
@@ -51,9 +52,7 @@ export default function RequestScreen({ navigation }: Props) {
             />
 
             <Text style={styles.conversionText}>
-              {data && isValidInput
-                ? `≈ ${(Number(data) * 0.3).toFixed(3)}`
-                : null}
+              {data && isValidInput && formatUSDFromJMES(data, false) }
             </Text>
           </SafeAreaView>
 
@@ -161,14 +160,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    placeholderTextColor: 'rgba(112, 79, 247, 0.5)',
-    fontSize: 18,
+     fontSize: 18,
     textAlign: 'center',
     color: '#704FF7',
-    paddingLeft: 19,
-    marginLeft: 14,
-    marginRight: 14,
-
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: 'rgba(112, 79, 247, 0.5)',

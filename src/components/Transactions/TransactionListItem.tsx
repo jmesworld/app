@@ -112,7 +112,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#263047',
     fontWeight: '500',
-    preWrap: 'true',
   },
   bottomText: {
     marginTop: 5,

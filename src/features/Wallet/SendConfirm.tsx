@@ -18,6 +18,8 @@ import SendTxStatusModal from '../../components/Modal/SendTxStatusModal'
 import { useAppTheme } from '../../theme'
 import { Avatar, Divider } from 'react-native-paper'
 import { useIdentityContext } from '../../contexts/IdentityService'
+import { format } from 'path'
+import { formatBalance, formatUSDFromJMES } from '../../utils/balanceFormat'
 type Props = {
   navigation: Navigation
   route: Route<any>
@@ -166,19 +168,19 @@ export default function SendConfirmScreen({
             <View style={styles.detailsItemContainer}>
               <Text style={styles.detailsTitle}>Amount</Text>
               <Text style={styles.detailsTitle}>
-                {recipientAmount / 1e6} JMES
+                {formatBalance(recipientAmount)} JMES
               </Text>
             </View>
             <View style={styles.detailsItemContainer}>
               <Text style={styles.detailsTitle}>Network Fee</Text>
-              <Text style={styles.detailsTitle}>0.6948 JMES</Text>
+              <Text style={styles.detailsTitle}> 0.6948 JMES</Text>
             </View>
             <Divider />
             <View style={styles.separator} />
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
               <Text style={styles.detailsTotal}>
-                {recipientAmount / 1e6 + 0.6948} JMES
+                {formatBalance(recipientAmount  + (0.6948 * 1e6))} JMES
               </Text>
             </View>
             <View style={styles.conversion}>
@@ -189,7 +191,7 @@ export default function SendConfirmScreen({
                   fontWeight: '400',
                 }}
               >
-                ≈ $324.145
+               {formatUSDFromJMES(recipientAmount)}
               </Text>
             </View>
           </View>
