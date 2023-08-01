@@ -43,6 +43,14 @@ export default function SendScreen({ navigation, route }: Props) {
     error: null,
   })
 
+  useEffect(() => {
+    if(!route.params?.address) {
+      return
+    }
+   setNameOrAddress(route.params?.address)
+
+  }, [amount])
+
   const debouncedNameOrAddress = useDebounce({
     value: nameOrAddress,
     delay: 500,

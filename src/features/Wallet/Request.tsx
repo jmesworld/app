@@ -160,8 +160,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    placeholderTextColor: 'rgba(112, 79, 247, 0.5)',
-    fontSize: 18,
+     fontSize: 18,
     textAlign: 'center',
     color: '#704FF7',
     borderWidth: 1,

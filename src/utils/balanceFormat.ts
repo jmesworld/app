@@ -23,7 +23,7 @@ export const convertToUSD = (balance: number | string) => {
   const balanceNumber =
     typeof balance === 'string' ? parseFloat(balance) : balance
   return (balanceNumber * 0.3).toLocaleString(undefined, {
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 6,
   })
 }

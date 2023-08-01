@@ -45,13 +45,22 @@ const TransactionList = ({
     { enabled: !!address }
   )
 
+  const transactions =
+    allTransactions
+      ?.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
+      .filter((tx) => {
+        const { body } = tx
+        const { to_address, from_address } = body.messages[0]
+        return from_address === address || to_address === address
+      }) || []
+
   const sentTransactions =
-    allTransactions?.filter(
+    transactions?.filter(
       (transaction) => transaction.tx_type === 'Sent'
     ) || []
 
   const receivedTransactions =
-    allTransactions?.filter(
+    transactions?.filter(
       (transaction) => transaction.tx_type === 'Received'
     ) || []
   const displayedTransactions = useMemo(() => {
@@ -59,9 +68,7 @@ const TransactionList = ({
     const end = showFilter ? start + itemsPerPage : 5
     switch (activeTab) {
       case 'All':
-        return allTransactions
-          ?.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1))
-          .slice(start, end)
+        return transactions.slice(start, end)
       case 'Sent':
         return sentTransactions.slice(start, end)
       case 'Received':
@@ -71,7 +78,7 @@ const TransactionList = ({
     }
   }, [
     activeTab,
-    allTransactions,
+    transactions,
     sentTransactions,
     receivedTransactions,
     currentPage,
@@ -161,7 +168,7 @@ const TransactionList = ({
         renderSectionHeader={({ section: { title } }) => (
           <View
             style={{
-              backgroundColor: colors.background,
+              backgroundColor: colors.white,
               paddingVertical: 5,
             }}
           >
