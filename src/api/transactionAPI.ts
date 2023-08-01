@@ -1,12 +1,19 @@
 import axios from 'axios'
 import { Transaction } from '../types'
 import { PUBLIC_REST_URL } from '@env'
-const API_BASE_URL = `http://51.38.52.37:1317/cosmos/tx/v1beta1/txs`
-
+ 
 async function fetchTransactionsByEvent(
   event: string
 ): Promise<any[]> {
-  const response = await axios.get(`${API_BASE_URL}?events=${event}`)
+  const response = await axios.get(
+    `${PUBLIC_REST_URL}/cosmos/tx/v1beta1/txs`,
+    {
+      params: {
+        events: event,
+        order_by: 'ORDER_BY_DESC',
+      },
+    }
+  )
   return response.data.txs.map((tx, index) => ({
     ...tx,
     tx_type: event.includes('message.sender') ? 'Sent' : 'Received',
@@ -19,13 +26,18 @@ async function fetchTransactionsByEvent(
   }))
 }
 
-export async function getUserReceivedTransactions( address: string): Promise<any[]> {
-  const response = await axios.get(`${PUBLIC_REST_URL}/cosmos/tx/v1beta1/txs`, {
-    params: {
-      events: `transfer.recipient='${address}'`,
-      "order_by": "ORDER_BY_DESC",
+export async function getUserReceivedTransactions(
+  address: string
+): Promise<any[]> {
+  const response = await axios.get(
+    `${PUBLIC_REST_URL}/cosmos/tx/v1beta1/txs`,
+    {
+      params: {
+        events: `transfer.recipient='${address}'`,
+        order_by: 'ORDER_BY_DESC',
+      },
     }
-  })
+  )
   return response.data.txs.map((tx, index) => ({
     ...tx,
     tx_type: 'Received',
@@ -52,10 +64,6 @@ export async function fetchTransactions(
       ...sentTransactions,
       ...receivedTransactions,
     ]
-
-    console.log('allTransactions', allTransactions)
-    console.log('receivedTransactions', receivedTransactions)
-    console.log('sentTransactions', sentTransactions)
 
     return allTransactions
   } catch (error) {

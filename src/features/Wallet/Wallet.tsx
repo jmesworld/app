@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Image } from 'react-native'
-
 import {
-  Background,
   Text,
   View,
   CurrencyDropdown,
@@ -15,16 +13,16 @@ import {
   SendReceive,
 } from './components'
 import { Navigation } from '../../types'
-import { useBalance } from '../../hooks/useBalance'
 import { useCurrencyDropdown } from '../../hooks/useCurrencyDropdown'
 import { useTransactionModal } from '../../hooks/useTransactionModal'
-import { useInterval } from '../../hooks/useInterval'
 import { styles } from './Wallet.styles'
 import {
   useStoreActions,
   useStoreState,
 } from '../../hooks/storeHooks'
 import { getCoinBal } from '../../utils'
+import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
+
 type Props = {
   navigation: Navigation
 }
@@ -49,7 +47,6 @@ export default function WalletScreen({ navigation }: Props) {
     useTransactionModal()
 
   const updateStoreState = () => {
-    console.log('UpdateStoreState')
     updateAccount({ ...account, balance: balance })
   }
 
@@ -58,16 +55,13 @@ export default function WalletScreen({ navigation }: Props) {
     setBalance(fetchedBalance)
   }
   useEffect(() => {
-    // console.log('account', account)
     getBalance()
-    // console.log({ getBalance })
-    // console.log({ balance })
+
     const interval = setInterval(() => {
       if (shouldFetch) {
         getBalance()
         updateStoreState()
       }
-      console.log('interval')
     }, 10 * 1000)
 
     return () => clearInterval(interval)
@@ -75,7 +69,7 @@ export default function WalletScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Background>
+      <BackgroundWithNoScrollView>
         <Image
           source={require('../../../assets/images/jmes-text.png')}
           style={styles.image}
@@ -103,7 +97,9 @@ export default function WalletScreen({ navigation }: Props) {
         {showDropdown && (
           <CurrencyDropdown onSelect={handleCurrencySelection} />
         )}
+
         <RecentTransactions
+          showFilter={false}
           itemPressed={(item) => {
             setSelectedTransaction(item)
             setTransactionModalVisible(true)
@@ -111,8 +107,12 @@ export default function WalletScreen({ navigation }: Props) {
           navigation={navigation}
           title="Recent Transactions"
           textLink="See all"
+          viewStyle={{
+            paddingBottom: 66,
+          }}
         />
-      </Background>
+        <View style={styles.bottomSpacer} />
+      </BackgroundWithNoScrollView>
       <View style={styles.bottomNav}>
         <BottomNav navigation={navigation} />
       </View>

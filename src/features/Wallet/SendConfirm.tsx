@@ -12,8 +12,7 @@ import {
   StyledButton as CloseButton,
   Button,
 } from '../../components'
-import { isIOS, isWeb } from '../../utils/platformDetect'
-import { Navigation } from '../../types'
+ import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 import SendTxStatusModal from '../../components/Modal/SendTxStatusModal'
 import { useAppTheme } from '../../theme'
@@ -85,7 +84,6 @@ export default function SendConfirmScreen({
   }
   // TODO: trnsaction status issue
   const handleCloseModal = () => {
-    console.log('transactionStatus', transactionStatus)
     if (transactionStatus === 'Pending') {
       return
     }
@@ -244,7 +242,9 @@ export default function SendConfirmScreen({
 
           <View style={styles.buttonContainer}>
             <CloseButton
-              onPress={handleCloseModal}
+              onPress={() => {
+                navigation.navigate('WalletSend')
+              }}
               enabled={
                 transactionStatus === 'Failed' ||
                 transactionStatus === 'Success'

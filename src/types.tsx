@@ -34,7 +34,6 @@ export type ModalParamList = {
   Scan: undefined
 }
 
-
 export type RootStackScreenProps<
   Screen extends keyof RootStackParamList
 > = NativeStackScreenProps<RootStackParamList, Screen>
@@ -60,12 +59,24 @@ export type Transaction = {
   tx_hash?: string
   symbol?: React.ReactNode
   amount?: any
-  timestamp?: string
+  timestamp?: number
   conversion?: string
   to_address?: string
   from_address?: string
   denom?: string
   tx_type?: string
+  body: {
+    messages: {
+      to_address: string
+      from_address: string
+      amount: [
+        {
+          denom: string
+          amount: number
+        }
+      ]
+    }[]
+  }
 }
 
 export type Transactions = {

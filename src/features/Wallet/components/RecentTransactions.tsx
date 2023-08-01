@@ -1,17 +1,15 @@
-import { memo, useEffect, useState } from 'react'
+import { memo } from 'react'
 import {
   View,
   Text,
   BackdropSmall,
   TransactionList,
-  BottomNav,
 } from '../../../components'
 import {
-  Platform,
   Pressable,
   StyleSheet,
-  Image,
-  ScrollView,
+  StyleProp,
+  ViewStyle,
 } from 'react-native'
 import { Navigation, Transaction } from '../../../types'
 
@@ -21,6 +19,8 @@ interface Props {
   title?: string
   textLink?: string
   itemPressed?: (item: Transaction) => void
+  showFilter?: boolean
+  viewStyle?: StyleProp<ViewStyle>
 }
 
 const RecentTransactions = ({
@@ -29,24 +29,31 @@ const RecentTransactions = ({
   navigation,
   title,
   textLink,
+  showFilter = true,
+  viewStyle,
 }: Props) => {
   return (
-    <BackdropSmall>
-      <View style={styles.heading}>
+    <BackdropSmall style={viewStyle}>
+      <View style={[styles.heading]}>
         <Text style={styles.headingTitle}>{title}</Text>
-        <Pressable>
-          <Text
-            onPress={() => {
-              navigation.navigate('TransactionHistory')
-            }}
-            style={styles.headingSeeAll}
-          >
-            {textLink}
-          </Text>
-        </Pressable>
+        {!showFilter && (
+          <Pressable>
+            <Text
+              onPress={() => {
+                navigation.navigate('TransactionHistory')
+              }}
+              style={styles.headingSeeAll}
+            >
+              {textLink}
+            </Text>
+          </Pressable>
+        )}
       </View>
 
-      <TransactionList itemPressed={itemPressed} />
+      <TransactionList
+        showFilter={showFilter}
+        itemPressed={itemPressed}
+      />
     </BackdropSmall>
   )
 }

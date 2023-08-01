@@ -12,6 +12,9 @@ export const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
   },
+  bottomSpacer: {
+    backgroundColor: '#ffffff',
+  },
   container: {
     flex: 1,
     flexDirection: 'column',

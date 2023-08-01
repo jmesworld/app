@@ -1,5 +1,11 @@
 import { memo, useState, useMemo, useCallback } from 'react'
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  SectionList,
+} from 'react-native'
 import { useStoreState } from '../../hooks/storeHooks'
 import { Transaction } from '../../types'
 import { TransactionListItem } from '../Transactions/TransactionListItem'
@@ -8,20 +14,26 @@ import TransactionDetails from '../Modal/TransactionDetails'
 import Modal from '../Modal/Modal'
 import { useQuery } from 'react-query'
 import Button from '../Button/Button'
+import { categorizeTransactionByDate } from '../../lib/TransactionCategory'
+import { useAppTheme } from '../../theme'
+import { JMES_DENOM } from '../../utils/constants'
 
 type Props = {
   itemPressed?: (item: Transaction) => void
+  showFilter?: boolean
 }
 
-const TransactionList = ({ itemPressed }: Props) => {
+const itemsPerPage = 10
+const TransactionList = ({
+  showFilter = true,
+  itemPressed,
+}: Props) => {
   const address = useStoreState((state) => state.accounts[0]?.address)
   const [activeTab, setActiveTab] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
-
+  const { colors } = useAppTheme()
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
-  const [modalVisible, setModalVisible] = useState(false)
 
   const {
     isLoading,
@@ -42,13 +54,12 @@ const TransactionList = ({ itemPressed }: Props) => {
     allTransactions?.filter(
       (transaction) => transaction.tx_type === 'Received'
     ) || []
-
   const displayedTransactions = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage
-    const end = start + itemsPerPage
+    const end = showFilter ? start + itemsPerPage : 5
     switch (activeTab) {
       case 'All':
-        return allTransactions?.slice(start, end) || []
+        return allTransactions?.slice(start, end)
       case 'Sent':
         return sentTransactions.slice(start, end)
       case 'Received':
@@ -62,22 +73,32 @@ const TransactionList = ({ itemPressed }: Props) => {
     sentTransactions,
     receivedTransactions,
     currentPage,
+    showFilter,
     itemsPerPage,
   ])
+  const categorizedTransactions = useMemo(() => {
+    const category = []
+    const categorized = categorizeTransactionByDate(
+      displayedTransactions
+    )
 
+    Object.keys(categorized).forEach((key) => {
+      category.push({ title: key, data: categorized[key] })
+    })
+    return category
+  }, [displayedTransactions, showFilter])
   const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage)
   }, [])
 
-  const handleItemPress = useCallback((transaction: Transaction) => {
-    setSelectedTransaction(transaction)
-    setModalVisible(true)
-  }, [])
+  const handleItemPress = useCallback((txHash: string) => {
+     const tx = allTransactions.find((tx) => tx.tx_hash === txHash)
+    setSelectedTransaction(tx)
+  }, [allTransactions])
 
   const closeModal = useCallback(() => {
-    setModalVisible(false)
+    setSelectedTransaction(null)
   }, [])
-
   if (isLoading)
     return (
       <Text
@@ -91,7 +112,7 @@ const TransactionList = ({ itemPressed }: Props) => {
         Loading...
       </Text>
     )
-  if (error)
+  if (error && error instanceof Error)
     return (
       <Text
         style={{
@@ -101,40 +122,60 @@ const TransactionList = ({ itemPressed }: Props) => {
           marginTop: 20,
         }}
       >
-        Error: {error}
+        Error: {error?.message}
       </Text>
     )
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabContainer}>
-        {['All', 'Sent', 'Received'].map((tab) => (
+      {showFilter && (
+        <View style={styles.tabContainer}>
+          {['All', 'Sent', 'Received'].map((tab) => (
+            <View
+              style={{
+                flex: 1,
+              }}
+            >
+              <Button
+                onPress={() => {
+                  setActiveTab(tab)
+                  setCurrentPage(1)
+                }}
+                key={tab}
+                rounded="sm"
+                mode={activeTab === tab ? 'contained' : 'outlined'}
+              >
+                <Text style={styles.tab}>{tab}</Text>
+              </Button>
+            </View>
+          ))}
+        </View>
+      )}
+      <SectionList
+        renderSectionHeader={({ section: { title } }) => (
           <View
             style={{
-              flex: 1,
+              backgroundColor: colors.background,
+              paddingVertical: 5,
             }}
           >
-            <Button
-              onPress={() => setActiveTab(tab)}
-              key={tab}
-              rounded="sm"
-              mode={activeTab === tab ? 'contained' : 'outlined'}
-            >
-              <Text style={styles.tab}>{tab}</Text>
-            </Button>
+            <Text>{title}</Text>
           </View>
-        ))}
-      </View>
-      <View style={styles.transactionList}>
-        {displayedTransactions.map((tx, index) => {
-          const { timestamp, tx_hash, tx_type, body } = tx
+        )}
+        style={styles.transactionList}
+        sections={categorizedTransactions}
+        keyExtractor={(item) => item.tx_hash}
+        renderItem={({ item, index }) => {
+          const { timestamp, tx_hash, tx_type, body } = item
           const { to_address, from_address, amount } =
             body.messages[0]
-          const { denom, amount: amt } = amount[0]
+
+          const { denom = JMES_DENOM, amount: amt = 0 } =
+            amount?.[0] || {}
 
           return (
             <View key={index} style={styles.listItem}>
-              <Pressable onPress={() => handleItemPress(tx)}>
+              <Pressable onPress={() => handleItemPress(tx_hash)}>
                 <TransactionListItem
                   timestamp={timestamp}
                   tx_hash={tx_hash}
@@ -143,30 +184,40 @@ const TransactionList = ({ itemPressed }: Props) => {
                   from_address={from_address}
                   denom={denom}
                   amount={amt}
+                  body={{
+                    messages: [],
+                  }}
                 />
               </Pressable>
             </View>
           )
-        })}
-      </View>
-      <View style={styles.pagination}>
-        <Text
-          style={styles.paginationButton}
-          onPress={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          {'<'}
-        </Text>
-        <Text style={styles.pageNumber}>{currentPage}</Text>
-        <Text
-          style={styles.paginationButton}
-          onPress={() => handlePageChange(currentPage + 1)}
-        >
-          {'>'}
-        </Text>
-      </View>
+        }}
+      />
+
+      {showFilter && (
+        <View style={styles.pagination}>
+          <Text
+            style={styles.paginationButton}
+            onPress={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            {'<'}
+          </Text>
+          <Text style={styles.pageNumber}>{currentPage}</Text>
+          <Text
+            style={styles.paginationButton}
+            onPress={() => handlePageChange(currentPage + 1)}
+          >
+            {'>'}
+          </Text>
+        </View>
+      )}
       {selectedTransaction && (
-        <Modal isVisible={modalVisible} onRequestClose={closeModal}>
+        <Modal
+          height="lg"
+          isVisible={true}
+          onRequestClose={closeModal}
+        >
           <TransactionDetails
             transaction={selectedTransaction}
             closeModal={closeModal}
@@ -179,6 +230,7 @@ const TransactionList = ({ itemPressed }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: 'transparent',
   },
   tabContainer: {
@@ -206,9 +258,9 @@ const styles = StyleSheet.create({
   },
   transactionList: {
     marginTop: 16,
-    marginBottom: 52,
-    marginLeft: 35.5,
-    marginRight: 21,
+    marginBottom: 12,
+    overflow: 'scroll',
+    marginHorizontal: 10,
     backgroundColor: 'transparent',
   },
   listItem: {

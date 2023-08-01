@@ -8,7 +8,7 @@ interface Props {
 }
 
 const BackdropSmall = ({ children, style }: Props) => {
-  return <View style={styles.container}>{children}</View>
+  return <View style={[styles.container, style]}>{children}</View>
 }
 
 const styles = StyleSheet.create({

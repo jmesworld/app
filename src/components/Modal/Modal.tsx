@@ -10,12 +10,60 @@ import {
 } from 'react-native'
 
 const windowWidth = Dimensions.get('window').width
+const windowHeight = Dimensions.get('window').height
 
-const CustomModal = ({ isVisible, onRequestClose, children }) => {
-  const windowHeight = Dimensions.get('window').height
-  const height = useRef(new Animated.Value(windowHeight / 2)).current
+const initialLgHeight = windowHeight / 1.3
+const initialLgWidth = windowWidth / 1.3
 
-  const resetHeight = () => height.setValue(windowHeight / 2)
+const initialMdHeight = windowHeight / 2
+const initialMdWidth = windowWidth / 2
+
+const initialSmHeight = windowHeight / 2.5
+const initialSmWidth = windowWidth / 2.5
+
+type Props = {
+  isVisible: boolean
+  onRequestClose: () => void
+  children: React.ReactNode
+  height?: 'lg' | 'md' | 'sm'
+}
+
+const getHeights = (height: 'lg' | 'md' | 'sm') => {
+  switch (height) {
+    case 'lg':
+      return {
+        initialHeight: initialLgHeight,
+        initialWidth: initialLgWidth,
+      }
+    case 'md':
+      return {
+        initialHeight: initialMdHeight,
+        initialWidth: initialMdWidth,
+      }
+    case 'sm':
+      return {
+        initialHeight: initialSmHeight,
+        initialWidth: initialSmWidth,
+      }
+    default:
+      return {
+        initialHeight: initialLgHeight,
+        initialWidth: initialLgWidth,
+      }
+  }
+}
+
+const CustomModal = ({
+  isVisible,
+  onRequestClose,
+  children,
+  height = 'md',
+}: Props) => {
+  const modalHeight = useRef(
+    new Animated.Value(getHeights(height).initialHeight)
+  ).current
+
+  const resetHeight = () => modalHeight.setValue(getHeights(height).initialHeight)
 
   const panResponder = useRef(
     PanResponder.create({
@@ -30,7 +78,7 @@ const CustomModal = ({ isVisible, onRequestClose, children }) => {
           resetHeight()
           return
         }
-        height.setValue(newHeight)
+        modalHeight.setValue(newHeight)
       },
       onPanResponderRelease: (_, { vx, vy }) => {
         const speed = Math.sqrt(vx ** 2 + vy ** 2)
@@ -38,8 +86,8 @@ const CustomModal = ({ isVisible, onRequestClose, children }) => {
           onRequestClose()
           resetHeight()
         } else {
-          Animated.spring(height, {
-            toValue: windowHeight / 2,
+          Animated.spring(modalHeight, {
+            toValue: getHeights(height).initialHeight,
             useNativeDriver: false,
           }).start()
         }
@@ -64,7 +112,7 @@ const CustomModal = ({ isVisible, onRequestClose, children }) => {
           />
         </View>
         <Animated.View
-          style={[styles.modal, { height }]}
+          style={[styles.modal, { height: modalHeight }]}
           {...panResponder.panHandlers}
         >
           <View style={styles.resizeBar} />
