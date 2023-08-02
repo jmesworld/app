@@ -31,8 +31,8 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
   }
   const { amount: amt } = amount[0]
   const navigation = useNavigation()
-  // const fromIdentity = useIdentity(fromAddress, !transaction, true)
-  // const toIdentity = useIdentity(toAddress, !transaction, true)
+  const fromIdentity = useIdentity(fromAddress, !transaction, true)
+  const toIdentity = useIdentity(toAddress, !transaction, true)
   const { colors } = useAppTheme()
   if (!transaction) {
     return null
@@ -72,23 +72,21 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>From</Text>
-        <Text>{fromAddress}</Text>
-        {/* <UserAvatar
+        <UserAvatar
           address={fromAddress}
           name={fromIdentity?.data?.identity?.name}
           color={colors.green}
-        /> */}
+        />
 
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>
         <Text style={styles.textSmall}>To</Text>
-        <Text>{toAddress}</Text>
-        {/* <UserAvatar
+        <UserAvatar
           color={colors.primary}
           address={toAddress}
           name={toIdentity?.data?.identity?.name}
-        /> */}
+        />
         <View style={styles.itemSeparator} />
       </View>
       <View style={styles.item}>

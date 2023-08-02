@@ -16,7 +16,6 @@ import {
   PUBLIC_RPC_URL,
   PUBLIC_IDENTITY_SERVICE_CONTRACT,
 } from '@env'
-import { getClient } from '../lib/createUser'
 import { getOfflineSignerProto } from 'cosmjs-utils'
 import {
   SigningCosmWasmClient,
@@ -89,9 +88,6 @@ const IdentityServiceProvider = ({ children }: Props) => {
     getCosmWasmClient()
   }, [])
 
-  const client = useMemo(async () => {
-    return (await getClient()) as any
-  }, [getClient])
   const identityQueryClient = useMemo(
     () =>
       cosmWasmClient

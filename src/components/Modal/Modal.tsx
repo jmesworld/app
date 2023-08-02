@@ -12,8 +12,8 @@ import {
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
 
-const initialLgHeight = windowHeight / 1.5
-const initialLgWidth = windowWidth / 1.5
+const initialLgHeight = windowHeight / 1.3
+const initialLgWidth = windowWidth / 1.3
 
 const initialMdHeight = windowHeight / 2
 const initialMdWidth = windowWidth / 2
