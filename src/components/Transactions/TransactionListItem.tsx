@@ -17,8 +17,8 @@ export const TransactionListItem = (transaction: Transaction) => {
 
   const identity = useIdentity(
     transaction.tx_type === 'Sent'
-      ? transaction.from_address
-      : transaction.to_address,
+      ? transaction.to_address
+      : transaction.from_address,
     false,
     true
   )

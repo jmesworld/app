@@ -1,48 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Button } from "react-native";
-import { BarCodeScanner } from "expo-barcode-scanner";
-import { Navigation } from "../../types";
-import { useStoreActions, useStoreState } from "../../hooks/storeHooks";
+import React, { useState, useEffect } from 'react'
+import { Text, View, StyleSheet, Button } from 'react-native'
+import { BarCodeScanner } from 'expo-barcode-scanner'
+import { Navigation } from '../../types'
+import {
+  useStoreActions,
+  useStoreState,
+} from '../../hooks/storeHooks'
 
 type Props = {
-  navigation: Navigation;
-};
+  navigation: Navigation
+}
 
 export default function ScanScreen({ navigation }: Props) {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null)
+  const [scanned, setScanned] = useState(false)
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
-    getBarCodeScannerPermissions();
-  }, []);
+      const { status } =
+        await BarCodeScanner.requestPermissionsAsync()
+      setHasPermission(status === 'granted')
+    }
+    getBarCodeScannerPermissions()
+  }, [])
 
   const handleBarCodeScanned = async ({ data }) => {
-    const payload = JSON.parse(data);
-    setScanned(true);
+    try {
+      const payload = JSON.parse(data)
 
-    if (data) {
-      alert(`Scanned data ${payload.url}`); // @ts-ignore
-      return navigation.navigate({
-        name: "WalletSend",
-        params: {
-          ...payload,
-        },
-      });
-    } else {
-      alert(`there was an error with your request`);
-      console.error("error");
+      if (data) {
+        setScanned(true)
+        navigation.navigate({
+          name: 'WalletSend',
+          params: {
+            ...payload,
+          },
+        })
+        return
+      }
+      console.log('no data')
+    } catch (err) {
+      console.error('error', err)
     }
-  };
+  }
 
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return <Text>Requesting for camera permission</Text>
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <Text>No access to camera</Text>
   }
 
   return (
@@ -52,24 +58,27 @@ export default function ScanScreen({ navigation }: Props) {
         style={StyleSheet.absoluteFillObject}
       />
       {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+        <Button
+          title={'Tap to Scan Again'}
+          onPress={() => setScanned(false)}
+        />
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     marginTop: 15,
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
   textError: {
-    color: "red",
+    color: 'red',
   },
-});
+})

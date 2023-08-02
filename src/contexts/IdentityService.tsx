@@ -16,6 +16,7 @@ import {
   PUBLIC_RPC_URL,
   PUBLIC_IDENTITY_SERVICE_CONTRACT,
 } from '@env'
+console.log('PUBLIC_RPC_URL', PUBLIC_RPC_URL)
 import { getOfflineSignerProto } from 'cosmjs-utils'
 import {
   SigningCosmWasmClient,
@@ -24,7 +25,7 @@ import {
 import { DeliverTxResponse, GasPrice } from '@cosmjs/stargate'
 import { BJMES_DENOM, JMES_DENOM } from '../utils/constants'
 import { coin } from '@cosmjs/amino'
-
+console.log('PUBLIC_RPC_URL', PUBLIC_RPC_URL)
 type IdentityServiceContext = {
   identityService: IdentityserviceQueryClient | null
   cosmWasmClient: CosmWasmClient | null
@@ -132,10 +133,13 @@ const IdentityServiceProvider = ({ children }: Props) => {
     async (mnemonic: string, recipient: string, amount: number) => {
       if (!cosmWasmClient) return null
 
-      const { addr, signingClient } = await getSigner(mnemonic)
+      const { signingClient } = await getSigner(mnemonic)
+      if (!signingClient) {
+        throw new Error('Could not get signing client')
+      }
       const conBalance = coin(amount, JMES_DENOM)
       return signingClient.sendTokens(
-        addr,
+        recipient,
         recipient,
         [conBalance],
         'auto'

@@ -24,7 +24,6 @@ const LogoutModal = ({
 
   const handleLogout = async () => {
     await resetStore(true)
-    return navigation.navigate('Onboarding')
   }
 
   return (

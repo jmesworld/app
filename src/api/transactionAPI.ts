@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Transaction } from '../types'
 import { PUBLIC_REST_URL } from '@env'
- 
+ console.log('Public', PUBLIC_REST_URL)
 async function fetchTransactionsByEvent(
   event: string
 ): Promise<any[]> {

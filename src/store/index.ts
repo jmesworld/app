@@ -8,6 +8,7 @@ import {
 } from 'easy-peasy'
 import storage from './storage'
 import * as SecureStore from 'expo-secure-store'
+import secureStore from './secure'
 export interface IQRCodePayload {
   prefix?: string
   address?: string
@@ -243,6 +244,9 @@ const store = createStore<WalletModel>(
             pin: undefined,
           }
         }
+        secureStore.removeDataSecurely('secure_token')
+        secureStore.removeDataSecurely('secure_token')
+        secureStore.removeDataSecurely('mnemonic')
       }),
       addAccount: action((state, payload) => {
         state.accounts.push({

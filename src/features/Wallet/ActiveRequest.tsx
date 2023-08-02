@@ -125,7 +125,7 @@ const ActiveRequest = ({ navigation, route }: Props) => {
             <ActivityIndicator size="large" color={colors.primary} />
           )}
           <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={async () => {
+            <Button rounded="full" mode="outlined" onPress={async () => {
               navigation.navigate('Root')
             }}>
               <Text
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
 
     marginTop: 'auto',
-    marginBottom: 30,
+    marginBottom: 40,
     width: '90%',
     height: 48,
     backgroundColor: 'transparent',
