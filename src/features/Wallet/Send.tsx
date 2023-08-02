@@ -53,7 +53,7 @@ export default function SendScreen({ navigation, route }: Props) {
     if (route.params?.address) {
       setNameOrAddress(route.params?.address)
     }
-  }, [amount])
+  }, [])
 
   const debouncedNameOrAddress = useDebounce({
     value: nameOrAddress,

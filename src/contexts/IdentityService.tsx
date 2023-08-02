@@ -16,7 +16,6 @@ import {
   PUBLIC_RPC_URL,
   PUBLIC_IDENTITY_SERVICE_CONTRACT,
 } from '@env'
-console.log('PUBLIC_RPC_URL', PUBLIC_RPC_URL)
 import { getOfflineSignerProto } from 'cosmjs-utils'
 import {
   SigningCosmWasmClient,
@@ -25,8 +24,15 @@ import {
 import { DeliverTxResponse, GasPrice } from '@cosmjs/stargate'
 import { BJMES_DENOM, JMES_DENOM } from '../utils/constants'
 import { coin } from '@cosmjs/amino'
-console.log('PUBLIC_RPC_URL', PUBLIC_RPC_URL)
+import { GetIdentityByNameResponse } from '../client/Identityservice.types'
+
+type Identity = GetIdentityByNameResponse
+
 type IdentityServiceContext = {
+  identityCache: Record<string, Identity> | null
+  setIdentityCache?: React.Dispatch<
+    React.SetStateAction<Record<string, Identity> | null>
+  >
   identityService: IdentityserviceQueryClient | null
   cosmWasmClient: CosmWasmClient | null
   createWallet: (mnemonic: string) => Promise<{ address: string }>
@@ -56,6 +62,7 @@ const emptyFn = () => {
 }
 
 const initialState: IdentityServiceContext = {
+  identityCache: null,
   identityService: null,
   cosmWasmClient: null,
   createIdentity: emptyFn,
@@ -63,6 +70,7 @@ const initialState: IdentityServiceContext = {
   getBalance: emptyFn,
   getAccount: emptyFn,
   sendTransaction: emptyFn,
+  setIdentityCache: emptyFn,
 }
 
 const IdentityContext =
@@ -71,10 +79,14 @@ const IdentityContext =
 type Props = {
   children?: React.ReactNode
 }
+
 const IdentityServiceProvider = ({ children }: Props) => {
   const [cosmWasmClient, setCosmWasmClient] =
     useState<CosmWasmClient | null>(null)
-
+  const [identityCache, setIdentityCache] = useState<Record<
+    string,
+    Identity
+  > | null>(null)
   useEffect(() => {
     async function getCosmWasmClient() {
       try {
@@ -235,6 +247,8 @@ const IdentityServiceProvider = ({ children }: Props) => {
     getBalance,
     getAccount,
     sendTransaction,
+    identityCache,
+    setIdentityCache,
   }
 
   return (

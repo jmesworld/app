@@ -10,7 +10,7 @@ import { useAppTheme } from '../../theme'
 export const TransactionListItem = (transaction: Transaction) => {
   const shortenAddress = (address) => {
     if (!address || address.length < 7) return address
-    return address.slice(0, 4) + '...' + address.slice(-3)
+    return address.slice(0,8) + '...' + address.slice(-4)
   }
 
   const { colors } = useAppTheme()
@@ -25,7 +25,7 @@ export const TransactionListItem = (transaction: Transaction) => {
   const isSent = transaction.tx_type === 'Sent'
   return (
     <View style={styles.transactionListItem}>
-      <Pressable
+      <View
         style={{
           backgroundColor: isSent ? colors.bgInput : colors.greenBg,
           borderRadius: 18,
@@ -40,7 +40,7 @@ export const TransactionListItem = (transaction: Transaction) => {
         ) : (
           <ReceiveIcon />
         )}
-      </Pressable>
+      </View>
       <View style={styles.transactionType}>
         <Text style={styles.topText}>
           {identity.data?.identity?.name}

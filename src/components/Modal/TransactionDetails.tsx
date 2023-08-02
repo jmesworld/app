@@ -50,11 +50,11 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
         <View>
           {transaction.status === 'Success' ? (
             <Text style={styles.statusTextConfirmed}>
-              {transaction.status}
+              Confirmed
             </Text>
           ) : transaction.status === 'Failed' ? (
             <Text style={styles.statusTextFailed}>
-              {transaction.status}
+             Failed
             </Text>
           ) : (
             <Text style={styles.statusTextPending}>

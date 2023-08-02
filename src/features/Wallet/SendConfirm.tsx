@@ -12,14 +12,18 @@ import {
   StyledButton as CloseButton,
   Button,
 } from '../../components'
- import { Navigation } from '../../types'
+import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 import SendTxStatusModal from '../../components/Modal/SendTxStatusModal'
 import { useAppTheme } from '../../theme'
 import { Avatar, Divider } from 'react-native-paper'
 import { useIdentityContext } from '../../contexts/IdentityService'
-import { format } from 'path'
-import { formatBalance, formatUSDFromJMES } from '../../utils/balanceFormat'
+import {
+  formatBalance,
+  formatUSDFromJMES,
+} from '../../utils/balanceFormat'
+import JmesIcon from '../../assets/jmesBlack.svg'
+
 type Props = {
   navigation: Navigation
   route: Route<any>
@@ -84,7 +88,7 @@ export default function SendConfirmScreen({
       setTransactionStatus('Failed')
     }
   }
-  // TODO: trnsaction status issue
+  // TODO: transaction status issue
   const handleCloseModal = () => {
     if (transactionStatus === 'Pending') {
       return
@@ -167,21 +171,30 @@ export default function SendConfirmScreen({
           >
             <View style={styles.detailsItemContainer}>
               <Text style={styles.detailsTitle}>Amount</Text>
-              <Text style={styles.detailsTitle}>
-                {formatBalance(recipientAmount)} JMES
-              </Text>
+              <View style={styles.amountContainer}>
+                <JmesIcon width={12} height={12} />
+                <Text style={styles.detailsTitle}>
+                  {formatBalance(recipientAmount)}
+                </Text>
+              </View>
             </View>
             <View style={styles.detailsItemContainer}>
               <Text style={styles.detailsTitle}>Network Fee</Text>
-              <Text style={styles.detailsTitle}> 0.6948 JMES</Text>
+              <View style={styles.amountContainer}>
+                <JmesIcon width={12} height={12} />
+                <Text style={styles.detailsTitle}> 0.6948 </Text>
+              </View>
             </View>
             <Divider />
             <View style={styles.separator} />
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
-              <Text style={styles.detailsTotal}>
-                {formatBalance(recipientAmount  + (0.6948 * 1e6))} JMES
-              </Text>
+              <View style={styles.amountContainer}>
+                <JmesIcon width={12} height={12} />
+                <Text style={styles.detailsTotal}>
+                  {formatBalance(recipientAmount + 0.6948 * 1e6)}
+                </Text>
+              </View>
             </View>
             <View style={styles.conversion}>
               <Text
@@ -191,7 +204,7 @@ export default function SendConfirmScreen({
                   fontWeight: '400',
                 }}
               >
-               {formatUSDFromJMES(recipientAmount)}
+                {formatUSDFromJMES(recipientAmount)}
               </Text>
             </View>
           </View>
@@ -281,7 +294,12 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#454E62',
   },
-
+  amountContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    gap: 2,
+  },
   userItemContainer: {
     display: 'flex',
     flexDirection: 'row',
