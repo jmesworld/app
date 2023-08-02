@@ -15,13 +15,13 @@ export const TransactionListItem = (transaction: Transaction) => {
 
   const { colors } = useAppTheme()
 
-  // const identity = useIdentity(
-  //   transaction.tx_type === 'Sent'
-  //     ? transaction.from_address
-  //     : transaction.to_address,
-  //   false,
-  //   true
-  // )
+  const identity = useIdentity(
+    transaction.tx_type === 'Sent'
+      ? transaction.from_address
+      : transaction.to_address,
+    false,
+    true
+  )
   const isSent = transaction.tx_type === 'Sent'
   return (
     <View style={styles.transactionListItem}>
@@ -43,7 +43,7 @@ export const TransactionListItem = (transaction: Transaction) => {
       </Pressable>
       <View style={styles.transactionType}>
         <Text style={styles.topText}>
-          {/* {identity.data?.identity?.name}
+          {identity.data?.identity?.name}
           {!identity?.data?.identity?.name &&
             !identity.loading &&
             'Unknown'}
@@ -51,8 +51,7 @@ export const TransactionListItem = (transaction: Transaction) => {
           {!identity.error &&
             identity.loading &&
             !identity.data &&
-            'Loading...'} */}
-          {transaction.tx_type}
+            'Loading...'}
         </Text>
         <Text style={styles.bottomText}>
           {transaction.tx_type === 'Sent' ? 'Sent' : 'Received'} -{' '}
