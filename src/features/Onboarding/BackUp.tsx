@@ -15,11 +15,12 @@ import {
   Checkbox as CheckboxComponent,
   SeedList,
   Button,
+  BackdropSmall,
 } from '../../components'
 
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
-import { mnemonic as mnemonicPhreses } from '../../utils'
+import { getMnemonic  } from '../../utils'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
 import { OnBoardingNavigate } from '../../navigation/onBoardingStack'
 import {
@@ -51,8 +52,10 @@ export default function GenerateMnemonic({
   }, [])
 
   useEffect(() => {
-    if (!mnemonicPhreses) return
-    setMnemonic(mnemonicPhreses.split(' '))
+    setMnemonic(getMnemonic().split(' '))
+    return () => {
+      setMnemonic(undefined)
+    }
   }, [])
 
   const handleConfirm = async () => {
@@ -78,7 +81,7 @@ export default function GenerateMnemonic({
 
   return (
     <Background>
-      <Backdrop>
+      <BackdropSmall>
         <OnboardingNavbar
           navigation={navigation}
           children="welcome"
@@ -125,7 +128,7 @@ export default function GenerateMnemonic({
           </Button>
         </SafeAreaView>
         {/* Use a light status bar on iOS to account for the black space above the modal */}
-      </Backdrop>
+      </BackdropSmall>
     </Background>
   )
 }

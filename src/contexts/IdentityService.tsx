@@ -113,7 +113,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
   )
 
   const getSigner = useCallback(async (mnemonic: string) => {
-     if (!mnemonic) return null
+    if (!mnemonic) return null
     const signer = await getOfflineSignerProto({
       mnemonic: mnemonic,
       chain: {
@@ -171,7 +171,6 @@ const IdentityServiceProvider = ({ children }: Props) => {
         throw new Error('Invalid mnemonic')
       }
 
-      const account = await signingClient.getAccount(addr)
       const balance = await signingClient.getBalance(addr, JMES_DENOM)
       const identityClient = new IdentityserviceClient(
         signingClient,
@@ -182,14 +181,14 @@ const IdentityServiceProvider = ({ children }: Props) => {
         owner: addr,
       })
 
-      const token = account.pubkey?.value
+      const account = await signingClient.getAccount(addr)
+      const token = account?.pubkey?.value
       return {
         address: addr,
         token: token,
         balance: (Number(balance.amount) || 0) / 1e6,
         username: identity?.identity?.name,
       }
-      return null
     },
 
     [cosmWasmClient]

@@ -8,19 +8,15 @@ import {
   StyleSheet,
 } from 'react-native'
 import {
-  Navbar,
-  StyledButton,
   TextInfo,
   TextTitle,
   SeedList,
   Background,
-  Backdrop,
   Button,
+  BackdropSmall,
 } from '../../components'
-import { navigateToScreen, restoreUserIdentity } from '../../utils'
-import { Text, View } from '../../components/Themed/Themed'
+import { Text } from '../../components/Themed/Themed'
 import { useStoreActions } from '../../hooks/storeHooks'
-import { Navigation } from '../../types'
 import storage from '../../store/storage'
 import { useLockout } from '../../hooks/customHooks'
 import { useContext } from 'react'
@@ -105,51 +101,53 @@ export default function RestoreMnemonicScreen({
 
   const restore = async () => {
     try {
-    const { balance, token, address, username } = await getAccount(
-      mnemonicWords.join(' ')
-    )
+      const { balance, token, address, username } = await getAccount(
+        mnemonicWords.join(' ')
+      )
 
-    if (!address) {
-      handleLockout()
-      return
+      if (!address) {
+        handleLockout()
+        return
+      }
+
+      await Promise.all([
+        storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
+        token && storage.setSecureItem('token', token),
+      ])
+      setMnemonic(mnemonicWords)
+      setAccountAddress(address)
+      setBalance(balance)
+      setUsername(username)
+      setOnboardingPhase(OnBoardingPhase.createPin)
+      setHasToken(!!token)
+
+      if (!balance || token === undefined) {
+        setOnboardingPhase(OnBoardingPhase.topUp)
+        navigation.push('topUp')
+        return
+      }
+      if (username === undefined) {
+        setOnboardingPhase(OnBoardingPhase.pickUsername)
+        navigation.push('pickUsername')
+        return
+      }
+
+      navigation.push('createPin')
+    } catch (err) {
+      setErrorText('Invalid mnemonic')
+      console.error(err)
     }
-
-    setMnemonic(mnemonicWords)
-    setAccountAddress(address)
-    if (balance === undefined) {
-      setOnboardingPhase(OnBoardingPhase.topUp)
-      navigation.push('topUp')
-    }
-    if (username === undefined) {
-      setOnboardingPhase(OnBoardingPhase.pickUsername)
-      navigation.push('pickUsername')
-    }
-    setBalance(balance)
-
-    setUsername(username)
-    setOnboardingPhase(OnBoardingPhase.createPin)
-    navigation.push('createPin')
-
-    await Promise.all([
-      storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
-      storage.setSecureItem('token', token),
-    ])
-    setHasToken(true)
-  } catch (err) {
-    setErrorText('Invalid mnemonic')
-    console.error(err)
   }
-}
-
 
   const handleAccountRestore = async () => {
- 
-      setLoadingAccount(true)
-      setTimeout(() => {
-       restore().then().finally(() => {
-        setLoadingAccount(false)
-      })
-      }, 100)
+    setLoadingAccount(true)
+    setTimeout(() => {
+      restore()
+        .then()
+        .finally(() => {
+          setLoadingAccount(false)
+        })
+    }, 100)
   }
 
   const canConfirm = useMemo(() => {
@@ -171,7 +169,7 @@ export default function RestoreMnemonicScreen({
   }
   return (
     <Background>
-      <Backdrop>
+      <BackdropSmall>
         <OnboardingNavbar
           navigation={navigation}
           children="welcome"
@@ -218,7 +216,7 @@ export default function RestoreMnemonicScreen({
             </Text>
           </Button>
         </SafeAreaView>
-      </Backdrop>
+      </BackdropSmall>
     </Background>
   )
 }
@@ -233,9 +231,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   mainContentContainer: {
-    height: '70%',
+    height: '90%',
     width: '100%',
-  },
+   },
 
   mainContentcontnetStyle: {
     alignItems: 'center',
@@ -248,6 +246,7 @@ const styles = StyleSheet.create({
     width: '93%',
     height: 49,
     marginBottom: 34,
+    
     marginTop: 22,
   },
 })

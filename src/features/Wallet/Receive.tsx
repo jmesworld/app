@@ -24,6 +24,7 @@ type Props = {
 
 export default function ReceiveScreen({ navigation }: Props) {
   const address = useStoreState((state) => state.accounts[0]?.address)
+  const username = useStoreState((state) => state.accounts[0]?.username)
   const [copied, copyToClipboard] = useClipboardTimeout()
   const { colors } = useAppTheme()
 
@@ -39,7 +40,8 @@ export default function ReceiveScreen({ navigation }: Props) {
           <View style={styles.qrContainer}>
             <GeneratedQRCode
               payload={{
-                address: address,
+                username,
+                address,
               }}
               size={168}
             />

@@ -39,8 +39,7 @@ export default function ScanScreen({ navigation }: Props) {
         })
         return
       }
-      console.log('no data')
-    } catch (err) {
+     } catch (err) {
       console.error('error', err)
     }
   }

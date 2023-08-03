@@ -19,6 +19,7 @@ import { getUserReceivedTransactions } from '../../api/transactionAPI'
 import { TransactionReceived } from '../../components/Modal/TransactionReceived'
 import Modal from '../../components/Modal/Modal'
 import { formatUSDFromJMES } from '../../utils/balanceFormat'
+import JmesIcon from '../../assets/jmesBlack.svg'
 
 type routeParams = {
   amount: string
@@ -33,6 +34,9 @@ const ActiveRequest = ({ navigation, route }: Props) => {
   const { colors } = useAppTheme()
   const amount = route.params.amount
   const address = useStoreState((state) => state.accounts[0]?.address)
+  const username = useStoreState(
+    (state) => state.accounts[0]?.username
+  )
 
   const [transaction, setTransaction] = useState<any>(null)
 
@@ -97,16 +101,35 @@ const ActiveRequest = ({ navigation, route }: Props) => {
         <BackdropSmall>
           <View style={styles.mainContent}>
             <Text style={styles.title}>Requesting</Text>
-            <Text
-              style={[
-                styles.amount,
-                {
-                  color: colors.primary,
-                },
-              ]}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingTop: 15,
+                
+              }}
             >
-              {amount}
-            </Text>
+              <JmesIcon
+                style={{
+                  marginRight: 5,
+                }}
+                color={colors.primary}
+                height={30}
+                width={30}
+                
+              />
+              <Text
+                style={[
+                  styles.amount,
+                  {
+                    color: colors.primary,
+                  },
+                ]}
+              >
+                {amount}
+              </Text>
+            </View>
             <Text style={styles.conversionText}>
               {amount && formatUSDFromJMES(amount, false)}
             </Text>
@@ -116,6 +139,7 @@ const ActiveRequest = ({ navigation, route }: Props) => {
                 payload={{
                   address: address,
                   amount: amount,
+                  username,
                 }}
               />
             </View>
@@ -125,16 +149,20 @@ const ActiveRequest = ({ navigation, route }: Props) => {
             <ActivityIndicator size="large" color={colors.primary} />
           )}
           <View style={styles.buttonContainer}>
-            <Button rounded="full" mode="outlined" onPress={async () => {
-              navigation.navigate('Root')
-            }}>
+            <Button
+              rounded="full"
+              mode="outlined"
+              onPress={async () => {
+                navigation.navigate('Root')
+              }}
+            >
               <Text
                 style={{
                   fontWeight: '500',
                   textTransform: 'none',
                   fontStyle: 'normal',
                   fontSize: 16,
-                  color: colors.black
+                  color: colors.black,
                 }}
               >
                 Cancel
@@ -178,10 +206,8 @@ const styles = StyleSheet.create({
   },
 
   amount: {
-    marginTop: 15,
     fontSize: 38,
-    textAlign: 'center',
-  },
+   },
   conversionText: {
     alignSelf: 'center',
     marginTop: 10,

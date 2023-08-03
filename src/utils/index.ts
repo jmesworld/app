@@ -12,7 +12,7 @@ import {
   PUBLIC_CHAIN_ID,
   PUBLIC_RPC_URL,
   PUBLIC_REST_URL,
-  PUBLIC_IDENTITY_SERVICE_CONTRACT
+  PUBLIC_IDENTITY_SERVICE_CONTRACT,
 } from '@env'
 console.log('Public', PUBLIC_REST_URL)
 // const lcdc = client.createLCDClient({
@@ -46,7 +46,6 @@ const client = new Client({
   providers: {
     faucetAPI: {
       endpoint: {
-      
         api_url: PUBLIC_RPC_URL,
       },
     },
@@ -64,6 +63,12 @@ const mnemonic = Mnemonic.generateMnemonic(randomBytes)
 const wallet = client.createWallet(new Mnemonic(mnemonic))
 const account = wallet.getAccount()
 const lcdc = account.getLCDClient()
+
+export const getMnemonic = () => {
+  const randomBytes = crypto.getRandomValues(new Uint8Array(16))
+  const mnemonic = Mnemonic.generateMnemonic(randomBytes)
+  return mnemonic
+}
 
 //working
 const getCoinBal = async (address: string) => {

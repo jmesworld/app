@@ -40,17 +40,19 @@ export default function SendConfirmScreen({
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
-   const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
   const [transactionStatus, setTransactionStatus] =
     useState<TransactionStatus>(null)
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
   const address = useStoreState((state) => state.accounts[0]?.address)
-  const mnemonic = useStoreState((state) => state.accounts[0]?.mnemonic)
- 
+  const mnemonic = useStoreState(
+    (state) => state.accounts[0]?.mnemonic
+  )
+
   useEffect(() => {
-     if (route.params) {
+    if (route.params) {
       if (route.params.recipientAddress)
         setRecipientAddress(route.params.recipientAddress)
       if (route.params.username)
@@ -116,7 +118,13 @@ export default function SendConfirmScreen({
               label={username?.[0]?.toUpperCase()}
             />
             <View style={styles.userContainer}>
-              <Text style={styles.username}>{username}</Text>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="middle"
+                style={styles.username}
+              >
+                {username}
+              </Text>
               <Text
                 numberOfLines={1}
                 ellipsizeMode="middle"
@@ -142,7 +150,13 @@ export default function SendConfirmScreen({
               label={recipientUsername?.[0]?.toUpperCase()}
             />
             <View style={styles.userContainer}>
-              <Text style={styles.username}>{recipientUsername}</Text>
+              <Text
+                numberOfLines={2}
+                ellipsizeMode="middle"
+                style={styles.username}
+              >
+                {recipientUsername}
+              </Text>
               <Text
                 numberOfLines={1}
                 ellipsizeMode="middle"
@@ -182,7 +196,7 @@ export default function SendConfirmScreen({
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
               <View style={styles.amountContainer}>
-                <JmesIconBlack width={12} height={12} />
+                <JmesIconBlack color={colors.primaryText} width={12} height={12} />
                 <Text style={styles.detailsTotal}>
                   {formatBalance(recipientAmount + 0.6948 * 1e6)}
                 </Text>
@@ -205,38 +219,31 @@ export default function SendConfirmScreen({
             <Button
               rounded="full"
               mode="outlined"
-              style={styles.cancelButton}
+              width="48%"
               onPress={async () => {
                 navigation.navigate('Root')
               }}
             >
               <Text
                 style={{
-                  color: '#23262F',
-                  fontSize: 16,
-                  fontWeight: '500',
-                  lineHeight: 16,
+                  fontWeight: 'normal',
+
+                  color: colors.black,
                 }}
               >
                 Cancel
               </Text>
             </Button>
             <Button
-              mode="contained"
               rounded="full"
-              style={styles.sendButton}
+              mode="contained"
+              width="48%"
               onPress={handleSend}
             >
-              <Text
-                style={{
-                  color: '#FFFFFF',
-                  fontSize: 16,
-                  fontWeight: '500',
-                  lineHeight: 16,
-                }}
-              >
-                Send
-              </Text>
+              <Text style={{
+                fontWeight: 'normal',
+                color: colors.white
+              }} >Send</Text>
             </Button>
           </View>
         </BackdropSmall>
@@ -279,6 +286,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#454E62',
     marginBottom: 5,
+    maxWidth: '90%',
   },
   address: {
     fontSize: 12,
@@ -304,7 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    
+    overflow: 'hidden',
     alignSelf: 'center',
     marginLeft: 10,
     marginTop: 10,
@@ -342,30 +350,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignSelf: 'center',
-
+    gap: 10,
+    height: 48,
     marginTop: 'auto',
     marginBottom: 40,
     width: '90%',
-    height: 48,
     backgroundColor: 'transparent',
   },
 
-  cancelButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-
-    fontSize: 16,
-
-    width: '48%',
-  },
-  sendButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: 16,
-    width: '48%',
-  },
+  cancelButton: {},
+  sendButton: {},
   title: {
     color: '#263047',
     alignSelf: 'flex-start',
