@@ -22,7 +22,8 @@ import {
   formatBalance,
   formatUSDFromJMES,
 } from '../../utils/balanceFormat'
-import JmesIcon from '../../assets/jmesBlack.svg'
+import JmesIcon from '../../assets/jmesGray.svg'
+import JmesIconBlack from '../../assets/jmesBlack.svg'
 
 type Props = {
   navigation: Navigation
@@ -39,26 +40,17 @@ export default function SendConfirmScreen({
   const [recipientUsername, setRecipientUsername] = useState('')
   const [recipientAmount, setRecipientAmount] = useState(0)
   const [recipientAddress, setRecipientAddress] = useState('')
-  const [mnemonic, setMnemonic] = useState<any>()
-  const [modalVisible, setModalVisible] = useState(false)
+   const [modalVisible, setModalVisible] = useState(false)
   const [transactionStatus, setTransactionStatus] =
     useState<TransactionStatus>(null)
   const username = useStoreState(
     (state) => state.accounts[0].username
   )
   const address = useStoreState((state) => state.accounts[0]?.address)
-
-  async function getMnemonic() {
-    const mnemonicFromSecureStorage = await storage.getSecureItem(
-      'mnemonic'
-    )
-    setMnemonic(mnemonicFromSecureStorage)
-    return mnemonicFromSecureStorage
-  }
-
+  const mnemonic = useStoreState((state) => state.accounts[0]?.mnemonic)
+ 
   useEffect(() => {
-    getMnemonic()
-    if (route.params) {
+     if (route.params) {
       if (route.params.recipientAddress)
         setRecipientAddress(route.params.recipientAddress)
       if (route.params.username)
@@ -73,7 +65,7 @@ export default function SendConfirmScreen({
     setTransactionStatus('Pending')
     try {
       const response = await sendTransaction(
-        mnemonic,
+        mnemonic.join(' '),
         recipientAddress,
         recipientAmount
       )
@@ -109,7 +101,7 @@ export default function SendConfirmScreen({
     <View style={styles.container}>
       <Background>
         <Navbar
-          title={'Send Confirm'}
+          title={'Send confirm'}
           navigation={navigation}
           children={'WalletSend'}
         />
@@ -190,7 +182,7 @@ export default function SendConfirmScreen({
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
               <View style={styles.amountContainer}>
-                <JmesIcon width={12} height={12} />
+                <JmesIconBlack width={12} height={12} />
                 <Text style={styles.detailsTotal}>
                   {formatBalance(recipientAmount + 0.6948 * 1e6)}
                 </Text>
@@ -258,7 +250,7 @@ export default function SendConfirmScreen({
           <View style={styles.buttonContainer}>
             <CloseButton
               onPress={() => {
-                navigation.navigate('WalletSend')
+                navigation.navigate('Root')
               }}
               enabled={
                 transactionStatus === 'Failed' ||
@@ -305,13 +297,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '90%',
+    backgroundColor: 'transparent',
     marginBottom: 20,
   },
   userContainer: {
     backgroundColor: 'transparent',
     flexDirection: 'column',
     justifyContent: 'space-between',
-
+    
     alignSelf: 'center',
     marginLeft: 10,
     marginTop: 10,

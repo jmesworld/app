@@ -134,6 +134,7 @@ const ActiveRequest = ({ navigation, route }: Props) => {
                   textTransform: 'none',
                   fontStyle: 'normal',
                   fontSize: 16,
+                  color: colors.black
                 }}
               >
                 Cancel
@@ -156,9 +157,11 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     marginBottom: 40,
+    backgroundColor: 'transparent',
   },
   qrContainer: {
     width: '100%',
+    backgroundColor: 'transparent',
     height: 200,
     marginTop: 40,
   },

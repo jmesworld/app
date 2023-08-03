@@ -103,44 +103,53 @@ export default function RestoreMnemonicScreen({
     }
   }
 
-  const handleAccountRestore = async () => {
+  const restore = async () => {
     try {
-      setLoadingAccount(true)
-      const { balance, token, address, username } = await getAccount(
-        mnemonicWords.join(' ')
-      )
+    const { balance, token, address, username } = await getAccount(
+      mnemonicWords.join(' ')
+    )
 
-      if (!address) {
-        handleLockout()
-        return
-      }
-
-      setMnemonic(mnemonicWords)
-      setAccountAddress(address)
-      if (balance === undefined) {
-        setOnboardingPhase(OnBoardingPhase.topUp)
-        navigation.push('topUp')
-      }
-      if (username === undefined) {
-        setOnboardingPhase(OnBoardingPhase.pickUsername)
-        navigation.push('pickUsername')
-      }
-      setBalance(balance)
-
-      setUsername(username)
-      setOnboardingPhase(OnBoardingPhase.createPin)
-      navigation.push('createPin')
-
-      await Promise.all([
-        storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
-        storage.setSecureItem('token', token),
-      ])
-      setHasToken(true)
-    } catch (err) {
-      setErrorText('Invalid mnemonic')
-      console.error(err)
+    if (!address) {
+      handleLockout()
+      return
     }
-    setLoadingAccount(false)
+
+    setMnemonic(mnemonicWords)
+    setAccountAddress(address)
+    if (balance === undefined) {
+      setOnboardingPhase(OnBoardingPhase.topUp)
+      navigation.push('topUp')
+    }
+    if (username === undefined) {
+      setOnboardingPhase(OnBoardingPhase.pickUsername)
+      navigation.push('pickUsername')
+    }
+    setBalance(balance)
+
+    setUsername(username)
+    setOnboardingPhase(OnBoardingPhase.createPin)
+    navigation.push('createPin')
+
+    await Promise.all([
+      storage.setSecureItem('mnemonic', mnemonicWords.join(' ')),
+      storage.setSecureItem('token', token),
+    ])
+    setHasToken(true)
+  } catch (err) {
+    setErrorText('Invalid mnemonic')
+    console.error(err)
+  }
+}
+
+
+  const handleAccountRestore = async () => {
+ 
+      setLoadingAccount(true)
+      setTimeout(() => {
+       restore().then().finally(() => {
+        setLoadingAccount(false)
+      })
+      }, 100)
   }
 
   const canConfirm = useMemo(() => {

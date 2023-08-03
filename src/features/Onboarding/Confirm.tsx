@@ -45,9 +45,7 @@ export default function ConfirmMnemonic({
   const setOnboardingPhase = useStoreActions(
     (actions) => actions.setOnboardingPhase
   )
-  const setBalance = useStoreActions(
-    (actions) => actions.setBalance
-  )
+  const setBalance = useStoreActions((actions) => actions.setBalance)
   const [mnemonicWords, setMnemonicWords] = useState<string[]>([])
 
   useEffect(() => {
@@ -77,6 +75,14 @@ export default function ConfirmMnemonic({
       Alert.alert('Mnemonic does not match')
     }
     setCreatingAccount(true)
+    setTimeout(() => {
+        createAccount().then().finally(() => {
+        setCreatingAccount(false)
+      })
+    }, 100)
+  }
+
+  const createAccount = async () => {
     try {
       const res = await createWallet(mnemonicWords.join(' '))
       setAddress(res.address)
@@ -84,8 +90,6 @@ export default function ConfirmMnemonic({
       navigation.push('topUp')
     } catch (err) {
       console.error(err)
-    } finally {
-      setCreatingAccount(false)
     }
   }
 
@@ -169,6 +173,7 @@ const styles = StyleSheet.create({
   },
   centeredContainer: {
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   contentContainer: {
     height: '70%',

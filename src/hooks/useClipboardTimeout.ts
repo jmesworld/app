@@ -9,7 +9,7 @@ export function useClipboardTimeout(): [
 
   const copyToClipboard = (value: string, timeout = 2000) => {
     try {
-      Clipboard.setString(value)
+       Clipboard.setString(value)
 
       setCopied(true)
       setTimeout(() => {

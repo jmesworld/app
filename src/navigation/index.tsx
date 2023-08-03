@@ -4,13 +4,16 @@ import {
   DefaultTheme,
   DarkTheme,
 } from '@react-navigation/native'
-import { NativeStackScreenProps, createNativeStackNavigator } from '@react-navigation/native-stack'
+import {
+  NativeStackScreenProps,
+  createNativeStackNavigator,
+} from '@react-navigation/native-stack'
 import { ColorSchemeName, Modal } from 'react-native'
 import { useStoreState } from '../hooks/storeHooks'
 import { RootStackParamList, ModalParamList } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
 import NotFoundScreen from '../components/NotFound/NotFound'
- import {
+import {
   WalletScreen,
   SendScreen,
   RequestScreen,
@@ -21,6 +24,7 @@ import NotFoundScreen from '../components/NotFound/NotFound'
 } from '../features/Wallet'
 import { OnBoardingStack } from './onBoardingStack'
 import ActiveRequest from '../features/Wallet/ActiveRequest'
+import SendToAddress from '../features/Wallet/SendToAddress'
 
 export default function Navigation({
   colorScheme,
@@ -38,8 +42,9 @@ export default function Navigation({
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
-export type ModalNavigation<T extends keyof ModalParamList> = NativeStackScreenProps<ModalParamList, T>
- 
+export type ModalNavigation<T extends keyof ModalParamList> =
+  NativeStackScreenProps<ModalParamList, T>
+
 export type ModalNavigate<T> = ModalNavigation<T>['navigation']
 export type ModalRoute<T> = ModalNavigation<T>['route']
 
@@ -71,6 +76,16 @@ function RootNavigator() {
         <Stack.Screen
           name="WalletSend"
           component={SendScreen}
+          options={{
+            headerShown: false,
+            presentation: 'card',
+            title: 'Send to user',
+          }}
+        />
+
+        <Stack.Screen
+          name="SendToAddress"
+          component={SendToAddress}
           options={{
             headerShown: false,
             presentation: 'card',

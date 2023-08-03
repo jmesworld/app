@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     columnGap: 7,
   },
   seedWordNumber: {
+    marginTop: 5,
     color: '#704FF7',
     alignSelf: 'center',
   },
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     height: 48,
     minWidth: 108,
     width: '30%',
-  },
+   },
 })
 
 export default memo(SeedList)
