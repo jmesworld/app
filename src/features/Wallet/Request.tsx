@@ -8,13 +8,12 @@ import {
   Background,
   Button,
 } from '../../components'
-import { Navigation } from '../../types'
-import { numberSchema } from '../../validations/number'
-import { ModalNavigate } from '../../navigation'
-import { convertToUSD, formatUSDFromJMES } from '../../utils/balanceFormat'
+ import { numberSchema } from '../../validations/number'
+import { RootNavigateProps } from '../../navigation'
+import { formatUSDFromJMES } from '../../utils/balanceFormat'
 
 type Props = {
-  navigation: ModalNavigate<'ActiveRequest'>
+  navigation: RootNavigateProps<'ActiveRequest'>
 }
 
 export default function RequestScreen({ navigation }: Props) {
@@ -38,7 +37,7 @@ export default function RequestScreen({ navigation }: Props) {
         <Navbar
           title={'Request Amount'}
           navigation={navigation}
-          children={'WalletReceive'}
+          children={'Receive'}
         />
         <BackdropSmall>
           <Text style={styles.title}>Amount of JMES</Text>
@@ -52,7 +51,7 @@ export default function RequestScreen({ navigation }: Props) {
             />
 
             <Text style={styles.conversionText}>
-              {data && isValidInput && formatUSDFromJMES(data, false) }
+              {data && isValidInput && formatUSDFromJMES(data, false)}
             </Text>
           </SafeAreaView>
 
@@ -62,7 +61,7 @@ export default function RequestScreen({ navigation }: Props) {
               mode="contained"
               disabled={!isValidInput}
               onPress={async () => {
-                navigation.navigate('ActiveRequest', {
+                navigation.push('ActiveRequest', {
                   amount: data,
                 })
               }}
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-     fontSize: 18,
+    fontSize: 18,
     textAlign: 'center',
     color: '#704FF7',
     borderWidth: 1,

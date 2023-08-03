@@ -9,22 +9,23 @@ import {
   StyledButton as NextButton,
   Input,
 } from '../../components'
-import { Navigation } from '../../types'
 import { useStoreState } from '../../hooks/storeHooks'
-import QRCode from 'react-native-qrcode-svg' // Import QRCode component
 import { useClipboardTimeout } from '../../hooks/useClipboardTimeout'
 import CopyIcon from '../../assets/copy.svg'
 import CheckIcon from '../../assets/check.svg'
 import { useAppTheme } from '../../theme'
 import GeneratedQRCode from '../../components/QRCode/QRCode'
+import { RootNavigateProps } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
+  navigation: RootNavigateProps<'Receive'>
 }
 
 export default function ReceiveScreen({ navigation }: Props) {
   const address = useStoreState((state) => state.accounts[0]?.address)
-  const username = useStoreState((state) => state.accounts[0]?.username)
+  const username = useStoreState(
+    (state) => state.accounts[0]?.username
+  )
   const [copied, copyToClipboard] = useClipboardTimeout()
   const { colors } = useAppTheme()
 
@@ -105,7 +106,7 @@ export default function ReceiveScreen({ navigation }: Props) {
 
           <View style={styles.buttonContainer}>
             <NextButton
-              onPress={() => navigation.navigate('ReceiveRequest')}
+              onPress={() => navigation.push('ReceiveRequest')}
               enabled
             >
               Add Amount

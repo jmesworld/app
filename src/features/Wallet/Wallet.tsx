@@ -23,9 +23,10 @@ import {
 import { getCoinBal } from '../../utils'
 import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
 import { formatBalance } from '../../utils/balanceFormat'
+import { RootNavigateProps } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
+  navigation: RootNavigateProps<'Root'>
 }
 
 export default function WalletScreen({ navigation }: Props) {

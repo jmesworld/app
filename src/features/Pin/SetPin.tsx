@@ -66,11 +66,8 @@ const SetPinScreen = ({ navigation, route }: Props) => {
   return (
     <View style={styles.container}>
       <Background>
-          <Navbar
-            navigation={navigation}
-            children="pickUsername"
-            />
-            <BackdropSmall>
+        <Navbar navigation={navigation} />
+        <BackdropSmall>
           <View style={styles.centeredContainer}>
             <TextTitle> Choose a 4 digit PIN </TextTitle>
             <TextInfo>

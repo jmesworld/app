@@ -16,20 +16,30 @@ declare global {
   }
 }
 
-export type RootStackParamList = {
-  Root: NavigatorScreenParams<RootTabParamList> | undefined
-  Modal: NavigatorScreenParams<ModalParamList> | undefined
-  NotFound: undefined
-}
 
-export type ModalParamList = {
-  WalletSend: undefined
-  WalletSendConfirm: undefined
-  WalletReceive: undefined
-  ReceiveRequest: undefined
+export type RootStackParamList = {
+  Root: undefined
+  Send: {
+    address: string;
+    amount: string;
+  }
+  SendToAddress: {
+    username: string;
+    address: string;
+    amount: string;
+  }
+  SendConfirm: {
+    recipientAddress: string;
+    username: string;
+    amount: string;
+  }
   ActiveRequest: {
     amount: string
   }
+  NotFound: undefined
+  Balance: undefined
+  Receive: undefined
+  ReceiveRequest: undefined
   TransactionHistory: undefined
   Scan: undefined
 }

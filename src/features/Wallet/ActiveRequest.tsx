@@ -20,13 +20,14 @@ import { TransactionReceived } from '../../components/Modal/TransactionReceived'
 import Modal from '../../components/Modal/Modal'
 import { formatUSDFromJMES } from '../../utils/balanceFormat'
 import JmesIcon from '../../assets/jmesBlack.svg'
+import { RootNavigateProps, RootRouteProps } from '../../navigation'
 
 type routeParams = {
   amount: string
 }
 type Props = {
-  navigation: Navigation
-  route: Route<'ActiveRequest', routeParams>
+  navigation: RootNavigateProps<'ActiveRequest'>
+  route: RootRouteProps<'ActiveRequest'>
 }
 
 const ActiveRequest = ({ navigation, route }: Props) => {

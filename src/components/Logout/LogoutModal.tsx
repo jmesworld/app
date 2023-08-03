@@ -28,6 +28,7 @@ const LogoutModal = ({
 
   return (
     <CustomModal
+    
       isVisible={isVisible}
       onRequestClose={onRequestClose}
     >

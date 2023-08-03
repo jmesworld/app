@@ -11,9 +11,10 @@ import { Navigation } from '../../types'
 import { useAppTheme } from '../../theme'
 import { useStoreState } from '../../hooks/storeHooks'
 import JmesIcon from '../../assets/jmes.svg'
+import { RootNavigateProps } from '../../navigation'
 
 type Props = {
-  children: string
+  children?: string
   navigation: Navigation
   backButton?: boolean
   title?: string
@@ -42,7 +43,10 @@ const Navbar = ({
             onPress={
               handleBack
                 ? handleBack
-                : () => navigation.navigate(children)
+                : () =>
+                    children || !navigation.canGoBack()
+                      ? navigation.navigate(children)
+                      : navigation.goBack()
             }
             style={({ pressed }) => ({
               flexDirection: 'row',
@@ -59,7 +63,7 @@ const Navbar = ({
                 height: 16,
               }}
             />
-          <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>{title}</Text>
           </Pressable>
         </View>
         <View

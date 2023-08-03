@@ -17,19 +17,20 @@ import {
   StyledButton as NextButton,
   Input,
 } from '../../components'
-import { Navigation } from '../../types'
-import { Route } from '@react-navigation/native'
+
 import ScanIcon from '../../assets/ScanBlack.svg'
+import CloseIcon from '../../assets/close.svg'
 import { useIdentity } from '../../hooks/useIdentity'
 import { useDebounce } from '../../hooks/useDebounce'
 import { useAppTheme } from '../../theme'
 import { numberSchema } from '../../validations/number'
 import { useStoreState } from '../../hooks/storeHooks'
 import { formatUSDFromJMES } from '../../utils/balanceFormat'
+import { RootNavigateProps, RootRouteProps } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
-  route: Route<any>
+  navigation: RootNavigateProps<'Send'>
+  route: RootRouteProps<'Send'>
 }
 
 export default function SendScreen({ navigation, route }: Props) {
@@ -66,13 +67,12 @@ export default function SendScreen({ navigation, route }: Props) {
 
   const handleTxParams = async (username: string) => {
     // @ts-ignore
-    return navigation.navigate({
-      name: 'WalletSendConfirm',
-      params: {
-        username: username.length < 20 ? username : 'Unknown',
-        amount: amount.value,
-        recipientAddress: identity.data?.identity?.owner ? identity.data?.identity?.owner : nameOrAddress,
-      },
+    return navigation.push('SendConfirm', {
+      username: username.length < 20 ? username : 'unknown',
+      amount: amount.value,
+      recipientAddress: identity.data?.identity?.owner
+        ? identity.data?.identity?.owner
+        : nameOrAddress,
     })
   }
 
@@ -80,7 +80,7 @@ export default function SendScreen({ navigation, route }: Props) {
     if (!amount || amount.value === '' || amount.error) {
       return false
     }
-    if (  nameOrAddress === '') {
+    if (nameOrAddress === '') {
       return false
     }
     if (identity.loading || identity.error) {
@@ -173,7 +173,7 @@ export default function SendScreen({ navigation, route }: Props) {
       return 'Loading...'
     }
     if (searchResult === 'notFound') {
-      return 'Identity Not found'
+      return 'Identity not found'
     }
     return searchResult
   }, [searchResult])
@@ -211,16 +211,30 @@ export default function SendScreen({ navigation, route }: Props) {
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
                 imgSource={
                   <Pressable
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '100%',
+                      width: '100%',
+                    }}
                     onPress={() => {
-                      navigation.navigate('Scan')
+                      if (nameOrAddress) {
+                        setNameOrAddress('')
+                        return
+                      }
+                      navigation.push('Scan')
                     }}
                   >
-                    <ScanIcon
-                      style={{
-                        width: 40,
-                        height: 40,
-                      }}
-                    />
+                    {nameOrAddress.length ? (
+                      <CloseIcon
+                        height={30}
+                        width={30}
+                        fill={colors.primary}
+                      />
+                    ) : (
+                      <ScanIcon height={33} width={33} />
+                    )}
                   </Pressable>
                 }
               />
@@ -233,7 +247,7 @@ export default function SendScreen({ navigation, route }: Props) {
                 {
                   color:
                     searchResult === 'notFound'
-                      ? colors.red
+                      ? colors.orange
                       : colors.darkGray,
                 },
               ]}
