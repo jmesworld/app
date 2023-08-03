@@ -3,9 +3,10 @@ import { View, Text } from '../../../components'
 import { Platform, Pressable, StyleSheet, Image } from 'react-native'
 
 import { Navigation } from '../../../types'
+import { RootNavigateProps } from '../../../navigation'
 interface Props {
   children?: React.ReactNode
-  navigation: Navigation
+  navigation:  RootNavigateProps<'Root'>
 }
 
 const SendReceive = ({ children, navigation }: Props) => {
@@ -13,7 +14,7 @@ const SendReceive = ({ children, navigation }: Props) => {
     <View style={styles.container}>
       <Pressable
         onPress={() => {
-          navigation.navigate('WalletSend')
+          navigation.push('Send')
         }}
         style={styles.button}
       >
@@ -43,7 +44,7 @@ const SendReceive = ({ children, navigation }: Props) => {
       </Pressable>
       <Pressable
         onPress={() => {
-          navigation.navigate('WalletReceive')
+          navigation.push('Receive')
         }}
         style={styles.button}
       >

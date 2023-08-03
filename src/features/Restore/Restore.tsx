@@ -31,17 +31,13 @@ export default function RestoreScreen({ navigation }: Props) {
     try {
       const account = await getUserIdentity(username)
       if (account.data.identity.username === username) {
-        console.log('valid username', account.data.identity.username)
-        return true
+         return true
       } else {
-        console.log(
-          'invalid username',
-          account.data.identity.username
-        )
+       
         return false
       }
     } catch (error) {
-      console.log('error', error)
+      console.error('error', error)
       return false
     }
   }

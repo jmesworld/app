@@ -10,14 +10,8 @@ const secureStore = {
     try {
       if (isWebPlatform()) {
         await localForage.setItem(key, value)
-        console.log(
-          `success storing ${key}:, ${value} in localForage`
-        )
       } else {
         await SecureStore.setItemAsync(key, value)
-        console.log(
-          `success storing ${key}:, ${value} in SecureStore`
-        )
       }
     } catch (error) {
       console.error(`Error storing ${key}:`, error)
@@ -27,7 +21,6 @@ const secureStore = {
     try {
       if (isWebPlatform()) {
         const value = await localForage.getItem(key)
-        console.log('value', value)
         return value
       } else {
         const value = await SecureStore.getItemAsync(key)

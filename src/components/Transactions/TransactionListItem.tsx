@@ -46,7 +46,7 @@ export const TransactionListItem = (transaction: Transaction) => {
           {identity.data?.identity?.name}
           {!identity?.data?.identity?.name &&
             !identity.loading &&
-            'Unknown'}
+            'unknown'}
 
           {!identity.error &&
             identity.loading &&

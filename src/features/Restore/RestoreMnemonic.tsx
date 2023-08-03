@@ -28,6 +28,7 @@ import {
 } from '../../navigation/onBoardingStack'
 import { useIdentityContext } from '../../contexts/IdentityService'
 import { OnBoardingPhase } from '../../store'
+import Toast from 'react-native-toast-message'
 type Props = {
   navigation: OnBoardingNavigate<'confirmGeneratedMnemonic'>
   route: OnBoardingRoute<'confirmGeneratedMnemonic'>
@@ -134,7 +135,14 @@ export default function RestoreMnemonicScreen({
 
       navigation.push('createPin')
     } catch (err) {
-      setErrorText('Invalid mnemonic')
+      if(err instanceof Error) {
+         Toast.show({
+          type: 'error',
+          text1: err.message,
+          text2: "Couldn't create Account."
+        })
+        setErrorText(err.message)
+      }
       console.error(err)
     }
   }

@@ -24,10 +24,11 @@ import {
 } from '../../utils/balanceFormat'
 import JmesIcon from '../../assets/jmesGray.svg'
 import JmesIconBlack from '../../assets/jmesBlack.svg'
+import { RootNavigateProps, RootRouteProps } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
-  route: Route<any>
+  navigation: RootNavigateProps<'SendConfirm'>
+  route: RootRouteProps<'SendConfirm'>
 }
 
 type TransactionStatus = 'Pending' | 'Success' | 'Failed' | null
@@ -93,20 +94,16 @@ export default function SendConfirmScreen({
       return
     }
     if (transactionStatus === 'Failed') {
-      navigation.navigate('WalletSend')
+      navigation.navigate('Send')
       return
     }
-    return navigation.navigate('WalletSend')
+    return navigation.navigate('Send')
   }
 
   return (
     <View style={styles.container}>
       <Background>
-        <Navbar
-          title={'Send confirm'}
-          navigation={navigation}
-          children={'WalletSend'}
-        />
+        <Navbar title={'Send confirm'} navigation={navigation} />
         <BackdropSmall>
           <Text style={styles.title}>Sender account</Text>
           <View style={styles.userItemContainer}>
@@ -119,6 +116,7 @@ export default function SendConfirmScreen({
             />
             <View style={styles.userContainer}>
               <Text
+                selectable
                 numberOfLines={1}
                 ellipsizeMode="middle"
                 style={styles.username}
@@ -126,6 +124,7 @@ export default function SendConfirmScreen({
                 {username}
               </Text>
               <Text
+                selectable
                 numberOfLines={1}
                 ellipsizeMode="middle"
                 style={styles.address}
@@ -154,11 +153,13 @@ export default function SendConfirmScreen({
                 numberOfLines={2}
                 ellipsizeMode="middle"
                 style={styles.username}
+                selectable
               >
                 {recipientUsername}
               </Text>
               <Text
                 numberOfLines={1}
+                selectable
                 ellipsizeMode="middle"
                 style={styles.address}
               >
@@ -188,7 +189,7 @@ export default function SendConfirmScreen({
               <Text style={styles.detailsTitle}>Network Fee</Text>
               <View style={styles.amountContainer}>
                 <JmesIcon width={12} height={12} />
-                <Text style={styles.detailsTitle}> 0.6948 </Text>
+                <Text style={styles.detailsTitle}>0.6948</Text>
               </View>
             </View>
             <Divider />
@@ -196,7 +197,11 @@ export default function SendConfirmScreen({
             <View style={styles.detailsTotalContainer}>
               <Text style={styles.detailsTotal}>Total Amount</Text>
               <View style={styles.amountContainer}>
-                <JmesIconBlack color={colors.primaryText} width={12} height={12} />
+                <JmesIconBlack
+                  color={colors.primaryText}
+                  width={12}
+                  height={12}
+                />
                 <Text style={styles.detailsTotal}>
                   {formatBalance(recipientAmount + 0.6948 * 1e6)}
                 </Text>
@@ -240,10 +245,14 @@ export default function SendConfirmScreen({
               width="48%"
               onPress={handleSend}
             >
-              <Text style={{
-                fontWeight: 'normal',
-                color: colors.white
-              }} >Send</Text>
+              <Text
+                style={{
+                  fontWeight: 'normal',
+                  color: colors.white,
+                }}
+              >
+                Send
+              </Text>
             </Button>
           </View>
         </BackdropSmall>

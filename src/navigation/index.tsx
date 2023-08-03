@@ -1,4 +1,3 @@
-//@ts-nocheck
 import {
   NavigationContainer,
   DefaultTheme,
@@ -10,7 +9,7 @@ import {
 } from '@react-navigation/native-stack'
 import { ColorSchemeName, Modal } from 'react-native'
 import { useStoreState } from '../hooks/storeHooks'
-import { RootStackParamList, ModalParamList } from '../types'
+import { RootStackParamList } from '../types'
 import LinkingConfiguration from './LinkingConfiguration'
 import NotFoundScreen from '../components/NotFound/NotFound'
 import {
@@ -42,11 +41,11 @@ export default function Navigation({
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
-export type ModalNavigation<T extends keyof ModalParamList> =
-  NativeStackScreenProps<ModalParamList, T>
 
-export type ModalNavigate<T> = ModalNavigation<T>['navigation']
-export type ModalRoute<T> = ModalNavigation<T>['route']
+export type RootNavigateProps<T extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, T>['navigation']
+export type RootRouteProps<T extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, T>['route']
 
 function RootNavigator() {
   const account = useStoreState((state) => state.accounts[0])
@@ -74,7 +73,7 @@ function RootNavigator() {
 
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen
-          name="WalletSend"
+          name="Send"
           component={SendScreen}
           options={{
             headerShown: false,
@@ -94,7 +93,7 @@ function RootNavigator() {
         />
 
         <Stack.Screen
-          name="WalletSendConfirm"
+          name="SendConfirm"
           component={SendConfirmScreen}
           options={{
             headerShown: false,
@@ -103,7 +102,7 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
-          name="WalletReceive"
+          name="Receive"
           component={ReceiveScreen}
           options={{
             headerShown: false,

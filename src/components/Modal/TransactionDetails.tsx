@@ -115,8 +115,8 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
             width="48%"
             onPress={() => {
               if (
-                !fromIdentity?.data?.identity?.name ||
-                !toIdentity?.data?.identity?.name
+               ! toAddress ||
+               ! fromAddress
               ) {
                 return
               }

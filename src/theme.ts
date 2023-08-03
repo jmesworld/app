@@ -13,6 +13,7 @@ export const theme = {
     bgInput: '#f4f4f7',
     red: '#FF5876',
     redBg: '#fcdae0',
+    orange: '#ffa500',
     white: '#FFFFFF',
     green: '#A1F0C4',
     greenBg: '#e8f8ef',

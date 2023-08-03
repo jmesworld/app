@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Text, View, StyleSheet, Image, Button } from 'react-native'
 import { BarCodeScanner } from 'expo-barcode-scanner'
-import { Navigation } from '../../types'
-import {
-  useStoreActions,
-  useStoreState,
-} from '../../hooks/storeHooks'
 import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
+import { RootNavigateProps } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
+  navigation: RootNavigateProps<'Scan'>
 }
 
 export default function ScanScreen({ navigation }: Props) {

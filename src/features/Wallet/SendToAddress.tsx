@@ -28,10 +28,11 @@ import { useAppTheme } from '../../theme'
 import { numberSchema } from '../../validations/number'
 import { useStoreState } from '../../hooks/storeHooks'
 import { formatUSDFromJMES } from '../../utils/balanceFormat'
+import { RootNavigateProps, RootRouteProps } from '../../navigation'
 
 type Props = {
-  navigation: Navigation
-  route: Route<any>
+  navigation: RootNavigateProps<'SendToAddress'>
+  route: RootRouteProps<'SendToAddress'>
 }
 
 export default function SendToAddress({ navigation, route }: Props) {
@@ -72,13 +73,10 @@ export default function SendToAddress({ navigation, route }: Props) {
 
   const handleTxParams = async (username: string) => {
     // @ts-ignore
-    return navigation.navigate({
-      name: 'WalletSendConfirm',
-      params: {
-        username,
-        amount: amount.value,
-        recipientAddress: address,
-      },
+    return navigation.push('SendConfirm', {
+      username,
+      amount: amount.value,
+      recipientAddress: address,
     })
   }
 
@@ -86,14 +84,12 @@ export default function SendToAddress({ navigation, route }: Props) {
     if (!amount || amount.value === '' || amount.error) {
       return false
     }
-    
-   
 
     return true
   }, [identity, amount, name])
 
   const searchResult = useMemo(() => {
-    return name
+    return address
   }, [identity, debouncedname])
 
   const onAmountChange = (value: string) => {
@@ -151,7 +147,7 @@ export default function SendToAddress({ navigation, route }: Props) {
                   backgroundColor: '#f1edfe',
                 }}
                 readonly
-                value={address}
+                value={name || address}
                 placeholder={'Address or Name'}
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
               />
@@ -172,7 +168,7 @@ export default function SendToAddress({ navigation, route }: Props) {
               ellipsizeMode="middle"
               numberOfLines={1}
             >
-              {name && getSearchResultMessage}
+              {address && getSearchResultMessage}
             </Text>
 
             <Text
@@ -254,7 +250,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     paddingHorizontal: 10,
     width: '100%',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   buttonText: {
     fontSize: 24,

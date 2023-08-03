@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statusTextPending: {
-    color: '#FFC05C',
+    color: '#ffa500',
     fontWeight: '500',
     fontSize: 24,
     alignSelf: 'center',

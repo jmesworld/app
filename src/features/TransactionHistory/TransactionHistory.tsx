@@ -1,18 +1,14 @@
-import { Platform, StyleSheet } from 'react-native'
-import { Modal } from '../../components'
-import { Background, Navbar, View } from '../../components'
-import { Navigation, Transaction } from '../../types'
-
+import { StyleSheet } from 'react-native'
+import { Navbar, View } from '../../components'
+import { Transaction } from '../../types'
 import { RecentTransactions } from '../Wallet/components'
 import { useState } from 'react'
 import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
+import { RootNavigateProps } from '../../navigation'
 type Props = {
-  navigation: Navigation
+  navigation: RootNavigateProps<'TransactionHistory'>
   address: string
 }
-
-const isIOS = Platform.OS === 'ios'
-const isWeb = Platform.OS === 'web'
 
 export default function TransactionHistoryScreen({
   navigation,
