@@ -17,9 +17,15 @@ type Props = {
   navigation: Navigation
   backButton?: boolean
   title?: string
+  handleBack?: () => void
 }
 
-const Navbar = ({ navigation, children, title }: Props) => {
+const Navbar = ({
+  handleBack,
+  navigation,
+  children,
+  title,
+}: Props) => {
   const balance = useStoreState(
     (state) => state?.accounts?.[0]?.balance
   )
@@ -33,7 +39,11 @@ const Navbar = ({ navigation, children, title }: Props) => {
       <View style={styles.toolbar}>
         <View style={styles.flexRow}>
           <Pressable
-            onPress={() => navigation.navigate(children)}
+            onPress={
+              handleBack
+                ? handleBack
+                : () => navigation.navigate(children)
+            }
             style={({ pressed }) => ({
               opacity: pressed ? 0.5 : 1,
               justifyContent: 'flex-start',

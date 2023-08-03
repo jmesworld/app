@@ -34,7 +34,7 @@ const SendTxStatusModal = ({ transactionStatus }: Props) => {
           <Text style={styles.statusTextComplete}>
             Transaction Successful!
           </Text>
-          <Text style={[styles.desc, {color: colors.darkGray}]}>See details is history</Text>
+          <Text style={[styles.desc, {color: colors.darkGray}]}>See details in history.</Text>
         </View>
       ) : transactionStatus === 'Failed' ? (
         <Text style={styles.statusTextFailed}>

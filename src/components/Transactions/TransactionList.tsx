@@ -167,6 +167,7 @@ const TransactionList = ({
       <SectionList
         renderSectionHeader={({ section: { title } }) => (
           <View
+            key={title}
             style={{
               backgroundColor: colors.white,
               paddingVertical: 5,
@@ -177,8 +178,8 @@ const TransactionList = ({
         )}
         style={styles.transactionList}
         sections={categorizedTransactions}
-        keyExtractor={(item, index) => `${item.tx_hash}-${index}`}
-        renderItem={({ item, index }) => {
+        keyExtractor={(item) => item.tx_hash}
+        renderItem={({ item }) => {
           const { timestamp, tx_hash, tx_type, body } = item
           const { to_address, from_address, amount } =
             body.messages[0]
@@ -187,7 +188,7 @@ const TransactionList = ({
             amount?.[0] || {}
 
           return (
-            <View key={index} style={styles.listItem}>
+            <View  key={tx_hash} style={styles.listItem}>
               <Pressable onPress={() => handleItemPress(tx_hash)}>
                 <TransactionListItem
                   timestamp={timestamp}

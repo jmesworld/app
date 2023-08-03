@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
-import { getUserIdentity } from '../utils'
+import { useEffect, useMemo, useState } from 'react'
 import { useIdentityContext } from '../contexts/IdentityService'
 import { GetIdentityByNameResponse } from '../client/Identityservice.types'
+import { useQuery } from 'react-query'
 
 export const useIdentity = (
   debouncedUsername,
@@ -12,60 +12,50 @@ export const useIdentity = (
   error: null | Error
   data: null | GetIdentityByNameResponse
 } => {
-  const { identityService } = useIdentityContext()
-  const [identity, onChangeIdentity] = useState<{
-    loading: boolean
-    error: Error | null
-    data: GetIdentityByNameResponse | null
-  }>({
-    loading: false,
-    error: null,
-    data: null,
-  })
-
-  useEffect(() => {
-    if (!debouncedUsername) {
-      return
+  const { identityService, identityCache, setIdentityCache } =
+    useIdentityContext()
+  const identityFromCache = useMemo(() => {
+    if (!identityCache) return null
+    if (isAddress) {
+      return identityCache[debouncedUsername]
     }
-    async function fetchIdentity() {
-      onChangeIdentity((p) => ({
-        ...p,
-        error: null,
-        data: null,
-        loading: true,
-      }))
-      try {
-        let identity = null
-        if (isAddress) {
-          identity = await identityService.getIdentityByOwner({
-            owner: debouncedUsername,
-          })
-          onChangeIdentity({
-            loading: false,
-            error: null,
-            data: identity,
-          })
-          return
-        }
-        identity = await identityService?.getIdentityByName({
-          name: debouncedUsername,
-        })
-        onChangeIdentity({
-          loading: false,
-          error: null,
-          data: identity,
-        })
-      } catch (error) {
-        onChangeIdentity({
-          loading: false,
-          error,
-          data: null,
+    return Object.values(identityCache).find(
+      (identity) => identity?.identity?.name === debouncedUsername
+    )
+  }, [identityCache, debouncedUsername, isAddress])
+  const { isFetching, data, error } = useQuery({
+    queryKey: ['fetchIdentity', debouncedUsername, isAddress],
+    queryFn: async () => {
+      if (isAddress) {
+        return identityService.getIdentityByOwner({
+          owner: debouncedUsername,
         })
       }
-    }
-    if (!disabled) fetchIdentity()
-  }, [debouncedUsername])
+      return identityService.getIdentityByName({
+        name: debouncedUsername,
+      })
+    },
+    onError: (err) => {
+      console.error(err)
+    },
+    onSuccess: (data) => {
+      if (data?.identity?.owner) {
+        setIdentityCache((cache) => ({
+          ...cache,
+          [data.identity.owner]: data,
+        }))
+      }
+    },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    cacheTime: 0,
+    staleTime: 0,
+    enabled: !identityFromCache && !disabled,
+  })
+
   return {
-    ...identity,
+    data: identityFromCache || data,
+    loading: identityFromCache ? false : isFetching,
+    error: identityFromCache ? null : (error as Error),
   }
 }

@@ -1,6 +1,6 @@
 import { Client } from 'jmes'
 import { PUBLIC_RPC_URL, PUBLIC_REST_URL, PUBLIC_CHAIN_ID } from '@env'
-
+console.log('Public', PUBLIC_REST_URL)
 export const getClient = () => {
   const LCDOptions = {
     URL: PUBLIC_REST_URL,

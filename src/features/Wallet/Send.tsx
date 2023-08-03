@@ -53,7 +53,7 @@ export default function SendScreen({ navigation, route }: Props) {
     if (route.params?.address) {
       setNameOrAddress(route.params?.address)
     }
-  }, [amount])
+  }, [])
 
   const debouncedNameOrAddress = useDebounce({
     value: nameOrAddress,
@@ -262,7 +262,7 @@ export default function SendScreen({ navigation, route }: Props) {
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
               />
             </SafeAreaView>
-            <Text
+           {amount.error && (<Text
               selectionColor={colors.primary}
               style={[
                 styles.searchResult,
@@ -275,7 +275,7 @@ export default function SendScreen({ navigation, route }: Props) {
               numberOfLines={1}
             >
               {amount.error}
-            </Text>
+            </Text>)}
             {amount.value && (
               <Text
                 selectionColor={colors.primary}
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
     marginTop: 'auto',
-    marginBottom: 20,
+    marginBottom: 30,
     width: '90%',
     height: 48,
 
@@ -342,8 +342,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
     height: 20,
-    alignSelf: 'center',
-  },
+    marginLeft: 10,
+   },
   iconImageView: {
     flexDirection: 'row',
   },

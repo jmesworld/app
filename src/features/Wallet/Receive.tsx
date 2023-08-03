@@ -35,7 +35,7 @@ export default function ReceiveScreen({ navigation }: Props) {
           navigation={navigation}
           children={'Root'}
         />
-        <BackdropSmall>
+        <BackdropSmall style={styles.mainContainer}>
           <View style={styles.qrContainer}>
             <GeneratedQRCode
               payload={{
@@ -45,7 +45,7 @@ export default function ReceiveScreen({ navigation }: Props) {
             />
           </View>
 
-          <Text style={styles.textInfo}>Your JMES address</Text>
+          <Text style={styles.textInfo}>Yours JMES address</Text>
           <SafeAreaView
             style={{
               marginTop: 15,
@@ -118,10 +118,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
+  mainContainer: {
+    paddingHorizontal: 15,
+  },
   qrContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 40,
+    height: 168,
     backgroundColor: 'transparent',
   },
   textInfo: {
@@ -135,8 +139,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
     marginTop: 'auto',
-    marginBottom: 20,
-    width: '90%',
+    marginBottom: 30,
+    width: '100%',
     height: 48,
 
     backgroundColor: 'transparent',

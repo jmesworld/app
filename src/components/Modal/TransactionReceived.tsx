@@ -36,7 +36,7 @@ export const TransactionReceived = ({
             },
           ]}
         >
-          You received {amount} JMES from {name}. {'\n'}See details is history
+          You received {amount} JMES from {name}. {'\n'}See details in history.
         </Text>
       </View>
       </View>

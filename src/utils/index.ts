@@ -14,6 +14,7 @@ import {
   PUBLIC_REST_URL,
   PUBLIC_IDENTITY_SERVICE_CONTRACT
 } from '@env'
+console.log('Public', PUBLIC_REST_URL)
 // const lcdc = client.createLCDClient({
 //   chainID: 'jmes-888',
 //   URL: 'http://51.38.52.37:1888',

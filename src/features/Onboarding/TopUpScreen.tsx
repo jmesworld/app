@@ -33,11 +33,13 @@ import { OnBoardingPhase } from '../../store'
 import QRCode from 'react-native-qrcode-svg'
 import { useAppTheme } from '../../theme'
 import { FAUCET_URL } from '@env'
+console.log('FAUCET_URL', FAUCET_URL)
 import { useQuery } from 'react-query'
 import { useIdentityContext } from '../../contexts/IdentityService'
 import { useClipboardTimeout } from '../../hooks/useClipboardTimeout'
 import CopyIcon from '../../assets/copy.svg'
 import CheckIcon from '../../assets/check.svg'
+import GeneratedQRCode from '../../components/QRCode/QRCode'
 
 type Props = {
   navigation: OnBoardingNavigate<'generateMnemonic'>
@@ -88,7 +90,6 @@ const TopUpScreen = ({ navigation }: Props) => {
     setOnboardingPhase(OnBoardingPhase.topUp)
   }, [])
 
-
   return (
     <View style={styles.container}>
       <Background>
@@ -102,7 +103,12 @@ const TopUpScreen = ({ navigation }: Props) => {
             style={styles.contentContainer}
           >
             <TextTitle> Top up</TextTitle>
-            <QRCode value={address} size={168} color="#5136C2" />
+            <GeneratedQRCode
+              payload={{
+                address,
+              }}
+              size={168}
+            />
             <Text style={styles.textInfo}>Your JMES address</Text>
             <SafeAreaView
               style={{
@@ -128,7 +134,7 @@ const TopUpScreen = ({ navigation }: Props) => {
                 )}`}
                 readonly
                 placeholder={'Address or Name'}
-                 imgSource={
+                imgSource={
                   <Pressable
                     style={{
                       display: 'flex',
@@ -139,17 +145,18 @@ const TopUpScreen = ({ navigation }: Props) => {
                       backgroundColor: 'transparent',
                     }}
                     onPress={() => {
-                       copyToClipboard(address, 2000)
+                      copyToClipboard(address, 2000)
                     }}
                   >
-                    {copied ? <CheckIcon 
-                    width={20}
-                    height={20}
-                    color={colors.green}
-                    /> : <CopyIcon
-                    height={20}
-                    width={20}
-                    />}
+                    {copied ? (
+                      <CheckIcon
+                        width={20}
+                        height={20}
+                        color={colors.green}
+                      />
+                    ) : (
+                      <CopyIcon height={20} width={20} />
+                    )}
                   </Pressable>
                 }
               />

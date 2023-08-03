@@ -1,5 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Linking, SafeAreaView, StyleSheet } from 'react-native'
+import {
+  Alert,
+  Linking,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native'
 import { Text, View } from '../../components/Themed/Themed'
 import {
   Backdrop,
@@ -7,6 +12,7 @@ import {
   Background,
   Button,
   Input,
+  Modal,
   Navbar,
   TextTitle,
 } from '../../components'
@@ -43,6 +49,10 @@ export default function PickUsernameScreen({ navigation }: Props) {
   const setUsername = useStoreActions(
     (actions) => actions.setUsername
   )
+  const resetState = useStoreActions(
+    (actions) => actions.resetStore
+  )
+
   const [creatingIdentity, setCreatingIdentity] = useState(false)
   const [username, onChangeUsername] = useState<Input>({
     value: '',
@@ -120,10 +130,31 @@ export default function PickUsernameScreen({ navigation }: Props) {
     identity,
   ])
 
+  const handleBack = () => {
+    Alert.alert('Are you sure?', 'You will lose your progress', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      {
+        text: 'Leave',
+        onPress:   () => {
+            resetState(true)
+            navigation.navigate('welcome')
+        }
+      },
+    ])
+  }
+
   return (
     <View style={styles.container}>
       <Background>
-        <Navbar  navigation={navigation} children="topUp" />
+        <Navbar
+          handleBack={handleBack}
+          navigation={navigation}
+          children="topUp"
+        />
         <BackdropSmall>
           <TextTitle> Create new account</TextTitle>
 
