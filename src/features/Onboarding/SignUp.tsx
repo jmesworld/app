@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Linking,
@@ -46,6 +46,9 @@ type Input = {
 export default function PickUsernameScreen({ navigation }: Props) {
   const { createIdentity } = useIdentityContext()
   const mnemonic = useStoreState((state) => state.onBoarding.mnemonic)
+  const usernameFromStore = useStoreState(
+    (state) => state.onBoarding.username
+  )
   const setUsername = useStoreActions(
     (actions) => actions.setUsername
   )
@@ -56,6 +59,15 @@ export default function PickUsernameScreen({ navigation }: Props) {
     value: '',
     error: null,
   })
+
+  useEffect(() => {
+    if (usernameFromStore && !username.value) {
+      onChangeUsername({
+        value: usernameFromStore,
+        error: null,
+      })
+    }
+  }, [usernameFromStore, username])
 
   const debouncedUsername = useDebounce({
     value: username.value,
@@ -204,7 +216,7 @@ export default function PickUsernameScreen({ navigation }: Props) {
                   fontWeight: '700',
                 }}
               >
-                Sign up
+                Register
               </Text>
             </Button>
           </SafeAreaView>

@@ -9,7 +9,6 @@ import {
   Image,
   Text,
 } from 'react-native'
-import { getUserIdentity } from '../../utils'
 import {
   Background,
   BackdropSmall,
@@ -21,7 +20,6 @@ import {
 import { Navigation } from '../../types'
 import { Route } from '@react-navigation/native'
 import ScanIcon from '../../assets/ScanBlack.svg'
-import { useIdentityContext } from '../../contexts/IdentityService'
 import { useIdentity } from '../../hooks/useIdentity'
 import { useDebounce } from '../../hooks/useDebounce'
 import { useAppTheme } from '../../theme'
@@ -71,9 +69,9 @@ export default function SendScreen({ navigation, route }: Props) {
     return navigation.navigate({
       name: 'WalletSendConfirm',
       params: {
-        username,
+        username: username.length < 20 ? username : 'Unknown',
         amount: amount.value,
-        recipientAddress: identity.data?.identity?.owner,
+        recipientAddress: identity.data?.identity?.owner ? identity.data?.identity?.owner : nameOrAddress,
       },
     })
   }
@@ -82,25 +80,18 @@ export default function SendScreen({ navigation, route }: Props) {
     if (!amount || amount.value === '' || amount.error) {
       return false
     }
-    if (account?.[0].username === nameOrAddress || account?.[0]?.address === identity?.data?.identity?.owner) {
+    if (  nameOrAddress === '') {
       return false
     }
     if (identity.loading || identity.error) {
       return false
     }
 
-    if (nameOrAddress !== debouncedNameOrAddress) {
+    if (!identity.data && nameOrAddress.length < 20) {
       return false
     }
 
-    if (identity.data?.identity?.owner === nameOrAddress) {
-      return true
-    }
-    if (identity.data?.identity?.name === nameOrAddress) {
-      return true
-    }
-
-    return false
+    return true
   }, [identity, amount, nameOrAddress])
 
   const searchResult = useMemo(():
@@ -122,7 +113,7 @@ export default function SendScreen({ navigation, route }: Props) {
     const name = identity.data?.identity?.name
     const address = identity.data?.identity?.owner
     if (address === account?.[0].address) {
-      return 'you cannot send to yourself'
+      return 'you are sending to yourself.'
     }
     if (!address) {
       return 'notFound'
@@ -182,7 +173,7 @@ export default function SendScreen({ navigation, route }: Props) {
       return 'Loading...'
     }
     if (searchResult === 'notFound') {
-      return 'Not found'
+      return 'Identity Not found'
     }
     return searchResult
   }, [searchResult])
@@ -200,20 +191,20 @@ export default function SendScreen({ navigation, route }: Props) {
             <Text style={styles.title}>Recipient</Text>
             <SafeAreaView
               style={{
-                 height: 60,
+                height: 60,
                 width: '100%',
               }}
             >
               <Input
-                  containerStyle={{
-                    borderRadius: 24,
-                    borderColor: 'rgba(112, 79, 247, 0.5)',
-                    backgroundColor: '#f1edfe',
-                  }}
-                  style={{
-                    borderColor: 'rgba(112, 79, 247, 0.5)',
-                    backgroundColor: '#f1edfe',
-                  }}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderColor: 'rgba(112, 79, 247, 0.5)',
+                  backgroundColor: '#f1edfe',
+                }}
+                style={{
+                  borderColor: 'rgba(112, 79, 247, 0.5)',
+                  backgroundColor: '#f1edfe',
+                }}
                 onChangeText={setNameOrAddress}
                 value={nameOrAddress}
                 placeholder={'Address or Name'}

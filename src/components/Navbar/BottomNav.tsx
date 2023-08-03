@@ -8,7 +8,7 @@ import { useAppTheme } from '../../theme'
 import WalletIcon from '../../assets/wallet.svg'
 import WalletPurpleIcon from '../../assets/WalletPurple.svg'
 import ScanIcon from '../../assets/scan.svg'
-import SettingIcon from '../../assets/settings.svg'
+import LogoutIcon from '../../assets/logout.svg'
 
 interface Props {
   children?: React.ReactNode
@@ -38,9 +38,9 @@ const BottomNav = ({ children, navigation }: Props) => {
         style={[styles.button, route.name === 'Scan' && activeStyle]}
       >
         <ScanIcon
+          width={24}
+          height={24}
           style={{
-            width: 35,
-            height: 35,
             alignSelf: 'center',
           }}
         />
@@ -54,9 +54,9 @@ const BottomNav = ({ children, navigation }: Props) => {
       >
         {isRootActive && (
           <WalletPurpleIcon
+            width={24}
+            height={24}
             style={{
-              width: 34,
-              height: 34,
               alignSelf: 'center',
             }}
           />
@@ -65,9 +65,9 @@ const BottomNav = ({ children, navigation }: Props) => {
         {!isRootActive && (
           <WalletIcon
             color={isRootActive ? colors.primary : 'white'}
+            width={24}
+            height={24}
             style={{
-              width: 24,
-              height: 24,
               alignSelf: 'center',
             }}
           />
@@ -83,14 +83,15 @@ const BottomNav = ({ children, navigation }: Props) => {
         }}
         style={styles.button}
       >
-        <SettingIcon
+        <LogoutIcon
+          height={24}
+          width={24}
+          color={colors.white}
           style={{
-            width: 24,
-            height: 24,
             alignSelf: 'center',
           }}
         />
-        <Text style={styles.buttonText}>Settings</Text>
+        <Text style={styles.buttonText}>Logout</Text>
       </Pressable>
       <LogoutModal
         isVisible={modalVisible}
@@ -141,6 +142,7 @@ const styles = StyleSheet.create({
     color: 'white',
     alignSelf: 'center',
     fontSize: 10,
+    marginTop: 5,
   },
 })
 

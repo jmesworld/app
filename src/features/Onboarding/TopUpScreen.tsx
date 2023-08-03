@@ -33,7 +33,6 @@ import { OnBoardingPhase } from '../../store'
 import QRCode from 'react-native-qrcode-svg'
 import { useAppTheme } from '../../theme'
 import { FAUCET_URL } from '@env'
-console.log('FAUCET_URL', FAUCET_URL)
 import { useQuery } from 'react-query'
 import { useIdentityContext } from '../../contexts/IdentityService'
 import { useClipboardTimeout } from '../../hooks/useClipboardTimeout'
@@ -53,6 +52,7 @@ const TopUpScreen = ({ navigation }: Props) => {
     (state) => state.onBoarding.accountAddress
   )
   const mnemonic = useStoreState((state) => state.onBoarding.mnemonic)
+  const username = useStoreState((state) => state.onBoarding.username)
   const balance = useStoreState((state) => state.onBoarding.balance)
   const setOnboardingPhase = useStoreActions(
     (actions) => actions.setOnboardingPhase
@@ -72,7 +72,11 @@ const TopUpScreen = ({ navigation }: Props) => {
     if (data === undefined || isFetching || isLoading) return
     if (data > 0) {
       setAccountBalance(data / 1e6)
-      navigation.replace('pickUsername')
+      if (!username) {
+        navigation.replace('pickUsername')
+        return
+      }
+      navigation.replace('createPin')
     }
   }, [data])
 

@@ -13,6 +13,7 @@ import {
   Background,
   Backdrop,
   Button,
+  BackdropSmall,
 } from '../../components'
 import { Text, View } from '../../components/Themed/Themed'
 import OnboardingNavbar from '../../components/Navbar/OnboardingNavbar'
@@ -114,7 +115,7 @@ export default function ConfirmMnemonic({
 
   return (
     <Background>
-      <Backdrop>
+      <BackdropSmall>
         <OnboardingNavbar
           navigation={navigation}
           children="generateMnemonic"
@@ -155,11 +156,11 @@ export default function ConfirmMnemonic({
                 fontWeight: '700',
               }}
             >
-              Sign up
+              Next
             </Text>
           </Button>
         </SafeAreaView>
-      </Backdrop>
+      </BackdropSmall>
     </Background>
   )
 }

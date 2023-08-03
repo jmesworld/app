@@ -48,7 +48,7 @@ export default function SendToAddress({ navigation, route }: Props) {
     if (
       !route.params?.address &&
       !route.params?.amount &&
-      !route.params?.name
+      !route.params?.username
     ) {
       return
     }
@@ -58,8 +58,8 @@ export default function SendToAddress({ navigation, route }: Props) {
     if (route.params?.address) {
       setAddress(route.params?.address)
     }
-    if (route.params?.name) {
-      setName(route.params?.name)
+    if (route.params?.username) {
+      setName(route.params?.username)
     }
   }, [])
 
@@ -93,7 +93,7 @@ export default function SendToAddress({ navigation, route }: Props) {
   }, [identity, amount, name])
 
   const searchResult = useMemo(() => {
-    return address
+    return name
   }, [identity, debouncedname])
 
   const onAmountChange = (value: string) => {
@@ -157,7 +157,7 @@ export default function SendToAddress({ navigation, route }: Props) {
               />
             </SafeAreaView>
 
-            {/* <Text
+            <Text
               selectionColor={colors.primary}
               style={[
                 styles.searchResult,
@@ -173,7 +173,7 @@ export default function SendToAddress({ navigation, route }: Props) {
               numberOfLines={1}
             >
               {name && getSearchResultMessage}
-            </Text> */}
+            </Text>
 
             <Text
               style={[

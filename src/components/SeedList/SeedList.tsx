@@ -44,7 +44,7 @@ const SeedList = ({
   return (
     <KeyboardAvoidingView
       style={{
-        height: 352,
+        height: 400,
       }}
       enabled={!readonly}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: '100%',
-    height: 352,
+    height: 400,
     marginTop: 44,
     marginBottom: 22,
     paddingLeft: 9,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     columnGap: 7,
   },
   seedWordNumber: {
-    marginTop: 5,
+    marginTop: 2,
     color: '#704FF7',
     alignSelf: 'center',
   },
@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     height: 48,
     minWidth: 108,
+    marginBottom: 10,
     width: '30%',
    },
 })

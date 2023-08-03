@@ -61,9 +61,11 @@ export const TransactionListItem = (transaction: Transaction) => {
       <View style={styles.transactionValue}>
         <View style={styles.flexRow}>
           <Text style={styles.topText} numberOfLines={1}>
-            {transaction.tx_type === 'Sent' ? '-' : '+'}
+            {transaction.tx_type === 'Sent' ? '-' : ''}
           </Text>
-          <JmesIcon height={12} width={12} />
+          <JmesIcon style={{
+            marginRight: 3,
+          }} color={colors.black}  height={12} width={12} />
           <Text style={styles.topText} numberOfLines={1}>
             {(Number(transaction.amount) / 1e6).toFixed(2)}
           </Text>

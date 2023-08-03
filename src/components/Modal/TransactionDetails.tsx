@@ -89,7 +89,9 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
         <Text style={styles.textSmall}>Total Amount</Text>
         <View style={styles.amountContainer}>
           <View style={styles.amount}>
-            <JmesIcon width={12} height={12} />
+            <JmesIcon style={{
+              marginRight: 5
+            }} color={colors.primaryText} width={12} height={12} />
             <Text style={styles.textAmount}>
               {formatBalance(amt)}
             </Text>
@@ -119,7 +121,7 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
                 return
               }
               navigation.push('SendToAddress', {
-                name: isSent
+                username: isSent
                   ? toIdentity?.data?.identity?.name
                   : fromIdentity?.data?.identity?.name,
                 address: isSent ? toAddress : fromAddress,
@@ -130,6 +132,7 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
           >
             <Text
               style={{
+                fontWeight: 'normal',
                 color: colors.black,
               }}
             >
@@ -145,7 +148,14 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
               closeModal()
             }}
           >
-            <Text> Close </Text>
+            <Text
+              style={{
+                fontWeight: 'normal',
+              }}
+            >
+              {' '}
+              Close{' '}
+            </Text>
           </Button>
         </View>
       </View>
