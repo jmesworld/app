@@ -52,7 +52,9 @@ const Input = forwardRef<TextInput, Props>((props, ref) => {
         editable={!props.readonly}
         ref={ref}
         {...otherProps}
-        style={[styles.input, otherProps.style]}
+        style={[styles.input, otherProps.style, {
+          width : props.imgSource || props.success ? '85%': '100%'
+        }]}
       />
       {props.imgSource && (
         <View style={styles.imgContainer}>{props.imgSource}</View>
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
     height: '100%',
     overflow: 'hidden',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     borderStyle: 'solid',
     borderWidth: 1,
@@ -89,9 +91,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   input: {
-    width: '85%',
-    height: '100%',
-    backgroundColor: 'transparent',
+     height: '100%',
+    backgroundColor: 'white',
     paddingLeft: 16,
     paddingRight: 16,
     paddingTop: 16,

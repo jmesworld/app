@@ -49,13 +49,9 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
         <Text style={styles.textSmall}>Status</Text>
         <View>
           {transaction.status === 'Success' ? (
-            <Text style={styles.statusTextConfirmed}>
-              Confirmed
-            </Text>
+            <Text style={styles.statusTextConfirmed}>Confirmed</Text>
           ) : transaction.status === 'Failed' ? (
-            <Text style={styles.statusTextFailed}>
-             Failed
-            </Text>
+            <Text style={styles.statusTextFailed}>Failed</Text>
           ) : (
             <Text style={styles.statusTextPending}>
               {transaction.status}
@@ -116,8 +112,18 @@ const TransactionDetails = ({ transaction, closeModal }: Props) => {
             rounded="full"
             width="48%"
             onPress={() => {
-              navigation.navigate('WalletSend', {
+              if (
+                !fromIdentity?.data?.identity?.name ||
+                !toIdentity?.data?.identity?.name
+              ) {
+                return
+              }
+              navigation.push('SendToAddress', {
+                name: isSent
+                  ? toIdentity?.data?.identity?.name
+                  : fromIdentity?.data?.identity?.name,
                 address: isSent ? toAddress : fromAddress,
+                amount: 0,
               })
               closeModal()
             }}

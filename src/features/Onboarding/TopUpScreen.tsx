@@ -125,6 +125,9 @@ const TopUpScreen = ({ navigation }: Props) => {
                   backgroundColor: colors.bgInput,
                   borderWidth: 0,
                 }}
+                style={{
+                  backgroundColor: colors.bgInput,
+                }}
                 value={`${address.substring(
                   0,
                   15

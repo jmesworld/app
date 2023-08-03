@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
   },
   centeredContainer: {
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   buttonContainer: {
     display: 'flex',

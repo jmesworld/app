@@ -113,7 +113,7 @@ const IdentityServiceProvider = ({ children }: Props) => {
   )
 
   const getSigner = useCallback(async (mnemonic: string) => {
-    if (!mnemonic) return null
+     if (!mnemonic) return null
     const signer = await getOfflineSignerProto({
       mnemonic: mnemonic,
       chain: {
@@ -128,7 +128,6 @@ const IdentityServiceProvider = ({ children }: Props) => {
         signer,
         { gasPrice: GasPrice.fromString('0.3ujmes') }
       )
-
     if (!signingClient || !signer) {
       throw new Error('Invalid mnemonic')
     }
@@ -144,14 +143,17 @@ const IdentityServiceProvider = ({ children }: Props) => {
   const sendTransaction = useCallback(
     async (mnemonic: string, recipient: string, amount: number) => {
       if (!cosmWasmClient) return null
-
-      const { signingClient } = await getSigner(mnemonic)
+      const result = await getSigner(mnemonic)
+      if (!result) {
+        throw new Error("Couldn't get singer")
+      }
+      const { signingClient, addr } = result
       if (!signingClient) {
         throw new Error('Could not get signing client')
       }
       const conBalance = coin(amount, JMES_DENOM)
       return signingClient.sendTokens(
-        recipient,
+        addr,
         recipient,
         [conBalance],
         'auto'

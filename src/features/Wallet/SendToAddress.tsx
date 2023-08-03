@@ -34,37 +34,41 @@ type Props = {
   route: Route<any>
 }
 
-export default function SendScreen({ navigation, route }: Props) {
+export default function SendToAddress({ navigation, route }: Props) {
   const { colors } = useAppTheme()
   const account = useStoreState((state) => state.accounts)
-  const [nameOrAddress, setNameOrAddress] = useState('')
+  const [address, setAddress] = useState('')
+  const [name, setName] = useState('')
   const [amount, setAmount] = useState({
     value: '',
     error: null,
   })
 
   useEffect(() => {
-    if (!route.params?.address && !route.params?.amount) {
+    if (
+      !route.params?.address &&
+      !route.params?.amount &&
+      !route.params?.name
+    ) {
       return
     }
     if (route.params?.amount) {
       setAmount({ value: route.params?.amount, error: null })
     }
     if (route.params?.address) {
-      setNameOrAddress(route.params?.address)
+      setAddress(route.params?.address)
+    }
+    if (route.params?.name) {
+      setName(route.params?.name)
     }
   }, [])
 
-  const debouncedNameOrAddress = useDebounce({
-    value: nameOrAddress,
+  const debouncedname = useDebounce({
+    value: name,
     delay: 500,
   })
 
-  const identity = useIdentity(
-    debouncedNameOrAddress,
-    !nameOrAddress,
-    nameOrAddress.length > 20
-  )
+  const identity = useIdentity(debouncedname, !name, name.length > 20)
 
   const handleTxParams = async (username: string) => {
     // @ts-ignore
@@ -73,7 +77,7 @@ export default function SendScreen({ navigation, route }: Props) {
       params: {
         username,
         amount: amount.value,
-        recipientAddress: identity.data?.identity?.owner,
+        recipientAddress: address,
       },
     })
   }
@@ -82,83 +86,15 @@ export default function SendScreen({ navigation, route }: Props) {
     if (!amount || amount.value === '' || amount.error) {
       return false
     }
-    if (account?.[0].username === nameOrAddress || account?.[0]?.address === identity?.data?.identity?.owner) {
-      return false
-    }
-    if (identity.loading || identity.error) {
-      return false
-    }
+    
+   
 
-    if (nameOrAddress !== debouncedNameOrAddress) {
-      return false
-    }
+    return true
+  }, [identity, amount, name])
 
-    if (identity.data?.identity?.owner === nameOrAddress) {
-      return true
-    }
-    if (identity.data?.identity?.name === nameOrAddress) {
-      return true
-    }
-
-    return false
-  }, [identity, amount, nameOrAddress])
-
-  const searchResult = useMemo(():
-    | 'loading'
-    | 'notFound'
-    | string => {
-    if (identity.loading) {
-      return 'loading' as const
-    }
-    if (debouncedNameOrAddress !== nameOrAddress) {
-      return 'loading' as const
-    }
-    if (identity.error) {
-      return identity.error.message
-    }
-    if (!identity.data) {
-      return 'notFound'
-    }
-    const name = identity.data?.identity?.name
-    const address = identity.data?.identity?.owner
-    if (address === account?.[0].address) {
-      return 'you cannot send to yourself'
-    }
-    if (!address) {
-      return 'notFound'
-    }
-    if (!name && debouncedNameOrAddress === address) {
-      return address
-    }
-    if (debouncedNameOrAddress === address) {
-      return address
-    }
-    if (debouncedNameOrAddress === name) {
-      return address
-    }
-    if (debouncedNameOrAddress !== name) {
-      return 'loading'
-    }
-    return ''
-  }, [identity, debouncedNameOrAddress])
-
-  useEffect(() => {
-    if (
-      !identity.data?.identity?.owner ||
-      debouncedNameOrAddress.length <= 20
-    ) {
-      return
-    }
-    const addr = identity.data?.identity?.owner
-    const name = identity.data?.identity?.name
-    if (addr !== debouncedNameOrAddress) {
-      return
-    }
-    if (!name) {
-      return
-    }
-    setNameOrAddress(name)
-  }, [identity])
+  const searchResult = useMemo(() => {
+    return address
+  }, [identity, debouncedname])
 
   const onAmountChange = (value: string) => {
     if (!numberSchema.safeParse(value).success && value !== '') {
@@ -200,42 +136,28 @@ export default function SendScreen({ navigation, route }: Props) {
             <Text style={styles.title}>Recipient</Text>
             <SafeAreaView
               style={{
-                 height: 60,
+                height: 60,
                 width: '100%',
               }}
             >
               <Input
-                  containerStyle={{
-                    borderRadius: 24,
-                    borderColor: 'rgba(112, 79, 247, 0.5)',
-                    backgroundColor: '#f1edfe',
-                  }}
-                  style={{
-                    borderColor: 'rgba(112, 79, 247, 0.5)',
-                    backgroundColor: '#f1edfe',
-                  }}
-                onChangeText={setNameOrAddress}
-                value={nameOrAddress}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderColor: 'rgba(112, 79, 247, 0.5)',
+                  backgroundColor: '#f1edfe',
+                }}
+                style={{
+                  borderColor: 'rgba(112, 79, 247, 0.5)',
+                  backgroundColor: '#f1edfe',
+                }}
+                readonly
+                value={address}
                 placeholder={'Address or Name'}
                 placeholderTextColor="rgba(112, 79, 247, 0.5)"
-                imgSource={
-                  <Pressable
-                    onPress={() => {
-                      navigation.navigate('Scan')
-                    }}
-                  >
-                    <ScanIcon
-                      style={{
-                        width: 40,
-                        height: 40,
-                      }}
-                    />
-                  </Pressable>
-                }
               />
             </SafeAreaView>
 
-            <Text
+            {/* <Text
               selectionColor={colors.primary}
               style={[
                 styles.searchResult,
@@ -250,8 +172,8 @@ export default function SendScreen({ navigation, route }: Props) {
               ellipsizeMode="middle"
               numberOfLines={1}
             >
-              {nameOrAddress && getSearchResultMessage}
-            </Text>
+              {name && getSearchResultMessage}
+            </Text> */}
 
             <Text
               style={[
@@ -308,7 +230,7 @@ export default function SendScreen({ navigation, route }: Props) {
           </View>
           <View style={styles.buttonContainer}>
             <NextButton
-              onPress={() => handleTxParams(nameOrAddress)}
+              onPress={() => handleTxParams(name)}
               enabled={canProceed}
             >
               Next
@@ -332,7 +254,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     paddingHorizontal: 10,
     width: '100%',
-    backgroundColor: 'transparent',
+    backgroundColor: 'transparent'
   },
   buttonText: {
     fontSize: 24,
@@ -391,7 +313,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: 'rgba(112, 79, 247, 0.5)',
     borderRadius: 24,
-    backgroundColor: 'rgba(112, 79, 247, 0.1)',
+    backgroundColor: '#f1edfe',
     width: '100%',
     paddingLeft: 20,
     height: 60,

@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '90%',
- 
+    backgroundColor: 'transparent'
   },
   userContainer: {
     backgroundColor: 'transparent',

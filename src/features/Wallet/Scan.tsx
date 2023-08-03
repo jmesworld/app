@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Text, View, StyleSheet, Button } from 'react-native'
+import { Text, View, StyleSheet, Image, Button } from 'react-native'
 import { BarCodeScanner } from 'expo-barcode-scanner'
 import { Navigation } from '../../types'
 import {
   useStoreActions,
   useStoreState,
 } from '../../hooks/storeHooks'
+import BackgroundWithNoScrollView from '../../components/Background/BackgroundWithNoScrollView'
 
 type Props = {
   navigation: Navigation
@@ -31,7 +32,7 @@ export default function ScanScreen({ navigation }: Props) {
       if (data) {
         setScanned(true)
         navigation.navigate({
-          name: 'WalletSend',
+          name: 'SendToAddress',
           params: {
             ...payload,
           },
@@ -53,6 +54,11 @@ export default function ScanScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      <BackgroundWithNoScrollView>
+      <Image
+          source={require('../../../assets/images/jmes-text.png')}
+          style={styles.image}
+        />
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
@@ -63,6 +69,7 @@ export default function ScanScreen({ navigation }: Props) {
           onPress={() => setScanned(false)}
         />
       )}
+      </BackgroundWithNoScrollView>
     </View>
   )
 }
@@ -73,6 +80,11 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  image: {
+    marginTop: 7,
+    width: 80,
+    height: 23,
   },
   text: {
     marginTop: 15,

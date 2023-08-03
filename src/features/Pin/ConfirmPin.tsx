@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
   },
   centeredContainer: {
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   errorText: {
     color: '#FF5876',

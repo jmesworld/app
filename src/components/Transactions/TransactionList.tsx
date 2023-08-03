@@ -42,7 +42,7 @@ const TransactionList = ({
   } = useQuery(
     ['transactions', address],
     () => fetchTransactions(address),
-    { enabled: !!address }
+    { enabled: !!address, refetchOnMount: true, refetchOnWindowFocus: true, refetchInterval: 10000 }
   )
 
   const transactions =
@@ -145,6 +145,7 @@ const TransactionList = ({
         <View style={styles.tabContainer}>
           {['All', 'Sent', 'Received'].map((tab) => (
             <View
+              key={tab}
               style={{
                 flex: 1,
               }}
@@ -188,7 +189,7 @@ const TransactionList = ({
             amount?.[0] || {}
 
           return (
-            <View  key={tx_hash} style={styles.listItem}>
+            <View key={tx_hash} style={styles.listItem}>
               <Pressable onPress={() => handleItemPress(tx_hash)}>
                 <TransactionListItem
                   timestamp={timestamp}

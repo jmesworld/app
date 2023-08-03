@@ -45,9 +45,10 @@ const Navbar = ({
                 : () => navigation.navigate(children)
             }
             style={({ pressed }) => ({
+              flexDirection: 'row',
               opacity: pressed ? 0.5 : 1,
               justifyContent: 'flex-start',
-              alignSelf: 'flex-start',
+              alignSelf: 'center',
             })}
           >
             <Image
@@ -58,8 +59,8 @@ const Navbar = ({
                 height: 16,
               }}
             />
-          </Pressable>
           <Text style={styles.title}>{title}</Text>
+          </Pressable>
         </View>
         <View
           style={[styles.wallet, { backgroundColor: colors.primary }]}

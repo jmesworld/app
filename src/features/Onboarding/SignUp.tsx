@@ -49,9 +49,7 @@ export default function PickUsernameScreen({ navigation }: Props) {
   const setUsername = useStoreActions(
     (actions) => actions.setUsername
   )
-  const resetState = useStoreActions(
-    (actions) => actions.resetStore
-  )
+  const resetState = useStoreActions((actions) => actions.resetStore)
 
   const [creatingIdentity, setCreatingIdentity] = useState(false)
   const [username, onChangeUsername] = useState<Input>({
@@ -65,17 +63,22 @@ export default function PickUsernameScreen({ navigation }: Props) {
   })
 
   const identity = useIdentity(debouncedUsername, !!username.error)
-  const handleSignUp = async function () {
-    setCreatingIdentity(true)
+  const createUser = async () => {
     try {
       await createIdentity(username.value, mnemonic.join(' '))
       setUsername(username.value)
       navigation.push('createPin')
     } catch (e) {
       console.error(e)
-    } finally {
-      setCreatingIdentity(false)
     }
+  }
+  const handleSignUp = async function () {
+    setCreatingIdentity(true)
+    setTimeout(() => {
+      createUser().finally(() => {
+        setCreatingIdentity(false)
+      })
+    }, 100)
   }
 
   const onUsernameChange = (input) => {
@@ -139,10 +142,10 @@ export default function PickUsernameScreen({ navigation }: Props) {
       },
       {
         text: 'Leave',
-        onPress:   () => {
-            resetState(true)
-            navigation.navigate('welcome')
-        }
+        onPress: () => {
+          resetState(true)
+          navigation.navigate('welcome')
+        },
       },
     ])
   }
