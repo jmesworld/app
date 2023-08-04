@@ -12,6 +12,7 @@ import { useAppTheme } from '../../theme'
 import { useStoreState } from '../../hooks/storeHooks'
 import JmesIcon from '../../assets/jmes.svg'
 import { RootNavigateProps } from '../../navigation'
+import { formatBalance } from '../../utils/balanceFormat'
 
 type Props = {
   children?: string
@@ -80,7 +81,7 @@ const Navbar = ({
 
           <Text style={styles.walletText}>
             {' '}
-            {balance || onBoardingBalance}{' '}
+            {formatBalance( balance || onBoardingBalance, false)}{' '}
           </Text>
         </View>
       </View>
